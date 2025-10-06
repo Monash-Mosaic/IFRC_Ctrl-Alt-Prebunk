@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { AnimatedButton } from './animated/AnimatedButton'
 
 export default function AnswerButtons({ correctAnswer, whyCorrect, whyIncorrect }) {
   const router = useRouter()
@@ -27,8 +28,8 @@ export default function AnswerButtons({ correctAnswer, whyCorrect, whyIncorrect 
 
   return (
     <div className="quiz-actions">
-      <button className="btn btn-true" aria-label="Answer True" onClick={() => onAnswer('TRUE')}>TRUE</button>
-      <button className="btn btn-false" aria-label="Answer False" onClick={() => onAnswer('FALSE')}>FALSE</button>
+      <AnimatedButton className="btn btn-true" aria-label="Answer True" onClick={() => onAnswer('TRUE')} start_y={50} end_y={0}>TRUE</AnimatedButton>
+      <AnimatedButton className="btn btn-false" aria-label="Answer False" onClick={() => onAnswer('FALSE')} start_y={50} end_y={0}>FALSE</AnimatedButton>
     </div>
   )
 }

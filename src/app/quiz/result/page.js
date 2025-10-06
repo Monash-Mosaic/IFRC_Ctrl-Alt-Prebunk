@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import BackGuard from '../../components/BackGuard.jsx'
+import { Typewriter } from '../../components/animated/typewriter.jsx'
+import { AnimatedDiv } from '../../components/animated/AnimatedDiv.jsx'
 
 function getResultConfig(status) {
   const isCorrect = status === 'correct'
@@ -47,29 +49,30 @@ function ResultContent() {
     <main className="quiz-screen">
       <BackGuard />
       <div className="topbar">
-        <div className="left">LIVES {'♥ '.repeat(lives).trim()}</div>
-        <div className="right score">SCORE {score.toLocaleString()}</div>
+          <Typewriter className="left lives" text={`LIVES ${'♥ '.repeat(lives).trim()}`}></Typewriter>
+          <Typewriter className="right score" text={`SCORE ${Number(score).toLocaleString()}`}></Typewriter>
       </div>
 
       <div className="center">
         <div className="result-wrap">
-          <div className={cfg.badgeClass}>{cfg.badgeText}</div>
-          <div className="result-title">{cfg.title}</div>
+          <AnimatedDiv className={cfg.badgeClass} direction='down'>{cfg.badgeText}</AnimatedDiv>
+          <Typewriter className="result-title" text={cfg.title}></Typewriter>
           <div className="result-sub text-plain">{cfg.sub}</div>
 
-          <section className={cfg.explainClass} aria-labelledby="why">
-            <h2 id="why" className="text-plain">{cfg.explainTitle}</h2>
-            <p className="text-plain">
-              {state.lastExplain || 'Explanation unavailable.'}
-            </p>
-          </section>
+           <AnimatedDiv className={cfg.explainClass} aria-labelledby="why" direction='up'>
+              <h2 id="why" className="text-plain">{cfg.explainTitle}</h2>
+              <p className="text-plain">
+                {state.lastExplain || 'Explanation unavailable.'}
+              </p>
+          </AnimatedDiv>
+
         </div>
       </div>
 
       {current + 1 >= total ? (
         <Link aria-label="Finish and return to home" className="fab-next" href="/" onClick={() => localStorage.removeItem('debunk:state')}>›</Link>
       ) : (
-        <Link aria-label="Next question" className="fab-next" href="/quiz">›</Link>
+            <Link aria-label="Next question" className="fab-next" href="/quiz">›</Link>
       )}
     </main>
   )
