@@ -3,6 +3,8 @@ import { loadQuestions } from '../../lib/questions.server'
 import AnswerButtons from '../components/AnswerButtons.jsx'
 import { useEffect, useState } from 'react'
 import BackGuard from '../components/BackGuard.jsx'
+import { AnimatedDiv } from '../components/animated/AnimatedDiv'
+import { Typewriter } from '../components/animated/typewriter'
 
 export default function QuizPage() {
   const questions = loadQuestions()
@@ -36,22 +38,30 @@ export default function QuizPage() {
       <BackGuard />
       <div className="quiz-wrap">
         <div className="topbar">
-          <div className="left">LIVES {'♥ '.repeat(lives).trim()}</div>
-          <div className="right score">SCORE {Number(score).toLocaleString()}</div>
+          <Typewriter className="left lives" text={`LIVES ${'♥ '.repeat(lives).trim()}`}></Typewriter>
+          <Typewriter className="right score" text={`SCORE ${Number(score).toLocaleString()}`}></Typewriter>
         </div>
       </div>
 
       <div className="center">
         <div className="quiz-body">
-        <h2 className="quiz-title">QUESTION {current + 1}</h2>
-        <div className="prompt text-plain">{q.question}</div>
+          <AnimatedDiv direction='left'>
+            <h2 className="quiz-title">QUESTION {current + 1}</h2>
+          </AnimatedDiv>
+
+          <AnimatedDiv direction='right'>
+                    <div className="prompt text-plain">{q.question}</div>
+          </AnimatedDiv>
+
 
         <AnswerButtons correctAnswer={q.correctAnswer} whyCorrect={q.whyCorrect} whyIncorrect={q.whyIncorrect} />
 
         </div>
       </div>
 
-      <div className="quiz-footer"><div className="subtle">QUESTION {current + 1} OF {total}</div></div>
+      <div className="quiz-footer">
+        <div className="subtle">QUESTION {current + 1} OF {total}</div>
+        </div>
     </main>
   );
 }

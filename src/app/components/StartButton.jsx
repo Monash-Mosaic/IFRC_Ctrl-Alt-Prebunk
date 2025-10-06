@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { AnimatedButton } from './animated/AnimatedButton'
 
 export default function StartButton() {
   const router = useRouter()
@@ -35,9 +36,9 @@ export default function StartButton() {
   }
 
   return (
-    <button className="btn btn-filled" onClick={onStart}>
+    <AnimatedButton className="btn btn-filled" onClick={onStart} direction='left'>
       START
-    </button>
+    </AnimatedButton>
   )
 }
 
