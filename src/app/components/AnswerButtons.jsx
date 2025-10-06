@@ -28,8 +28,8 @@ export default function AnswerButtons({ correctAnswer, whyCorrect, whyIncorrect 
 
   return (
     <div className="quiz-actions">
-      <AnimatedButton className="btn btn-true" aria-label="Answer True" onClick={() => onAnswer('TRUE')} start_y={50} end_y={0}>TRUE</AnimatedButton>
-      <AnimatedButton className="btn btn-false" aria-label="Answer False" onClick={() => onAnswer('FALSE')} start_y={50} end_y={0}>FALSE</AnimatedButton>
+      <AnimatedButton className="btn btn-true" aria-label="Answer True" onClick={() => onAnswer('TRUE')} direction='up'>TRUE</AnimatedButton>
+      <AnimatedButton className="btn btn-false" aria-label="Answer False" onClick={() => onAnswer('FALSE')} direction='up'>FALSE</AnimatedButton>
     </div>
   )
 }
