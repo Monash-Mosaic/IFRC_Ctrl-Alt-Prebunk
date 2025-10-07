@@ -46,7 +46,7 @@ export default function QuizPage() {
         <h2 className="quiz-title">QUESTION {current + 1}</h2>
         <div className="prompt text-plain">{q.question}</div>
 
-        <AnswerButtons correctAnswer={q.correctAnswer} whyCorrect={q.whyCorrect} whyIncorrect={q.whyIncorrect} />
+        <AnswerButtons options={q.options} correctAnswer={q.correctAnswer} whyCorrect={q.whyCorrect} whyIncorrect={q.whyIncorrect} />
 
         </div>
       </div>

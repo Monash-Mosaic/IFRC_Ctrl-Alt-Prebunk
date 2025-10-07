@@ -1,7 +1,7 @@
 [
   {
     "question": "The Western Australian government signed a new 4 billion dollar contract with BHP this morning.",
-    "options": ["TRUE", "FALSE"],
+    "options": ["TRUE", "FALSE","MAYBE","UNSUREE"],
     "correctAnswer": "FALSE",
     "whyCorrect": "No primary source confirms this. Check official government and BHP press rooms.",
     "whyIncorrect": "Viral posts often recycle old or fabricated headlines. Verify with authoritative sources."
@@ -15,7 +15,7 @@
   },
   {
     "question": "An image showing snow in the Sahara from 2016 proves it snowed there today.",
-    "options": ["TRUE", "FALSE"],
+    "options": ["TRUE", "FALSE","MAYBE","UNSURE"],
     "correctAnswer": "FALSE",
     "whyCorrect": "Old images frequently recirculate. Use reverse image search to check when a photo first appeared.",
     "whyIncorrect": "Date-mismatch is a common misinformation tactic. Always verify with reputable weather records."

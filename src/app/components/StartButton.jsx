@@ -20,15 +20,15 @@ export default function StartButton() {
       const res = await fetch('/api/new-game', { cache: 'no-store' })
       const data = await res.json()
       const order = Array.isArray(data.order) && data.order.length ? data.order : [0]
-      const state = { order, current: 0, score: 0, lives: 3, max: data.max || Math.min(3, order.length) }
+      const state = { order, current: 0, score: 0, lives: 3, max: data.max || Math.min(8, order.length) }
       localStorage.setItem('debunk:state', JSON.stringify(state))
       router.push('/welcome')
     } catch {
-      // Fallback client-side randomization
+      // Fallback client-side sequential selection
       const total = 20
-      const max = 3
+      const max = 8
       const all = Array.from({ length: total }, (_, i) => i)
-      const order = shuffle(all).slice(0, max)
+      const order = all.slice(0, max)
       const state = { order, current: 0, score: 0, lives: 3, max }
       localStorage.setItem('debunk:state', JSON.stringify(state))
       router.push('/welcome')

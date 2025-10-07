@@ -5,8 +5,22 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import BackGuard from '../../components/BackGuard.jsx'
 
-function getResultConfig(status) {
+function getResultConfig(status, lives) {
   const isCorrect = status === 'correct'
+  const isGameOver = lives === 0
+  
+  if (isGameOver) {
+    return {
+      isCorrect: false,
+      badgeText: '💀',
+      title: 'GAME OVER!',
+      sub: 'Out of lives',
+      explainTitle: 'Why is this incorrect?',
+      badgeClass: 'result-badge bad',
+      explainClass: 'result-explain bad'
+    }
+  }
+  
   return {
     isCorrect,
     badgeText: isCorrect ? '+10' : '-1',
@@ -39,7 +53,7 @@ function ResultContent() {
 
   // Determine correctness if not provided via URL (primary path)
   const status = statusFromUrl || state.lastStatus || 'incorrect'
-  const cfg = getResultConfig(status)
+  const cfg = getResultConfig(status, lives)
 
   // Show score/lives from state
 
@@ -66,8 +80,10 @@ function ResultContent() {
         </div>
       </div>
 
-      {current + 1 >= total ? (
-        <Link aria-label="Finish and return to home" className="fab-next" href="/" onClick={() => localStorage.removeItem('debunk:state')}>›</Link>
+      {lives === 0 ? (
+        <Link aria-label="Game over - restart" className="fab-next" href="/" onClick={() => localStorage.removeItem('debunk:state')}>↻</Link>
+      ) : current >= total ? (
+        <Link aria-label="Complete quiz" className="fab-next" href="/quiz/complete">›</Link>
       ) : (
         <Link aria-label="Next question" className="fab-next" href="/quiz">›</Link>
       )}
