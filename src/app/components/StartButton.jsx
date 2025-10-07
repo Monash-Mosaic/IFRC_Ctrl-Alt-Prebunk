@@ -21,7 +21,7 @@ export default function StartButton() {
       const order = Array.isArray(data.order) && data.order.length ? data.order : [0]
       const state = { order, current: 0, score: 0, lives: 3, max: data.max || Math.min(3, order.length) }
       localStorage.setItem('debunk:state', JSON.stringify(state))
-      router.push('/quiz')
+      router.push('/welcome')
     } catch {
       // Fallback client-side randomization
       const total = 20
@@ -30,7 +30,7 @@ export default function StartButton() {
       const order = shuffle(all).slice(0, max)
       const state = { order, current: 0, score: 0, lives: 3, max }
       localStorage.setItem('debunk:state', JSON.stringify(state))
-      router.push('/quiz')
+      router.push('/welcome')
     }
   }
 
