@@ -4,6 +4,28 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import BackGuard from '../../components/BackGuard.jsx'
+import { useState } from 'react'
+
+function escapeHtml(input) {
+  return String(input)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function markdownToHtml(md) {
+  const escaped = escapeHtml(md || '')
+  // basic markdown: links [text](url), bold **text**, italics *text*, inline code `code`
+  const withCode = escaped.replace(/`([^`]+)`/g, '<code>$1</code>')
+  const withBold = withCode.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+  const withItalics = withBold.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+  const withLinks = withItalics.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+  // auto-link bare URLs
+  const withAutoLinks = withLinks.replace(/(^|\s)(https?:\/\/[^\s<]+)(?=$|\s)/g, '$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>')
+  return withAutoLinks
+}
 
 function getResultConfig(status, lives) {
   const isCorrect = status === 'correct'
@@ -38,6 +60,21 @@ function ResultContent() {
   const raw = sp.get('status') || ''
   let statusFromUrl = raw === 'correct' ? 'correct' : raw === 'incorrect' ? 'incorrect' : null
 
+  function LifeIcon({ index }) {
+    const [src, setSrc] = useState('/lives.png')
+    if (src === null) return <span style={{ marginRight: 4 }}>♥</span>
+    return (
+      <img
+        src={src}
+        alt="life"
+        width={16}
+        height={16}
+        style={{ marginRight: 4, verticalAlign: 'text-bottom' }}
+        onError={() => setSrc(prev => (prev === '/lives.png' ? '/lives-bar1 (1).png' : null))}
+      />
+    )
+  }
+
   // Load state
   let state
   try {
@@ -45,6 +82,10 @@ function ResultContent() {
   } catch { state = null }
   if (!state) {
     router.replace('/')
+    return null
+  }
+  if (state.lives === 0) {
+    router.replace('/game-over')
     return null
   }
 
@@ -61,7 +102,9 @@ function ResultContent() {
     <main className="quiz-screen">
       <BackGuard />
       <div className="topbar">
-        <div className="left">LIVES {'♥ '.repeat(lives).trim()}</div>
+        <div className="left">LIVES {Array.from({ length: lives }).map((_, i) => (
+          <LifeIcon key={i} index={i} />
+        ))}</div>
         <div className="right score">SCORE {score.toLocaleString()}</div>
       </div>
 
@@ -73,9 +116,7 @@ function ResultContent() {
 
           <section className={cfg.explainClass} aria-labelledby="why">
             <h2 id="why" className="text-plain">{cfg.explainTitle}</h2>
-            <p className="text-plain">
-              {state.lastExplain || 'Explanation unavailable.'}
-            </p>
+            <div className="text-plain" dangerouslySetInnerHTML={{ __html: markdownToHtml(state.lastExplain || 'Explanation unavailable.') }} />
           </section>
         </div>
       </div>

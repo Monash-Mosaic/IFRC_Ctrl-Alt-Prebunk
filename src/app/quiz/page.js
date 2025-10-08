@@ -9,6 +9,21 @@ export default function QuizPage() {
   const [state, setState] = useState(null)
   const [q, setQ] = useState(null)
 
+  function LifeIcon({ index }) {
+    const [src, setSrc] = useState('/lives.png')
+    if (src === null) return <span style={{ marginRight: 4 }}>♥</span>
+    return (
+      <img
+        src={src}
+        alt="life"
+        width={16}
+        height={16}
+        style={{ marginRight: 4, verticalAlign: 'text-bottom' }}
+        onError={() => setSrc(prev => (prev === '/lives.png' ? '/lives-bar1 (1).png' : null))}
+      />
+    )
+  }
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem('debunk:state')
@@ -36,7 +51,9 @@ export default function QuizPage() {
       <BackGuard />
       <div className="quiz-wrap">
         <div className="topbar">
-          <div className="left">LIVES {'♥ '.repeat(lives).trim()}</div>
+          <div className="left">LIVES {Array.from({ length: lives }).map((_, i) => (
+            <LifeIcon key={i} index={i} />
+          ))}</div>
           <div className="right score">SCORE {Number(score).toLocaleString()}</div>
         </div>
       </div>
