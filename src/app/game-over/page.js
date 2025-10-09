@@ -1,6 +1,7 @@
 "use client"
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 export default function GameOverPage() {
@@ -36,7 +37,7 @@ export default function GameOverPage() {
 
       <div className="center">
         <div className="result-wrap" style={{ textAlign: 'center' }}>
-          <div className="result-badge bad" style={{ margin: '0 auto' }}>💀</div>
+          <Image src="/paula_lose.svg" alt="Sad face" width={184} height={265} />
           <div className="result-title" style={{ marginTop: 24 }}>OH NO!</div>
           <div className="result-sub" style={{ fontFamily: 'inherit', letterSpacing: '0.25ch' }}>YOU'VE FAILED!</div>
 
