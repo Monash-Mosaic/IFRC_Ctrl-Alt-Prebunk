@@ -19,7 +19,7 @@ export default function Page() {
           ></Image>
         </AnimatedDiv>
 
-        <AnimatedDiv direction="down" delay={0.2} hover={1.1}>
+        <AnimatedDiv direction="down" delay={0.2}>
           <h1 className="title">CTRL + ALT + PREBUNK</h1>
         </AnimatedDiv>
 
