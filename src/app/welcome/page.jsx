@@ -197,7 +197,8 @@ export default function Welcome() {
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
                 <p>
-                  Natoque metus blandit commodo non consequat diam molestie. Et et justo nullam dui hac arcu condimentum interdum scelerisque ultrices non? Vivamus dictumst vel euismod mus tellus posuere. Nunc habitasse dictum iaculis tempor turpis interdum sit scelerisque elementum aliquet lorem malesuada. Commodo tristique vehicula commodo; nam metus fames accumsan eros.
+                  Climate change is a change in the state of the climate that can be identified (e.g., by using statistical tests) by changes in the mean and/ or the variability of its properties and that persists for an extended period, typically decades or longer.
+Climate change may be due to natural internal processes or external forcings such as modulations of the solar cycles, volcanic eruptions and persistent anthropogenic changes in the composition of the atmosphere or in land use (IPCC).
                 </p>
               </motion.div>
 

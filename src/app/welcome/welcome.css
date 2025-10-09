@@ -194,14 +194,11 @@ body {
   z-index: 100;
 }
 
-.top-bar .lives {
-  color: #ffffff;
-  letter-spacing: 0.2ch;
-}
+.topbar .left,
+.topbar .right { letter-spacing: 0.15ch; font-size: 14px; }
 
-.top-bar .score {
-  color: #6af58a;
-  letter-spacing: 0.1ch;
+.topbar .score {
+   color: #6af58a; letter-spacing: 0.1ch; 
 }
 
 .context-title {
