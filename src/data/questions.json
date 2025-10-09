@@ -2,38 +2,38 @@
     {
         "question": "Which claim is true?",
         "options": [
-            "It is certain that human activities have caused the observed and projected changes in climate",
-            "The climate has changed many times in the past before humans began burning coal and oil so it’s a natural occurrence",
-            "Global warming means that every place on Earth will get warmer all the time",
-            "Renewable energy is expensive for consumers"
+            "A. It is certain that human activities have caused the observed and projected changes in climate",
+            "B. The climate has changed many times in the past before humans began burning coal and oil so it’s a natural occurrence",
+            "C. Global warming means that every place on Earth will get warmer all the time",
+            "D. Renewable energy is expensive for consumers"
         ],
-        "correctAnswer": "It is certain that human activities have caused the observed and projected changes in climate",
+        "correctAnswer": "A. It is certain that human activities have caused the observed and projected changes in climate",
         "whyCorrect": "Yes, it is extremely likely that human activities are the dominant cause of climate change.",
-        "whyIncorrect": "Climate drivers have both natural and human sources while \"Global warming\" refers to the long-term trend of rising average global temperatures. Renewable energy like solar and wind is now far less expensive than fossil fuels."
+        "whyIncorrect": "The correct answer is A. Climate drivers have both natural and human sources while \"Global warming\" refers to the long-term trend of rising average global temperatures. Renewable energy like solar and wind is now far less expensive than fossil fuels."
     },
     {
         "question": "Which one is a myth?",
         "options": [
-            "The oceans absorb about a quarter of the carbon dioxide (CO2) released by human activities",
-            "Climate models from the 1980s and 1990s accurately predicted the subsequent warming of the planet.",
-            "We know the concentration of carbon dioxide in the atmosphere is higher than it has been at any time in at least the past 800,000 years.",
-            "We need to sustain a high amount of CO2 since trees need them."
+            "A. The oceans absorb about a quarter of the carbon dioxide (CO2) released by human activities",
+            "B. Climate models from the 1980s and 1990s accurately predicted the subsequent warming of the planet.",
+            "C. We know the concentration of carbon dioxide in the atmosphere is higher than it has been at any time in at least the past 800,000 years.",
+            "D. We need to sustain a high amount of CO2 since trees need them."
         ],
-        "correctAnswer": "We need to sustain a high amount of CO2 since trees need them.",
+        "correctAnswer": "D. We need to sustain a high amount of CO2 since trees need them.",
         "whyCorrect": "Plants do need carbon dioxide (CO2) but CO2 itself does not cause problems. It's part of the natural global ecosystem. The problem is the surplus quantity of CO2 that’s being produced by us as humans",
-        "whyIncorrect": "Plants do need carbon dioxide (CO2) but CO2 itself does not cause problems. It's part of the natural global ecosystem. The problem is the surplus quantity of CO2 that’s being produced by us as humans."
+        "whyIncorrect": "The correct answer is D. Plants do need carbon dioxide (CO2) but CO2 itself does not cause problems. It's part of the natural global ecosystem. The problem is the surplus quantity of CO2 that’s being produced by us as humans."
     },
     {
         "question": "Increased CO2 is beneficial because it makes plants more water-efficient, reducing water loss and increasing water levels in our soil and streams.",
         "options": [
-            "But CO2 is a poisonous to plants",
-            "CO2 doesn’t have any effects on plants growth",
-            "Yes, but rising CO2 levels are creating less nutritious food",
-            "More CO2 is causing a global decline in oxygen levels and we will run out of air to breathe."
+            "A. But CO2 is a poisonous to plants",
+            "B. CO2 doesn’t have any effects on plants growth",
+            "C. Yes, but rising CO2 levels are creating less nutritious food",
+            "D. More CO2 is causing a global decline in oxygen levels and we will run out of air to breathe."
         ],
-        "correctAnswer": "Yes, but rising CO2 levels are creating less nutritious food",
+        "correctAnswer": "C. Yes, but rising CO2 levels are creating less nutritious food",
         "whyCorrect": "Studies show that staple crops like wheat, rice, and potatoes grown under elevated CO2 have significantly lower concentrations of protein, key minerals, and essential B vitamins, threatening global food security and human health",
-        "whyIncorrect": "Studies show that staple crops like wheat, rice, and potatoes grown under elevated CO2 have significantly lower concentrations of protein, key minerals, and essential B vitamins, threatening global food security and human health"
+        "whyIncorrect": "The correct response is D. Studies show that staple crops like wheat, rice, and potatoes grown under elevated CO2 have significantly lower concentrations of protein, key minerals, and essential B vitamins, threatening global food security and human health"
     },
     {
         "question": "Sudden change in weather in the middle of the day means climate change is getting worse!",
