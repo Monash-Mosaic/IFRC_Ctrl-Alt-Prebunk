@@ -130,13 +130,19 @@ html, body { padding: 0; margin: 0; }
 
 /* Small screens */
 @media (max-width: 640px) {
-  .title { font-size: clamp(12px, 4.6vw, 24px); letter-spacing: 0.18ch; max-width: 100vw; }
+  .title {     letter-spacing: 0.18ch; max-width: 100vw; }
   .topbar { height: 48px; padding: 0 16px; }
   .topbar .left, .topbar .right { font-size: 12px; letter-spacing: 0.1ch; }
   .quiz-actions { flex-direction: column; gap: 14px; }
   .btn-true, .btn-false { width: 100%; min-width: 0; height: 52px; }
   .prompt { max-width: 100%; padding: 14px 16px; }
   .fab-next { right: 16px; bottom: 16px; width: 64px; height: 64px; font-size: 28px; }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .title {
+    font-size: clamp(20px, 3vw, 32px);
+  }
 }
 
 /* Large displays */
