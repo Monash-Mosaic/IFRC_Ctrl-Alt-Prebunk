@@ -3,11 +3,13 @@ import { loadQuestions } from '../../lib/questions.server'
 import AnswerButtons from '../components/AnswerButtons.jsx'
 import { useEffect, useState } from 'react'
 import BackGuard from '../components/BackGuard.jsx'
+import LifeIcon from '../components/LifeIcon.jsx'
 
 export default function QuizPage() {
   const questions = loadQuestions()
   const [state, setState] = useState(null)
   const [q, setQ] = useState(null)
+
 
   useEffect(() => {
     try {
@@ -36,7 +38,9 @@ export default function QuizPage() {
       <BackGuard />
       <div className="quiz-wrap">
         <div className="topbar">
-          <div className="left">LIVES {'♥ '.repeat(lives).trim()}</div>
+          <div className="left">LIVES {Array.from({ length: lives }).map((_, i) => (
+            <LifeIcon key={i} index={i} />
+          ))}</div>
           <div className="right score">SCORE {Number(score).toLocaleString()}</div>
         </div>
       </div>
@@ -46,7 +50,7 @@ export default function QuizPage() {
         <h2 className="quiz-title">QUESTION {current + 1}</h2>
         <div className="prompt text-plain">{q.question}</div>
 
-        <AnswerButtons correctAnswer={q.correctAnswer} whyCorrect={q.whyCorrect} whyIncorrect={q.whyIncorrect} />
+        <AnswerButtons options={q.options} correctAnswer={q.correctAnswer} whyCorrect={q.whyCorrect} whyIncorrect={q.whyIncorrect} />
 
         </div>
       </div>

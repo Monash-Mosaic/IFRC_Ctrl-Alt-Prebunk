@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import LifeIcon from '../components/LifeIcon.jsx'
 import './welcome.css'
 
 export default function Welcome() {
@@ -51,14 +53,13 @@ export default function Welcome() {
               {showEcho && (
                 <motion.div className="character-msg echo-container">
                   <div className="icon-with-name">
-                    <motion.img
-                      src="/images/characters/echo.png"
-                      alt="Echo"
-                      className="character"
+                    <motion.div
                       initial={{ opacity: 0, x: -40 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.6 }}
-                    />
+                    >
+                      <Image src="/images/characters/echo.png" alt="Echo" className="character" width={100} height={100} />
+                    </motion.div>
                     <div className="char-name">Echo</div>
                   </div>
                   {showEchoMsg && (
@@ -90,14 +91,13 @@ export default function Welcome() {
                     </motion.p>
                   )}
                   <div className="icon-with-name">
-                    <motion.img
-                      src="/images/characters/paula.png"
-                      alt="Paula"
-                      className="character"
+                    <motion.div
                       initial={{ opacity: 0, x: 40 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.6 }}
-                    />
+                    >
+                      <Image src="/images/characters/paula.png" alt="Paula" className="character" width={100} height={100} />
+                    </motion.div>
                     <div className="char-name">Paula</div>
                   </div>
                 </motion.div>
@@ -124,7 +124,7 @@ export default function Welcome() {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 100, damping: 12, delay: 0.3 }}
               >
-                <img src="/images/characters/echo.png" alt="Echo" className="character" />
+                <Image src="/images/characters/echo.png" alt="Echo" className="character" width={100} height={100} />
                 <div className="char-name">Echo</div>
               </motion.div>
 
@@ -136,7 +136,7 @@ export default function Welcome() {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 100, damping: 12, delay: 0.3 }}
               >
-                <img src="/images/characters/paula.png" alt="Paula" className="character" />
+                <Image src="/images/characters/paula.png" alt="Paula" className="character" width={100} height={100} />
                 <div className="char-name">Paula</div>
               </motion.div>
             </div>
@@ -175,7 +175,9 @@ export default function Welcome() {
           >
             
             <div className="topbar">
-              <div className="left">LIVES ♥ ♥ ♥</div>
+              <div className="left">LIVES {Array.from({ length: 3 }).map((_, i) => (
+                <LifeIcon key={i} index={i} />
+              ))}</div>
               <div className="right score">SCORE 0</div>
             </div>
 
@@ -208,10 +210,12 @@ Climate change may be due to natural internal processes or external forcings suc
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <img
-                  src="/images/characters/robo1.jpg"
+                <Image
+                  src="/images/characters/climate-change-illustration.png"
                   alt="Climate change illustration"
                   className="context-image"
+                  width={200}
+                  height={200}
                 />
               </motion.div>
             </div>
