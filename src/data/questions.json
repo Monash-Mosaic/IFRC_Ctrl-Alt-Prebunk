@@ -1,94 +1,94 @@
 [
-  {
-      "question": "Which claim is true?",
-      "options": [
-          "It is certain that human activities have caused the observed and projected changes in climate.",
-          "The climate has changed many times in the past before humans began burning coal and oil so it’s a natural occurrence",
-          "Global warming means that every place on Earth will get warmer all the time",
-          "Renewable energy is expensive for consumers"
-      ],
-      "correctAnswer": "It is certain that human activities have caused the observed and projected changes in climate",
-      "whyCorrect": "Yes, it is extremely likely that human activities are the dominant cause of climate change.",
-      "whyIncorrect": "Climate drivers have both natural and human sources while \"Global warming\" refers to the long-term trend of rising average global temperatures. Renewable energy like solar and wind is now far less expensive than fossil fuels."
-  },
-  {
-      "question": "Which one is a myth?",
-      "options": [
-          "The oceans absorb about a quarter of the carbon dioxide (CO2) released by human activities",
-          "Climate models from the 1980s and 1990s accurately predicted the subsequent warming of the planet.",
-          "We know the concentration of carbon dioxide in the atmosphere is higher than it has been at any time in at least the past 800,000 years.",
-          "We need to sustain a high amount of CO2 since trees need them."
-      ],
-      "correctAnswer": "We need to sustain a high amount of CO2 since trees need them.",
-      "whyCorrect": "Plants do need carbon dioxide (CO2) but CO2 itself does not cause problems. It's part of the natural global ecosystem. The problem is the surplus quantity of CO2 that’s being produced by us as humans",
-      "whyIncorrect": "Plants do need carbon dioxide (CO2) but CO2 itself does not cause problems. It's part of the natural global ecosystem. The problem is the surplus quantity of CO2 that’s being produced by us as humans."
-  },
-  {
-      "question": "Increased CO2 is beneficial because it makes plants more water-efficient, reducing water loss and increasing water levels in our soil and streams.",
-      "options": [
-          "But CO2 is a poisonous to plants",
-          "CO2 doesn’t have any effects on plants growth",
-          "Yes, but rising CO2 levels are creating less nutritious food",
-          "More CO2 is causing a global decline in oxygen levels and we will run out of air to breathe."
-      ],
-      "correctAnswer": "Yes, but rising CO2 levels are creating less nutritious food",
-      "whyCorrect": "Studies show that staple crops like wheat, rice, and potatoes grown under elevated CO2 have significantly lower concentrations of protein, key minerals, and essential B vitamins, threatening global food security and human health",
-      "whyIncorrect": "Studies show that staple crops like wheat, rice, and potatoes grown under elevated CO2 have significantly lower concentrations of protein, key minerals, and essential B vitamins, threatening global food security and human health"
-  },
-  {
-      "question": "Sudden change in weather in the middle of the day means climate change is getting worse!",
-      "options": [
-          "TRUE",
-          "FALSE"
-      ],
-      "correctAnswer": "FALSE",
-      "whyCorrect": "Climate refers to those weather conditions averaged over many years",
-      "whyIncorrect": "Climate refers to those weather conditions averaged over many years"
-  },
-  {
-      "question": "If a claim cites 'scientists say' without naming organizations or studies, it should be treated with caution.",
-      "options": [
-          "TRUE",
-          "FALSE"
-      ],
-      "correctAnswer": "TRUE",
-      "whyCorrect": "Good reporting names institutions, researchers, and provides links to studies so readers can verify.",
-      "whyIncorrect": "Vague sourcing hides accountability and prevents verification."
-  },
-  {
-      "question": "How much has the world warmed above pre-industrial levels?",
-      "options": [
-          "1 °C",
-          "5 °C",
-          "10 °C",
-          "4 °C"
-      ],
-      "correctAnswer": "1 °C",
-      "whyCorrect": "It’s around 1 °C warmer than pre-industrial times.",
-      "whyIncorrect": "It’s around 1 °C warmer than pre-industrial times."
-  },
-  {
-      "question": "What is deforestation?",
-      "options": [
-          "Conversion of forest to non-forest",
-          "Replacing my garden with a driveway",
-          "Cutting down trees",
-          "Bad environmental policies"
-      ],
-      "correctAnswer": "Conversion of forest to non-forest",
-      "whyCorrect": "For a discussion of the term forest and related terms such as afforestation, reforestation and deforestation, see the 2006 IPCC Guidelines for National Greenhouse Gas Inventories and their 2019 Refinement, and information provided by the United Nations Framework Convention 2226 Annex VII Glossary AVII on Climate Change (IPCC, 2006, 2019; UNFCCC, 2021a, b).",
-      "whyIncorrect": "The IPCC defines deforestation as the conversion of forest to non-forest land. Other options, while harmful to the environment, don’t count as deforestation."
-  },
-  {
-      "question": "“Polar Bear population is increasing now in comparison to 50 years ago (as low as 5,000 in the 1960s). This proves  climate change isn't hurting them.” Which misinformation technique is being used here?",
-      "options": [
-          "Cherry-picking data",
-          "Pseudoscience",
-          "Conspiracy theories",
-          "Sensationalism"
-      ],
-      "correctAnswer": "Pseudoscience",
-      "whyCorrect": "This is pseudoscience because it relies on a false baseline. The claim of a population increase cites unreliable, unverified estimates from the 1960s—a period of unregulated hunting with no accurate population data. While some populations later rebounded due to conservation laws, this does not prove an overall historical increase.",
-      "whyIncorrect": "This is pseudoscience because it relies on a false baseline. The data isn’t being cherry-picked, and there’s no element of sensationalism or conspiracy theories involved."
-  }
+    {
+        "question": "Which claim is true?",
+        "options": [
+            "It is certain that human activities have caused the observed and projected changes in climate",
+            "The climate has changed many times in the past before humans began burning coal and oil so it’s a natural occurrence",
+            "Global warming means that every place on Earth will get warmer all the time",
+            "Renewable energy is expensive for consumers"
+        ],
+        "correctAnswer": "It is certain that human activities have caused the observed and projected changes in climate",
+        "whyCorrect": "Yes, it is extremely likely that human activities are the dominant cause of climate change.",
+        "whyIncorrect": "Climate drivers have both natural and human sources while \"Global warming\" refers to the long-term trend of rising average global temperatures. Renewable energy like solar and wind is now far less expensive than fossil fuels."
+    },
+    {
+        "question": "Which one is a myth?",
+        "options": [
+            "The oceans absorb about a quarter of the carbon dioxide (CO2) released by human activities",
+            "Climate models from the 1980s and 1990s accurately predicted the subsequent warming of the planet.",
+            "We know the concentration of carbon dioxide in the atmosphere is higher than it has been at any time in at least the past 800,000 years.",
+            "We need to sustain a high amount of CO2 since trees need them."
+        ],
+        "correctAnswer": "We need to sustain a high amount of CO2 since trees need them.",
+        "whyCorrect": "Plants do need carbon dioxide (CO2) but CO2 itself does not cause problems. It's part of the natural global ecosystem. The problem is the surplus quantity of CO2 that’s being produced by us as humans",
+        "whyIncorrect": "Plants do need carbon dioxide (CO2) but CO2 itself does not cause problems. It's part of the natural global ecosystem. The problem is the surplus quantity of CO2 that’s being produced by us as humans."
+    },
+    {
+        "question": "Increased CO2 is beneficial because it makes plants more water-efficient, reducing water loss and increasing water levels in our soil and streams.",
+        "options": [
+            "But CO2 is a poisonous to plants",
+            "CO2 doesn’t have any effects on plants growth",
+            "Yes, but rising CO2 levels are creating less nutritious food",
+            "More CO2 is causing a global decline in oxygen levels and we will run out of air to breathe."
+        ],
+        "correctAnswer": "Yes, but rising CO2 levels are creating less nutritious food",
+        "whyCorrect": "Studies show that staple crops like wheat, rice, and potatoes grown under elevated CO2 have significantly lower concentrations of protein, key minerals, and essential B vitamins, threatening global food security and human health",
+        "whyIncorrect": "Studies show that staple crops like wheat, rice, and potatoes grown under elevated CO2 have significantly lower concentrations of protein, key minerals, and essential B vitamins, threatening global food security and human health"
+    },
+    {
+        "question": "Sudden change in weather in the middle of the day means climate change is getting worse!",
+        "options": [
+            "TRUE",
+            "FALSE"
+        ],
+        "correctAnswer": "FALSE",
+        "whyCorrect": "Climate refers to those weather conditions averaged over many years",
+        "whyIncorrect": "Climate refers to those weather conditions averaged over many years"
+    },
+    {
+        "question": "If a claim cites 'scientists say' without naming organizations or studies, it should be treated with caution.",
+        "options": [
+            "TRUE",
+            "FALSE"
+        ],
+        "correctAnswer": "TRUE",
+        "whyCorrect": "Good reporting names institutions, researchers, and provides links to studies so readers can verify.",
+        "whyIncorrect": "Vague sourcing hides accountability and prevents verification."
+    },
+    {
+        "question": "How much has the world warmed above pre-industrial levels?",
+        "options": [
+            "1 °C",
+            "5 °C",
+            "10 °C",
+            "4 °C"
+        ],
+        "correctAnswer": "1 °C",
+        "whyCorrect": "It’s around 1 °C warmer than pre-industrial times.",
+        "whyIncorrect": "It’s around 1 °C warmer than pre-industrial times."
+    },
+    {
+        "question": "What is deforestation?",
+        "options": [
+            "Conversion of forest to non-forest",
+            "Replacing my garden with a driveway",
+            "Cutting down trees",
+            "Bad environmental policies"
+        ],
+        "correctAnswer": "Conversion of forest to non-forest",
+        "whyCorrect": "For a discussion of the term forest and related terms such as afforestation, reforestation and deforestation, see the 2006 IPCC Guidelines for National Greenhouse Gas Inventories and their 2019 Refinement, and information provided by the United Nations Framework Convention 2226 Annex VII Glossary AVII on Climate Change (IPCC, 2006, 2019; UNFCCC, 2021a, b).",
+        "whyIncorrect": "The IPCC defines deforestation as the conversion of forest to non-forest land. Other options, while harmful to the environment, don’t count as deforestation."
+    },
+    {
+        "question": "“Polar Bear population is increasing now in comparison to 50 years ago (as low as 5,000 in the 1960s). This proves  climate change isn't hurting them.” Which misinformation technique is being used here?",
+        "options": [
+            "Cherry-picking data",
+            "Pseudoscience",
+            "Conspiracy theories",
+            "Sensationalism"
+        ],
+        "correctAnswer": "Pseudoscience",
+        "whyCorrect": "This is pseudoscience because it relies on a false baseline. The claim of a population increase cites unreliable, unverified estimates from the 1960s—a period of unregulated hunting with no accurate population data. While some populations later rebounded due to conservation laws, this does not prove an overall historical increase.",
+        "whyIncorrect": "This is pseudoscience because it relies on a false baseline. The data isn’t being cherry-picked, and there’s no element of sensationalism or conspiracy theories involved."
+    }
 ]
