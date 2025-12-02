@@ -1,35 +1,28 @@
 {
   "name": "debunk",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint .",
+    "build": "next build --turbopack",
+    "start": "next start --turbopack",
+    "lint": "eslint",
     "format": "prettier -w ."
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "engines": {
-    "node": ">=18.18",
-    "npm": ">=9"
-  },
   "dependencies": {
-    "@vercel/speed-insights": "^1.2.0",
-    "framer-motion": "^12.23.22",
-    "next": "^15.5.4",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "geist": "^1.5.1",
+    "next": "16.0.6",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
-    "eslint": "^9.36.0",
-    "eslint-config-next": "^15.5.4",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
-    "prettier": "^3.6.2"
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
