@@ -1,4 +1,4 @@
-"use client";
+import Image from "next/image";
 
 interface HeaderProps {
   points?: number;
@@ -14,34 +14,13 @@ export default function Header({ points = 0, credibility = 80 }: HeaderProps) {
         <div className="flex items-center gap-2">
           {/* IFRC Logo */}
           <div className="flex items-center gap-1">
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 40 40"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="shrink-0"
-            >
-              {/* Red Cross */}
-              <rect x="16" y="4" width="8" height="32" fill="#E63946" />
-              <rect x="4" y="16" width="32" height="8" fill="#E63946" />
-              {/* Red Crescent (simplified) */}
-              <path
-                d="M32 20c0 6.627-5.373 12-12 12"
-                stroke="#E63946"
-                strokeWidth="3"
-                fill="none"
-                className="hidden"
-              />
-            </svg>
-            <div className="hidden flex-col md:flex">
-              <span className="text-xs font-bold text-[#E63946]">IFRC</span>
-              <span className="text-[10px] leading-tight text-[#0D1B3E]">
-                solferino
-                <br />
-                academy
-              </span>
-            </div>
+            <Image
+              src="/images/logos/IFRC-Solferino.png"
+              alt="IFRC Solferino Academy Logo"
+              height={61.35}
+              width={223.67}
+              className="h-8 w-auto"
+            />
           </div>
         </div>
 
@@ -54,28 +33,13 @@ export default function Header({ points = 0, credibility = 80 }: HeaderProps) {
         {/* Right: Partner Logos (Desktop only) */}
         <div className="hidden items-center gap-4 md:flex">
           {/* Monash Logo */}
-          <div className="flex items-center gap-1">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="12" cy="12" r="10" fill="#0D1B3E" />
-              <path d="M8 8l4 4-4 4M12 8l4 4-4 4" stroke="white" strokeWidth="1.5" />
-            </svg>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-[#0D1B3E]">MONASH</span>
-              <span className="text-[8px] text-[#0D1B3E]">University</span>
-            </div>
-          </div>
-          {/* MOSAIC Logo */}
-          <div className="border-l border-[#0D1B3E]/20 pl-3">
-            <span className="text-sm font-bold tracking-wide text-[#0D1B3E]">
-              MOSAIC
-            </span>
-          </div>
+          <Image
+            src="/images/logos/Monash-MOSAIC.png"
+            alt="Monash University MOSAIC Logo"
+            height={302.82}
+            width={72}
+            className="h-8 w-auto"
+          />
         </div>
 
         {/* Mobile: Empty space for balance */}
