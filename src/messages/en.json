@@ -1,0 +1,38 @@
+{
+  "nav": {
+    "home": "Home",
+    "chat": "Chat",
+    "analytics": "Analytics",
+    "share": "Share",
+    "profile": "Profile"
+  },
+  "header": {
+    "points": "Points",
+    "credibility": "Credibility",
+    "title": "CTRL + ALT + PREBUNK",
+    "titleMobile": "US!",
+    "ifrcLogoAlt": "IFRC Solferino Academy",
+    "monashLogoAlt": "Monash University MOSAIC"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred"
+  },
+  "metadata": {
+    "title": "CTRL + ALT + PREBUNK",
+    "description": "IFRC Solferino Academy - Fact-checking and media literacy platform"
+  },
+  "errors": {
+    "404": {
+      "title": "Page Not Found",
+      "description": "The page you are looking for does not exist.",
+      "backHome": "Back to Home"
+    },
+    "500": {
+      "title": "Server Error",
+      "description": "Something went wrong on our end. Please try again later.",
+      "backHome": "Back to Home"
+    }
+  }
+}
+

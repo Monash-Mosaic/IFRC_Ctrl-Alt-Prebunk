@@ -1,0 +1,38 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "chat": "Chat",
+    "analytics": "Analytique",
+    "share": "Partager",
+    "profile": "Profil"
+  },
+  "header": {
+    "points": "Points",
+    "credibility": "Crédibilité",
+    "title": "CTRL + ALT + PREBUNK",
+    "titleMobile": "US!",
+    "ifrcLogoAlt": "Académie Solferino de la FICR",
+    "monashLogoAlt": "MOSAIC de l'Université Monash"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite"
+  },
+  "metadata": {
+    "title": "CTRL + ALT + PREBUNK",
+    "description": "Académie Solferino de la FICR - Plateforme de vérification des faits et d'éducation aux médias"
+  },
+  "errors": {
+    "404": {
+      "title": "Page introuvable",
+      "description": "La page que vous recherchez n'existe pas.",
+      "backHome": "Retour à l'accueil"
+    },
+    "500": {
+      "title": "Erreur du serveur",
+      "description": "Une erreur s'est produite. Veuillez réessayer plus tard.",
+      "backHome": "Retour à l'accueil"
+    }
+  }
+}
+

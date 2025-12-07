@@ -1,0 +1,38 @@
+{
+  "nav": {
+    "home": "首页",
+    "chat": "聊天",
+    "analytics": "分析",
+    "share": "分享",
+    "profile": "个人资料"
+  },
+  "header": {
+    "points": "积分",
+    "credibility": "可信度",
+    "title": "CTRL + ALT + PREBUNK",
+    "titleMobile": "US!",
+    "ifrcLogoAlt": "国际红十字与红新月运动索尔费里诺学院",
+    "monashLogoAlt": "莫纳什大学MOSAIC"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "发生错误"
+  },
+  "metadata": {
+    "title": "CTRL + ALT + PREBUNK",
+    "description": "国际红十字与红新月运动索尔费里诺学院 - 事实核查和媒体素养平台"
+  },
+  "errors": {
+    "404": {
+      "title": "页面未找到",
+      "description": "您要查找的页面不存在。",
+      "backHome": "返回首页"
+    },
+    "500": {
+      "title": "服务器错误",
+      "description": "出现了问题。请稍后再试。",
+      "backHome": "返回首页"
+    }
+  }
+}
+

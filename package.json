@@ -7,21 +7,31 @@
     "build": "next build --turbopack",
     "start": "next start --turbopack",
     "lint": "eslint",
-    "format": "prettier -w ."
+    "format": "prettier -w .",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "geist": "^1.5.1",
-    "next": "16.0.6",
+    "next": "^16.0.7",
+    "next-intl": "^4.5.8",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.6",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

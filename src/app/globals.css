@@ -68,3 +68,37 @@ body {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+}
+
+/* RTL utilities - Tailwind automatically handles rtl: prefix when dir attribute is set */
+/* Custom RTL adjustments for specific components */
+[dir="rtl"] .ltr\:flex-row {
+  flex-direction: row-reverse;
+}
+
+/* Ensure icons and logos maintain their appearance in RTL */
+[dir="rtl"] img,
+[dir="rtl"] svg {
+  transform: none;
+}
+
+/* RTL support for fixed positioning */
+[dir="rtl"] aside {
+  left: auto;
+  right: 0;
+}
+
+[dir="ltr"] aside {
+  left: 0;
+  right: auto;
+}
