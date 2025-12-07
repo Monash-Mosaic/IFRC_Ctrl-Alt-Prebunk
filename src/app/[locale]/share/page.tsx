@@ -1,5 +1,6 @@
+import UnderDevelopment from "@/components/UnderDevelopment";
 
 export default function SharePage() {
-  throw new Error("Not implemented");
+  return <UnderDevelopment />;
 }
 
