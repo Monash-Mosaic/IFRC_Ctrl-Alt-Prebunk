@@ -35,7 +35,7 @@
     "500": {
       "title": "Error del servidor",
       "description": "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
-      "backHome": "Volver al inicio"
+      "reload": "Recargar"
     }
   }
 }

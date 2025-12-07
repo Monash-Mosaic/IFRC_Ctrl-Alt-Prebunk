@@ -1,17 +1,8 @@
 import { render, screen } from "@/test-utils/test-utils";
 import Navigation from "@/components/Navigation";
 
-// Mock usePathname - we'll override it in individual tests
-jest.mock("next/navigation", () => ({
-  usePathname: jest.fn(() => "/"),
-  useRouter: jest.fn(() => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
-  })),
-}));
-
-const mockUsePathname = require("next/navigation").usePathname;
+// Use the global mock from jest.setup.js
+const mockUsePathname = global.mockUsePathname as unknown as jest.Mock;
 
 describe("Navigation", () => {
   beforeEach(() => {

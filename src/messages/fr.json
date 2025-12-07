@@ -35,7 +35,7 @@
     "500": {
       "title": "Erreur du serveur",
       "description": "Une erreur s'est produite. Veuillez réessayer plus tard.",
-      "backHome": "Retour à l'accueil"
+      "reload": "Recharger"
     }
   }
 }

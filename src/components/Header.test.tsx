@@ -79,7 +79,8 @@ describe("Header", () => {
     const monashLogo = screen.getByAltText("Monash University MOSAIC");
     expect(monashLogo).toBeInTheDocument();
     expect(monashLogo).toHaveAttribute("src", "/images/logos/Monash-MOSAIC.png");
-    expect(monashLogo.closest("div")).toHaveClass("hidden", "md:flex");
+    const logoContainer = monashLogo.closest("div");
+    expect(logoContainer).toHaveClass("flex", "items-center", "gap-4");
   });
 
   it("has correct header styling", async () => {

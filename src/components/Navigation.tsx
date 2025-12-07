@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link, routing, usePathname } from "@/i18n/routing";
+import { Home, MessageSquare, PieChart, Upload, User } from "lucide-react";
 
 interface NavItem {
   href: keyof typeof routing.pathnames;
@@ -18,165 +19,32 @@ export default function Navigation() {
     {
       href: "/",
       labelKey: "home",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          <polyline points="9,22 9,12 15,12 15,22" />
-        </svg>
-      ),
-      activeIcon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          stroke="currentColor"
-          strokeWidth="1"
-        >
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        </svg>
-      ),
+      icon: <Home size={24} strokeWidth={2} />,
+      activeIcon: <Home size={24} fill="currentColor" strokeWidth={1} />,
     },
     {
       href: "/chat",
       labelKey: "chat",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      ),
-      activeIcon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          stroke="currentColor"
-          strokeWidth="1"
-        >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      ),
+      icon: <MessageSquare size={24} strokeWidth={2} />,
+      activeIcon: <MessageSquare size={24} fill="currentColor" strokeWidth={1} />,
     },
     {
       href: "/analytics",
       labelKey: "analytics",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 2a10 10 0 0 1 10 10" />
-          <path d="M12 12V2" />
-          <path d="M12 12h10" />
-        </svg>
-      ),
-      activeIcon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          stroke="currentColor"
-          strokeWidth="1"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 2a10 10 0 0 1 10 10" fill="white" />
-          <path d="M12 12V2" stroke="white" />
-          <path d="M12 12h10" stroke="white" />
-        </svg>
-      ),
+      icon: <PieChart size={24} strokeWidth={2} />,
+      activeIcon: <PieChart size={24} fill="currentColor" strokeWidth={1} />,
     },
     {
       href: "/share",
       labelKey: "share",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="17,8 12,3 7,8" />
-          <line x1="12" y1="3" x2="12" y2="15" />
-        </svg>
-      ),
-      activeIcon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          stroke="currentColor"
-          strokeWidth="1"
-        >
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="17,8 12,3 7,8" fill="currentColor" />
-          <line x1="12" y1="3" x2="12" y2="15" />
-        </svg>
-      ),
+      icon: <Upload size={24} strokeWidth={2} />,
+      activeIcon: <Upload size={24} fill="currentColor" strokeWidth={1} />,
     },
     {
       href: "/profile",
       labelKey: "profile",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      ),
-      activeIcon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          stroke="currentColor"
-          strokeWidth="1"
-        >
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      ),
+      icon: <User size={24} strokeWidth={2} />,
+      activeIcon: <User size={24} fill="currentColor" strokeWidth={1} />,
     },
   ];
 

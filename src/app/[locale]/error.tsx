@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
 
 export default function Error({
   error,
@@ -33,20 +32,12 @@ export default function Error({
             Error ID: {error.digest}
           </p>
         )}
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-          <button
-            onClick={reset}
-            className="inline-block rounded bg-[#E63946] px-6 py-3 font-medium text-white transition-colors hover:bg-[#D62839] focus:outline-none focus:ring-2 focus:ring-[#E63946] focus:ring-offset-2"
-          >
-            {t("backHome")}
-          </button>
-          <Link
-            href="/"
-            className="inline-block rounded border-2 border-[#E63946] px-6 py-3 font-medium text-[#E63946] transition-colors hover:bg-[#E63946] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#E63946] focus:ring-offset-2"
-          >
-            {t("backHome")}
-          </Link>
-        </div>
+        <button
+          onClick={reset}
+          className="inline-block rounded bg-[#E63946] px-6 py-3 font-medium text-white transition-colors hover:bg-[#D62839] focus:outline-none focus:ring-2 focus:ring-[#E63946] focus:ring-offset-2"
+        >
+          {t("reload")}
+        </button>
       </div>
     </div>
   );
