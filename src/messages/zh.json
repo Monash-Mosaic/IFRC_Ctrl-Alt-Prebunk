@@ -18,6 +18,10 @@
     "loading": "加载中...",
     "error": "发生错误"
   },
+  "underDevelopment": {
+    "title": "开发中",
+    "message": "此页面正在开发中。请稍后再来查看！"
+  },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
     "description": "国际红十字与红新月运动索尔费里诺学院 - 事实核查和媒体素养平台"

@@ -1,36 +1,18 @@
-import { getTranslations } from "next-intl/server";
-import { headers } from "next/headers";
-import { Link, getPathname } from "@/i18n/routing";
+"use client";
+
+import { useTranslations } from "next-intl";
+import { Link, routing, usePathname } from "@/i18n/routing";
 
 interface NavItem {
-  href: string;
+  href: keyof typeof routing.pathnames;
   labelKey: string;
   icon: React.ReactNode;
   activeIcon: React.ReactNode;
 }
 
-export default async function Navigation() {
-  const t = await getTranslations("nav");
-  
-  // Get pathname for server-side rendering
-  // Try using getPathname from next-intl first, fallback to headers
-  let currentPath = "/";
-  try {
-    // getPathname might need locale context, so try headers approach
-    const headersList = await headers();
-    const url = headersList.get("x-url") || headersList.get("referer") || "";
-    
-    if (url) {
-      // Extract pathname from URL, removing locale prefix
-      const urlObj = new URL(url);
-      const pathname = urlObj.pathname;
-      // Remove locale prefix (e.g., "/en" -> "")
-      currentPath = pathname.replace(/^\/[a-z]{2}/, "") || "/";
-    }
-  } catch (error) {
-    // Fallback to root if pathname can't be determined
-    currentPath = "/";
-  }
+export default function Navigation() {
+  const t = useTranslations("nav");
+  const pathname = usePathname();
 
   const navItems: NavItem[] = [
     {
@@ -205,8 +187,8 @@ export default async function Navigation() {
         <nav className="flex flex-1 flex-col justify-center items-center gap-2">
           {navItems.map((item) => {
             const isActive =
-              currentPath === item.href ||
-              (item.href !== "/" && currentPath.startsWith(item.href));
+              pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(item.href));
 
             return (
               <Link
@@ -233,8 +215,8 @@ export default async function Navigation() {
         <div className="flex h-16 items-center justify-around px-2">
           {navItems.map((item) => {
             const isActive =
-              currentPath === item.href ||
-              (item.href !== "/" && currentPath.startsWith(item.href));
+              pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(item.href));
 
             return (
               <Link

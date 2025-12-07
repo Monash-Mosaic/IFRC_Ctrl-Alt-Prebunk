@@ -18,6 +18,10 @@
     "loading": "Chargement...",
     "error": "Une erreur s'est produite"
   },
+  "underDevelopment": {
+    "title": "En Développement",
+    "message": "Cette page est actuellement en développement. Revenez bientôt!"
+  },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
     "description": "Académie Solferino de la FICR - Plateforme de vérification des faits et d'éducation aux médias"

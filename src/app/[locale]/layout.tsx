@@ -9,7 +9,7 @@ import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import PointsCredibilityBar from "@/components/PointsCredibilityBar";
 import { routing } from "@/i18n/routing";
-import { getDirection } from "@/i18n/utils";
+import { getDirection, isRTLLocale } from "@/i18n/utils";
 
 import "../globals.css";
 
@@ -73,14 +73,12 @@ export default async function LocaleLayout({
 
   // Determine direction for RTL support
   const direction = getDirection(locale);
-  const isRTL = direction === "rtl";
+  const isRTL = isRTLLocale(locale);
 
   return (
     <html lang={locale} dir={direction}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${
-          isRTL ? "rtl" : "ltr"
-        }`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased ${direction}`}
       >
         <NextIntlClientProvider messages={messages}>
           <Header />

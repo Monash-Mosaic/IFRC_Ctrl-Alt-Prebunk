@@ -6,7 +6,6 @@ import { routing } from "@/i18n/routing";
 
 export default function RootError({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;

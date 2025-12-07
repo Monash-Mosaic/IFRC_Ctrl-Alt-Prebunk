@@ -18,6 +18,10 @@
     "loading": "Loading...",
     "error": "An error occurred"
   },
+  "underDevelopment": {
+    "title": "Under Development",
+    "message": "This page is currently under development. Please check back soon!"
+  },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
     "description": "IFRC Solferino Academy - Fact-checking and media literacy platform"

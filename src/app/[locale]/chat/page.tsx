@@ -1,5 +1,6 @@
 import UnderDevelopment from "@/components/UnderDevelopment";
 
-export default function Home() {
+export default function ChatPage() {
   return <UnderDevelopment />;
 }
+
