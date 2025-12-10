@@ -26,6 +26,36 @@
     "title": "CTRL + ALT + PREBUNK",
     "description": "Académie Solferino de la FICR - Plateforme de vérification des faits et d'éducation aux médias"
   },
+  "chat": {
+    "illustrationAlt": "Réseau de personnes et de connexions de médias sociaux",
+    "startOnboarding": "Commencer le chat d'intégration avec Paula",
+    "skip": "Ignorer",
+    "onboarding": {
+      "step1": {
+        "greeting": "Salut ! Bienvenue dans le fil d'actualité. Je suis Paula, et je vais t'aider à naviguer dans ce monde sauvage d'informations en ligne. 👋",
+        "option1": "Allons-y ! Je suis prêt.",
+        "option2": "Ça a l'air compliqué...",
+        "option3": "Montre-moi juste comment ça fonctionne !"
+      },
+      "step2": {
+        "explanation": "Ne t'inquiète pas - tu peux le faire ! Tu vois ce post ci-dessous ? Quelqu'un partage quelque chose sur le changement climatique. Ton travail : décider si c'est fiable ou totalement absurde.",
+        "option1": "Je peux déjà repérer les fausses informations !",
+        "option2": "Compris ! Garder les bonnes choses, dénoncer les fausses.",
+        "option3": "Attends, comment je sais ce qui est réel ?"
+      },
+      "step3": {
+        "tips": "Exactement ! Voici le secret : Cherche un langage exagéré, des sources manquantes, et des choses qui semblent TROP folles pour être vraies. Essaie le premier post - je te dirai comment tu t'en es sorti !",
+        "option1": "D'accord, j'entre dans le fil maintenant !",
+        "option2": "Montre-moi un exemple d'abord ?"
+      },
+      "example": {
+        "message": "Voici un exemple de post avec des explications. Remarque le langage exagéré et les sources manquantes - ce sont des signaux d'alarme !"
+      },
+      "completed": {
+        "message": "Le jeu commence ! Tu es prêt à naviguer dans le fil et identifier la désinformation. Bonne chance ! 🎮"
+      }
+    }
+  },
   "errors": {
     "404": {
       "title": "Page introuvable",

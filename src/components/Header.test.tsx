@@ -54,22 +54,25 @@ describe("Header", () => {
     expect(logo).toHaveAttribute("src", "/images/logos/IFRC-Solferino.png");
   });
 
-  it("renders the desktop title", async () => {
+  it("renders the title link with responsive sizing and svg", async () => {
     const component = await Header();
-    render(component);
+    const { container } = render(component);
 
-    const title = screen.getByText("CTRL + ALT + PREBUNK");
-    expect(title).toBeInTheDocument();
-    expect(title).toHaveClass("hidden", "md:inline");
-  });
+    const titleLink = Array.from(
+      container.querySelectorAll<HTMLAnchorElement>('a[href="/"]')
+    ).find((link) => link.querySelector("svg"));
+    expect(titleLink).toBeInTheDocument();
+    expect(titleLink).toHaveClass(
+      "inline-flex",
+      "w-full",
+      "max-w-[260px]",
+      "items-center",
+      "rounded",
+      "md:max-w-[573px]"
+    );
 
-  it("renders the mobile title", async () => {
-    const component = await Header();
-    render(component);
-
-    const mobileTitle = screen.getByText("US!");
-    expect(mobileTitle).toBeInTheDocument();
-    expect(mobileTitle).toHaveClass("md:hidden");
+    const titleSvg = titleLink?.querySelector("svg");
+    expect(titleSvg).toBeInTheDocument();
   });
 
   it("renders the Monash logo on desktop", async () => {
@@ -80,7 +83,7 @@ describe("Header", () => {
     expect(monashLogo).toBeInTheDocument();
     expect(monashLogo).toHaveAttribute("src", "/images/logos/Monash-MOSAIC.png");
     const logoContainer = monashLogo.closest("div");
-    expect(logoContainer).toHaveClass("flex", "items-center", "gap-4");
+    expect(logoContainer).toHaveClass("hidden", "items-center", "gap-4", "md:flex");
   });
 
   it("has correct header styling", async () => {

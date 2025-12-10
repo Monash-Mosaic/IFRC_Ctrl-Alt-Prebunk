@@ -26,6 +26,36 @@
     "title": "CTRL + ALT + PREBUNK",
     "description": "IFRC Solferino Academy - Fact-checking and media literacy platform"
   },
+  "chat": {
+    "illustrationAlt": "Network of people and social media connections",
+    "startOnboarding": "Start onboarding chat with Paula",
+    "skip": "Skip",
+    "onboarding": {
+      "step1": {
+        "greeting": "Hey! Welcome to the feed. I'm Paula, and I'll help you navigate this wild world of online information. 👋",
+        "option1": "Let's do this! I'm ready.",
+        "option2": "This sounds complicated...",
+        "option3": "Just show me how it works!"
+      },
+      "step2": {
+        "explanation": "Don't worry - you've got this! See that post below? Someone's sharing something about climate change. Your job: decide if it's trustworthy or total nonsense.",
+        "option1": "I can spot fake news already!",
+        "option2": "Got it! Like the good stuff, call out the fake stuff.",
+        "option3": "Wait, how do I know what's real?"
+      },
+      "step3": {
+        "tips": "Exactly! Here's the secret: Look for exaggerated language, missing sources, and stuff that seems TOO crazy to be true. Try the first post - I'll tell you how you did!",
+        "option1": "Okay, entering the feed now!",
+        "option2": "Show me an example first?"
+      },
+      "example": {
+        "message": "Here's an example post with explanations. Notice the exaggerated language and missing sources - these are red flags!"
+      },
+      "completed": {
+        "message": "Game begins! You're all set to navigate the feed and identify misinformation. Good luck! 🎮"
+      }
+    }
+  },
   "errors": {
     "404": {
       "title": "Page Not Found",

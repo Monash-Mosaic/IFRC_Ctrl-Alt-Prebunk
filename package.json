@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start --turbopack",
+    "analyze": "ANALYZE=true next build",
     "lint": "eslint",
     "format": "prettier -w .",
     "test": "jest",
@@ -13,19 +14,26 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.0.8",
+    "@xstate/react": "^6.0.0",
     "geist": "^1.5.1",
     "lucide-react": "^0.556.0",
     "next": "^16.0.7",
     "next-intl": "^4.5.8",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "xstate": "^5.24.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.0.8",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
+    "@types/mdx": "^2.0.12",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
