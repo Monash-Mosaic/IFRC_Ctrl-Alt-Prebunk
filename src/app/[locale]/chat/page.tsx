@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link, routing } from "@/i18n/routing";
-import Illustration from "./_components/Illustration";
+import Illustration from "./_components/OnboardingIllustration";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
