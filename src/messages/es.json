@@ -33,9 +33,9 @@
     "onboarding": {
       "step1": {
         "greeting": "¡Hola! Bienvenido al feed. Soy Paula, y te ayudaré a navegar por este mundo salvaje de información en línea. 👋",
-        "option1": "¡Vamos a hacerlo! Estoy listo.",
-        "option2": "Esto suena complicado...",
-        "option3": "¡Solo muéstrame cómo funciona!"
+        "option1": "¡Vamos a hacerlo! Estoy listo.🚀",
+        "option2": "Esto suena complicado...🤔",
+        "option3": "¡Solo muéstrame cómo funciona!🎮"
       },
       "step2": {
         "explanation": "No te preocupes, ¡puedes hacerlo! ¿Ves esa publicación de abajo? Alguien está compartiendo algo sobre el cambio climático. Tu trabajo: decidir si es confiable o una tontería total.",

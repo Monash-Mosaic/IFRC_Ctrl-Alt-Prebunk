@@ -43,17 +43,14 @@ export default function OnboardingFlow() {
           {
             id: "option1-step1",
             translationKey: "step1.option1",
-            emoji: "🎮",
           },
           {
             id: "option2-step1",
             translationKey: "step1.option2",
-            emoji: "🤔",
           },
           {
             id: "option3-step1",
             translationKey: "step1.option3",
-            emoji: "🚀",
           },
         ];
       case "step2":
@@ -61,17 +58,14 @@ export default function OnboardingFlow() {
           {
             id: "option1-step2",
             translationKey: "step2.option1",
-            emoji: "",
           },
           {
             id: "option2-step2",
             translationKey: "step2.option2",
-            emoji: "",
           },
           {
             id: "option3-step2",
             translationKey: "step2.option3",
-            emoji: "",
           },
         ];
       case "step3":
@@ -79,12 +73,10 @@ export default function OnboardingFlow() {
           {
             id: "option1-step3",
             translationKey: "step3.option1",
-            emoji: "",
           },
           {
             id: "option2-step3",
             translationKey: "step3.option2",
-            emoji: "",
           },
         ];
       default:
@@ -111,6 +103,17 @@ export default function OnboardingFlow() {
                   senderName={message.sender === "user" ? "You" : message.sender === "paula" ? "Paula" : "Echo"}
                   senderAvatar={message.sender === "paula" ? <PaulaAvatar /> : message.sender === "echo" ? <EchoAvatar /> : undefined}
                   displayText={t(message.text)}
+                />
+              );
+            case "post":
+              return (
+                <PostMessage
+                  key={message.id}
+                  name={message.post.name}
+                  handle={message.post.handle}
+                  content={message.post.content}
+                  mediaUrl={message.post.mediaUrl}
+                  mediaType={message.post.mediaType}
                 />
               );
             default:

@@ -1,13 +1,13 @@
 "use client";
 
-import { ChevronDown, ThumbsUp, ThumbsDown, MessageCircle, Send } from "lucide-react";
+import Image from "next/image";
+import { ThumbsUp, ThumbsDown, MessageCircle, Send, Video } from "lucide-react";
 import EchoAvatar from "../_icons/EchoAvatar";
 
 interface PostMessageProps {
   name?: string;
   handle?: string;
-  text: string;
-  hashtags?: string[];
+  content: React.ReactNode;
   mediaUrl?: string;
   mediaType?: "image" | "video";
   onLike?: () => void;
@@ -17,10 +17,9 @@ interface PostMessageProps {
 }
 
 export default function PostMessage({
-  name = "Echo",
-  handle = "@climate_truth_warrior",
-  text,
-  hashtags = [],
+  name,
+  handle,
+  content,
   mediaUrl,
   mediaType = "image",
   onLike,
@@ -42,31 +41,12 @@ export default function PostMessage({
               <span className="text-xs text-[#6B7280]">{handle}</span>
             </div>
           </div>
-          <button
-            className="shrink-0 text-[#6B7280] hover:text-[#0D1B3E]"
-            aria-label="More options"
-          >
-            <ChevronDown size={20} />
-          </button>
         </div>
       </div>
 
       {/* Post content */}
       <div className="mb-3">
-        {text}
-        {/* Hashtags */}
-        {hashtags.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-2">
-            {hashtags.map((tag, index) => (
-              <span
-                key={index}
-                className="text-xs font-semibold text-[#0D1B3E]"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
+        {content}
 
         {/* Media attachment */}
         {mediaUrl && (
@@ -76,8 +56,18 @@ export default function PostMessage({
               <div className="flex h-full items-center justify-center">
                 {mediaType === "video" && (
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/80 shadow-md">
-                    <div className="ml-1 h-0 w-0 border-l-[12px] border-l-[#2FE89F] border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent" />
+                    <div className="ml-1 h-0 w-0 border-l-[12px] border-l-[#2FE89F] border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent">
+                      <Video size={20} strokeWidth={2} />
+                    </div>
                   </div>
+                )}
+                {mediaType === "image" && (
+                    <Image
+                      src={mediaUrl}
+                      alt="Echo post"
+                      width={500}
+                      height={500}
+                      className="w-full h-full object-cover" />
                 )}
               </div>
             </div>

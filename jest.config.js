@@ -11,6 +11,7 @@ const customJestConfig = {
   testEnvironment: "jest-environment-jsdom",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "\\.(mdx|md)$": "<rootDir>/jest.mock.js",
   },
   testMatch: [
     "**/?(*.)+(spec|test).[jt]s?(x)",
@@ -21,6 +22,9 @@ const customJestConfig = {
     "!src/components/**/*.d.ts",
     "!src/components/**/*.test.{ts,tsx}",
     "!src/components/index.ts",
+  ],
+  transformIgnorePatterns: [
+    "/node_modules/(?!(@mdx-js)/)",
   ],
 };
 

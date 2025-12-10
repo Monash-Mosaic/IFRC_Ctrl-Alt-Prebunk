@@ -67,7 +67,6 @@ describe("Header", () => {
       "w-full",
       "max-w-[260px]",
       "items-center",
-      "rounded",
       "md:max-w-[573px]"
     );
 

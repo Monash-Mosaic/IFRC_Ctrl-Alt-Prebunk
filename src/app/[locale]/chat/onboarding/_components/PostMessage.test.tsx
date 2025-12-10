@@ -9,10 +9,27 @@ jest.mock("../_icons/EchoAvatar", () => {
   };
 });
 
+// Mock Next.js Image component
+jest.mock("next/image", () => ({
+  __esModule: true,
+  default: function Image({ src, alt, ...props }: any) {
+    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+    return <img src={src} alt={alt} {...props} />;
+  },
+}));
+
 describe("PostMessage", () => {
+  const defaultContent = (
+    <div>
+      <p>So much for 'global warming'! Record freezing temperatures in rural Victoria today.</p>
+      <p>#ClimateHoax #GlobalWarming</p>
+    </div>
+  );
+
   const defaultProps = {
-    text: "So much for 'global warming'! Record freezing temperatures in rural Victoria today.",
-    hashtags: ["#ClimateHoax", "#GlobalWarming"],
+    name: "Echo",
+    handle: "@climate_truth_warrior",
+    content: defaultContent,
   };
 
   it("renders the post with default props", () => {
@@ -20,7 +37,7 @@ describe("PostMessage", () => {
 
     expect(screen.getByText("Echo")).toBeInTheDocument();
     expect(screen.getByText("@climate_truth_warrior")).toBeInTheDocument();
-    expect(screen.getByText(defaultProps.text)).toBeInTheDocument();
+    expect(screen.getByText(/So much for 'global warming'/)).toBeInTheDocument();
   });
 
   it("renders custom name and handle", () => {
@@ -36,24 +53,30 @@ describe("PostMessage", () => {
     expect(screen.getByText("@custom_handle")).toBeInTheDocument();
   });
 
-  it("renders hashtags", () => {
-    render(<PostMessage {...defaultProps} />);
+  it("renders custom content", () => {
+    const customContent = <div>Custom post content</div>;
+    render(
+      <PostMessage
+        name="Echo"
+        handle="@climate_truth_warrior"
+        content={customContent}
+      />
+    );
 
-    defaultProps.hashtags.forEach((tag) => {
-      expect(screen.getByText(tag)).toBeInTheDocument();
-    });
+    expect(screen.getByText("Custom post content")).toBeInTheDocument();
   });
 
-  it("renders media when mediaUrl is provided", () => {
-    const { container } = render(
+  it("renders image when mediaUrl and mediaType image are provided", () => {
+    render(
       <PostMessage {...defaultProps} mediaUrl="/test-image.jpg" mediaType="image" />
     );
 
-    const mediaContainer = container.querySelector(".aspect-video");
-    expect(mediaContainer).toBeInTheDocument();
+    const image = screen.getByAltText("Echo post");
+    expect(image).toBeInTheDocument();
+    expect(image).toHaveAttribute("src", "/test-image.jpg");
   });
 
-  it("renders video play button when mediaType is video", () => {
+  it("renders video icon when mediaType is video", () => {
     const { container } = render(
       <PostMessage
         {...defaultProps}
@@ -62,8 +85,15 @@ describe("PostMessage", () => {
       />
     );
 
-    const playButton = container.querySelector(".rounded-full");
-    expect(playButton).toBeInTheDocument();
+    const videoIcon = container.querySelector(".lucide-video");
+    expect(videoIcon).toBeInTheDocument();
+  });
+
+  it("does not render media when mediaUrl is not provided", () => {
+    const { container } = render(<PostMessage {...defaultProps} />);
+
+    const mediaContainer = container.querySelector(".aspect-video");
+    expect(mediaContainer).not.toBeInTheDocument();
   });
 
   it("calls onLike when like button is clicked", async () => {
@@ -119,24 +149,22 @@ describe("PostMessage", () => {
     expect(screen.getByLabelText("Share")).toBeInTheDocument();
   });
 
-  it("renders dropdown button", () => {
-    render(<PostMessage {...defaultProps} />);
-
-    expect(screen.getByLabelText("More options")).toBeInTheDocument();
-  });
-
   it("renders Echo avatar", () => {
     render(<PostMessage {...defaultProps} />);
 
     expect(screen.getByTestId("echo-avatar")).toBeInTheDocument();
   });
 
-  it("handles empty hashtags array", () => {
-    render(<PostMessage text={defaultProps.text} hashtags={[]} />);
+  it("handles empty content", () => {
+    render(
+      <PostMessage
+        name="Echo"
+        handle="@climate_truth_warrior"
+        content={<div />}
+      />
+    );
 
-    expect(screen.getByText(defaultProps.text)).toBeInTheDocument();
+    expect(screen.getByText("Echo")).toBeInTheDocument();
+    expect(screen.getByText("@climate_truth_warrior")).toBeInTheDocument();
   });
 });
-
-
-

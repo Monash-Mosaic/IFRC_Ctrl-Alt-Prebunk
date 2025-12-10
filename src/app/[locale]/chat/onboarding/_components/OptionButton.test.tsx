@@ -2,28 +2,19 @@ import { render, screen } from "@/test-utils/test-utils";
 import userEvent from "@testing-library/user-event";
 import OptionButton from "./OptionButton";
 
-const translations: Record<string, string> = {
-  clickMe: "Click me",
-  "step1.option1": "Let's do this! I'm ready.",
-};
-
 describe("OptionButton", () => {
   const mockOnClick = jest.fn();
-  const mockT = jest.fn((key: string) => translations[key] ?? key);
 
   beforeEach(() => {
     mockOnClick.mockClear();
-    mockT.mockClear();
   });
 
   it("renders the button with text", () => {
     render(
       <OptionButton
         id="test-button"
-        text="Click me"
-        translationKey="clickMe"
+        displayText="Click me"
         onClick={mockOnClick}
-        t={mockT}
       />
     );
 
@@ -35,10 +26,8 @@ describe("OptionButton", () => {
     render(
       <OptionButton
         id="test-button"
-        text="Click me"
-        translationKey="clickMe"
+        displayText="Click me"
         onClick={mockOnClick}
-        t={mockT}
       />
     );
 
@@ -48,45 +37,51 @@ describe("OptionButton", () => {
     expect(mockOnClick).toHaveBeenCalledTimes(1);
   });
 
-  it("displays emoji when provided", () => {
+  it("displays text content correctly", () => {
     render(
       <OptionButton
         id="test-button"
-        text="Click me"
-        translationKey="clickMe"
-        emoji="🎮"
+        displayText="🎮 Let's play"
         onClick={mockOnClick}
-        t={mockT}
       />
     );
 
-    expect(screen.getByText("🎮")).toBeInTheDocument();
+    expect(screen.getByText("🎮 Let's play")).toBeInTheDocument();
   });
 
-  it("does not display emoji when not provided", () => {
+  it("renders button with correct id attribute", () => {
     render(
       <OptionButton
         id="test-button"
-        text="Click me"
-        translationKey="clickMe"
+        displayText="Click me"
         onClick={mockOnClick}
-        t={mockT}
       />
     );
 
-    const emoji = screen.queryByText(/🎮|🚀|😌/);
-    expect(emoji).not.toBeInTheDocument();
+    const button = screen.getByRole("button");
+    expect(button).toHaveAttribute("id", "test-button");
+  });
+
+  it("has aria-label for accessibility", () => {
+    render(
+      <OptionButton
+        id="test-button"
+        displayText="Click me"
+        onClick={mockOnClick}
+      />
+    );
+
+    const button = screen.getByRole("button");
+    expect(button).toHaveAttribute("aria-label", "Click me");
   });
 
   it("is disabled when disabled prop is true", () => {
     render(
       <OptionButton
         id="test-button"
-        text="Click me"
-        translationKey="clickMe"
+        displayText="Click me"
         onClick={mockOnClick}
         disabled={true}
-        t={mockT}
       />
     );
 
@@ -98,10 +93,8 @@ describe("OptionButton", () => {
     render(
       <OptionButton
         id="test-button"
-        text="Click me"
-        translationKey="clickMe"
+        displayText="Click me"
         onClick={mockOnClick}
-        t={mockT}
       />
     );
 
@@ -114,11 +107,9 @@ describe("OptionButton", () => {
     render(
       <OptionButton
         id="test-button"
-        text="Click me"
-        translationKey="clickMe"
+        displayText="Click me"
         onClick={mockOnClick}
         disabled={true}
-        t={mockT}
       />
     );
 
@@ -128,45 +119,13 @@ describe("OptionButton", () => {
     expect(mockOnClick).not.toHaveBeenCalled();
   });
 
-  it("has correct id attribute", () => {
-    render(
-      <OptionButton
-        id="test-button"
-        text="Click me"
-        translationKey="clickMe"
-        onClick={mockOnClick}
-        t={mockT}
-      />
-    );
-
-    const button = screen.getByRole("button");
-    expect(button).toHaveAttribute("id", "test-button");
-  });
-
-  it("has aria-label for accessibility", () => {
-    render(
-      <OptionButton
-        id="test-button"
-        text="Click me"
-        translationKey="clickMe"
-        onClick={mockOnClick}
-        t={mockT}
-      />
-    );
-
-    const button = screen.getByRole("button");
-    expect(button).toHaveAttribute("aria-label");
-  });
-
   it("applies disabled styling when disabled", () => {
     const { container } = render(
       <OptionButton
         id="test-button"
-        text="Click me"
-        translationKey="clickMe"
+        displayText="Click me"
         onClick={mockOnClick}
         disabled={true}
-        t={mockT}
       />
     );
 
@@ -174,28 +133,21 @@ describe("OptionButton", () => {
     expect(button).toHaveClass("disabled:cursor-not-allowed", "disabled:opacity-50");
   });
 
-  it("handles translation keys correctly", () => {
-    mockT.mockReturnValue("Translated Option");
-    render(
+  it("applies correct styling classes", () => {
+    const { container } = render(
       <OptionButton
         id="test-button"
-        text="step1.option1"
-        translationKey="step1.option1"
+        displayText="Click me"
         onClick={mockOnClick}
-        t={mockT}
       />
     );
 
-    // Translation should be attempted
-    expect(mockT).toHaveBeenCalledWith("step1.option1");
-    expect(screen.getByText("Translated Option")).toBeInTheDocument();
+    const button = container.querySelector("button");
+    expect(button).toHaveClass(
+      "rounded-lg",
+      "border-2",
+      "border-dashed",
+      "bg-[#F5F5F5]"
+    );
   });
 });
-
-
-
-
-
-
-
-

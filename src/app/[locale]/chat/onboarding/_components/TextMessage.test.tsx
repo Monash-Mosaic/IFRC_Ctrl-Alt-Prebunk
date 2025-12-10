@@ -96,17 +96,20 @@ describe("TextMessage", () => {
 
   it("preserves whitespace in message text", () => {
     const multiLineText = "Line 1\nLine 2\nLine 3";
-    render(<TextMessage {...defaultProps} displayText={multiLineText} />);
+    const { container } = render(<TextMessage {...defaultProps} displayText={multiLineText} />);
 
-    const messageText = screen.getByText(multiLineText);
+    const messageText = container.querySelector("p.whitespace-pre-wrap");
+    expect(messageText).toBeInTheDocument();
     expect(messageText).toHaveClass("whitespace-pre-wrap");
+    expect(messageText?.textContent).toBe(multiLineText);
   });
 
   it("handles empty message text", () => {
-    render(<TextMessage {...defaultProps} displayText="" />);
+    const { container } = render(<TextMessage {...defaultProps} displayText="" />);
 
-    const messageText = screen.getByText("");
+    const messageText = container.querySelector("p.whitespace-pre-wrap");
     expect(messageText).toBeInTheDocument();
+    expect(messageText?.textContent).toBe("");
   });
 
   it("handles long message text", () => {
