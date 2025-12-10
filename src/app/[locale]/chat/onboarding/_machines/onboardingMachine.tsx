@@ -1,4 +1,5 @@
-import { setup, assign } from "xstate";
+import type React from "react";
+import useStateMachine, { t } from "@cassiozen/usestatemachine";
 import EchoPost from "../_icons/EchoPost.mdx";
 
 export type MessageSender = "paula" | "echo" | "user";
@@ -33,9 +34,23 @@ export interface OnboardingContext {
   selectedOptions: string[];
 }
 
+export type OnboardingOptionEvent = {
+  type:
+    | "option1-step1"
+    | "option2-step1"
+    | "option3-step1"
+    | "option1-step2"
+    | "option2-step2"
+    | "option3-step2"
+    | "option1-step3"
+    | "option2-step3";
+  optionText: string;
+};
+
 export type OnboardingEvent =
-  | { type: "SELECT_OPTION"; optionId: string; optionText: string }
-  | { type: "RESTORE_STATE"; state: OnboardingContext };
+  | OnboardingOptionEvent
+  | { type: "RESTORE_STATE"; state: OnboardingContext }
+  | { type: "AUTO_COMPLETE" };
 
 const createMessage = (sender: MessageSender, text: string): TextMessage => ({
   id: `msg-${Date.now()}-${Math.random()}`,
@@ -56,215 +71,135 @@ export const createPostMessage = (
   timestamp: Date.now(),
 });
 
-export const onboardingMachine = setup({
-  types: {
-    context: {} as OnboardingContext,
-    events: {} as OnboardingEvent,
-  },
-}).createMachine({
+const appendUserSelection = (
+  context: OnboardingContext,
+  event: OnboardingOptionEvent
+): OnboardingContext => ({
+  ...context,
+  messages: [...context.messages, createMessage("user", event.optionText)],
+  selectedOptions: [...context.selectedOptions, event.type],
+});
+
+type EffectArgs = {
+  context: OnboardingContext;
+  event?: OnboardingEvent;
+  setContext: (
+    updater: (context: OnboardingContext) => OnboardingContext
+  ) => void;
+  send: (event: OnboardingEvent) => void;
+};
+
+export const useOnboardingMachine = () => useStateMachine({
   id: "onboarding",
-  initial: "initial",
+  schema: {
+    context: t<OnboardingContext>(),
+    events: {
+      
+    },
+  },
   context: {
-    messages: [],
+    messages: [createMessage("paula", "step1.greeting")],
     selectedOptions: [],
   },
+  initial: "initial",
   states: {
     initial: {
-      entry: assign({
-        messages: ({ context }) => [
-          ...context.messages,
-          createMessage("paula", "step1.greeting"),
-        ],
-      }),
       on: {
-        SELECT_OPTION: [
-          {
-            guard: ({ event }) =>
-              event.type === "SELECT_OPTION" && event.optionId === "option1-step1",
-            target: "completed",
-            actions: [
-              assign({
-                messages: ({ context, event }) => [
-                  ...context.messages,
-                  createMessage(
-                    "user",
-                    event.type === "SELECT_OPTION" ? event.optionText : ""
-                  ),
-                ],
-              }),
-              assign({
-                selectedOptions: ({ context, event }) => [
-                  ...context.selectedOptions,
-                  event.type === "SELECT_OPTION" ? event.optionId : "",
-                ],
-              }),
-            ],
-          },
-          {
-            guard: ({ event }) =>
-              event.type === "SELECT_OPTION" &&
-              (event.optionId === "option2-step1" ||
-                event.optionId === "option3-step1"),
-            target: "step2",
-            actions: [
-              assign({
-                messages: ({ context, event }) => [
-                  ...context.messages,
-                  createMessage(
-                    "user",
-                    event.type === "SELECT_OPTION" ? event.optionText : ""
-                  ),
-                ],
-              }),
-              assign({
-                selectedOptions: ({ context, event }) => [
-                  ...context.selectedOptions,
-                  event.type === "SELECT_OPTION" ? event.optionId : "",
-                ],
-              }),
-            ],
-          },
-        ],
+        "option1-step1": "completed",
+        "option2-step1": "step2",
+        "option3-step1": "step2",
       },
     },
     step2: {
-      entry: assign({
-        messages: ({ context }) => [
-          ...context.messages,
-          createMessage("paula", "step2.explanation"),
-        ],
-      }),
+      effect({ setContext, event }: EffectArgs) {
+        if (!event || event.type === "AUTO_COMPLETE" || event.type === "RESTORE_STATE") return;
+
+        setContext((context: OnboardingContext) => {
+          const withSelection = appendUserSelection(context, event);
+
+          return {
+            ...withSelection,
+            messages: [
+              ...withSelection.messages,
+              createMessage("paula", "step2.explanation"),
+            ],
+          };
+        });
+      },
       on: {
-        SELECT_OPTION: [
-          {
-            guard: ({ event }) =>
-              event.type === "SELECT_OPTION" && event.optionId === "option1-step2",
-            target: "completed",
-            actions: [
-              assign({
-                messages: ({ context, event }) => [
-                  ...context.messages,
-                  createMessage(
-                    "user",
-                    event.type === "SELECT_OPTION" ? event.optionText : ""
-                  ),
-                ],
-              }),
-              assign({
-                selectedOptions: ({ context, event }) => [
-                  ...context.selectedOptions,
-                  event.type === "SELECT_OPTION" ? event.optionId : "",
-                ],
-              }),
-            ],
-          },
-          {
-            guard: ({ event }) =>
-              event.type === "SELECT_OPTION" &&
-              (event.optionId === "option2-step2" ||
-                event.optionId === "option3-step2"),
-            target: "step3",
-            actions: [
-              assign({
-                messages: ({ context, event }) => [
-                  ...context.messages,
-                  createMessage(
-                    "user",
-                    event.type === "SELECT_OPTION" ? event.optionText : ""
-                  ),
-                ],
-              }),
-              assign({
-                selectedOptions: ({ context, event }) => [
-                  ...context.selectedOptions,
-                  event.type === "SELECT_OPTION" ? event.optionId : "",
-                ],
-              }),
-            ],
-          },
-        ],
+        "option1-step2": "completed",
+        "option2-step2": "step3",
+        "option3-step2": "step3",
+        AUTO_COMPLETE: "completed",
       },
     },
     step3: {
-      entry: assign({
-        messages: ({ context }) => [
-          ...context.messages,
-          createMessage("paula", "step3.tips"),
-        ],
-      }),
+      effect({ setContext, event }: EffectArgs) {
+        if (!event || event.type === "AUTO_COMPLETE" || event.type === "RESTORE_STATE") return;
+
+        setContext((context: OnboardingContext) => {
+          const withSelection = appendUserSelection(context, event);
+
+          return {
+            ...withSelection,
+            messages: [
+              ...withSelection.messages,
+              createMessage("paula", "step3.tips"),
+            ],
+          };
+        });
+      },
       on: {
-        SELECT_OPTION: [
-          {
-            guard: ({ event }) =>
-              event.type === "SELECT_OPTION" && event.optionId === "option1-step3",
-            target: "completed",
-            actions: [
-              assign({
-                messages: ({ context, event }) => [
-                  ...context.messages,
-                  createMessage(
-                    "user",
-                    event.type === "SELECT_OPTION" ? event.optionText : ""
-                  ),
-                ],
-              }),
-              assign({
-                selectedOptions: ({ context, event }) => [
-                  ...context.selectedOptions,
-                  event.type === "SELECT_OPTION" ? event.optionId : "",
-                ],
-              }),
-            ],
-          },
-          {
-            guard: ({ event }) =>
-              event.type === "SELECT_OPTION" && event.optionId === "option2-step3",
-            target: "example",
-            actions: [
-              assign({
-                messages: ({ context, event }) => [
-                  ...context.messages,
-                  createMessage("user", event.optionText),
-                ],
-              }),
-              assign({
-                selectedOptions: ({ context, event }) => [
-                  ...context.selectedOptions,
-                  event.type === "SELECT_OPTION" ? event.optionId : "",
-                ],
-              }),
-            ],
-          },
-        ],
+        "option1-step3": "completed",
+        "option2-step3": "example",
       },
     },
     example: {
-      entry: assign({
-        messages: ({ context }) => [
-          ...context.messages,
-          createMessage("paula", "example.message"),
-          createPostMessage("echo", {
-            name: "Echo",
-            handle: "@climate_truth_warrior",
-            content: <EchoPost />,
-            mediaUrl: "/images/example/echo-post-img.jpg",
-            mediaType: "image",
-          }),
-        ],
-      }),
-      after: {
-        2000: {
-          target: "completed",
-        },
+      effect({ setContext, event, send }: EffectArgs) {
+        if (!event || event.type === "AUTO_COMPLETE" || event.type === "RESTORE_STATE") return;
+
+        setContext((context: OnboardingContext) => {
+          const updated = appendUserSelection(context, event);
+          return {
+            ...updated,
+            messages: [
+              ...updated.messages,
+              createMessage("paula", "example.message"),
+              createPostMessage("echo", {
+                name: "Echo",
+                handle: "@climate_truth_warrior",
+                content: <EchoPost />,
+                mediaUrl: "/images/example/echo-post-img.jpg",
+                mediaType: "image",
+              }),
+            ],
+          };
+        });
+
+        const timeout = setTimeout(() => send({ type: "AUTO_COMPLETE" }), 2000);
+        return () => clearTimeout(timeout);
+      },
+      on: {
+        AUTO_COMPLETE: "completed",
       },
     },
     completed: {
-      entry: assign({
-        messages: ({ context }) => [
-          ...context.messages,
-          createMessage("paula", "completed.message"),
-        ],
-      }),
+      effect({ setContext, event }: EffectArgs) {
+        setContext((context: OnboardingContext) => {
+          const baseContext =
+            event && event.type !== "AUTO_COMPLETE" && event.type !== "RESTORE_STATE"
+              ? appendUserSelection(context, event as OnboardingOptionEvent)
+              : context;
+
+          return {
+            ...baseContext,
+            messages: [
+              ...baseContext.messages,
+              createMessage("paula", "completed.message"),
+            ],
+          };
+        });
+      },
       type: "final",
     },
   },

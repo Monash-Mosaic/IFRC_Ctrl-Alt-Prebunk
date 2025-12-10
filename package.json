@@ -14,17 +14,16 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@cassiozen/usestatemachine": "^1.0.0",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^16.0.8",
-    "@xstate/react": "^6.0.0",
     "geist": "^1.5.1",
     "lucide-react": "^0.556.0",
     "next": "^16.0.7",
     "next-intl": "^4.5.8",
     "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "xstate": "^5.24.0"
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.0.8",

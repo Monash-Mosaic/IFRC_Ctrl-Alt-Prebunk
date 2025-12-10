@@ -1,62 +1,108 @@
-import { createActor } from "xstate";
-import { onboardingMachine } from "./onboardingMachine";
+import { act, renderHook } from "@testing-library/react";
+import { useOnboardingMachine } from "./onboardingMachine";
+import type { Message } from "./onboardingMachine";
 
 jest.useFakeTimers();
 
 describe("onboardingMachine", () => {
   it("starts with initial greeting message", () => {
-    const actor = createActor(onboardingMachine).start();
-    const snapshot = actor.getSnapshot();
+    const { result } = renderHook(() => useOnboardingMachine());
 
-    expect(snapshot.value).toBe("initial");
-    expect(snapshot.context.messages).toHaveLength(1);
-    expect(snapshot.context.messages[0].text).toBe("step1.greeting");
+    expect(result.current[0].value).toBe("initial");
+    expect(result.current[0].context.messages).toHaveLength(1);
+    const firstMessage = result.current[0].context.messages[0];
+    expect(firstMessage?.type === "text" ? firstMessage.text : undefined).toBe(
+      "step1.greeting"
+    );
   });
 
   it("goes to completed when selecting option1 in step1", () => {
-    const actor = createActor(onboardingMachine).start();
-    actor.send({ type: "SELECT_OPTION", optionId: "option1-step1", optionText: "Let's go" });
+    const { result } = renderHook(() => useOnboardingMachine());
 
-    const snapshot = actor.getSnapshot();
-    expect(snapshot.value).toBe("completed");
-    expect(snapshot.context.selectedOptions).toContain("option1-step1");
+    act(() =>
+      result.current[1]({
+        type: "option1-step1",
+        optionText: "Let's go",
+      })
+    );
+
+    expect(result.current[0].value).toBe("completed");
+    expect(result.current[0].context.selectedOptions).toContain("option1-step1");
   });
 
   it("follows step1 -> step2 -> step3 path", () => {
-    const actor = createActor(onboardingMachine).start();
-    actor.send({ type: "SELECT_OPTION", optionId: "option2-step1", optionText: "Option 2" });
-    let snapshot = actor.getSnapshot();
-    expect(snapshot.value).toBe("step2");
+    const { result } = renderHook(() => useOnboardingMachine());
 
-    actor.send({ type: "SELECT_OPTION", optionId: "option3-step2", optionText: "Option 3" });
-    snapshot = actor.getSnapshot();
-    expect(snapshot.value).toBe("step3");
+    act(() =>
+      result.current[1]({
+        type: "option2-step1",
+        optionText: "Option 2",
+      })
+    );
+    expect(result.current[0].value).toBe("step2");
+
+    act(() =>
+      result.current[1]({
+        type: "option3-step2",
+        optionText: "Option 3",
+      })
+    );
+    expect(result.current[0].value).toBe("step3");
   });
 
   it("goes through example and completes after delay", () => {
-    const actor = createActor(onboardingMachine).start();
-    actor.send({ type: "SELECT_OPTION", optionId: "option2-step1", optionText: "Option 2" });
-    actor.send({ type: "SELECT_OPTION", optionId: "option2-step2", optionText: "Option 2" });
-    actor.send({ type: "SELECT_OPTION", optionId: "option2-step3", optionText: "Option 2" });
+    const { result } = renderHook(() => useOnboardingMachine());
 
-    let snapshot = actor.getSnapshot();
-    expect(snapshot.value).toBe("example");
+    act(() =>
+      result.current[1]({
+        type: "option2-step1",
+        optionText: "Option 2",
+      })
+    );
+    act(() =>
+      result.current[1]({
+        type: "option2-step2",
+        optionText: "Option 2",
+      })
+    );
+    act(() =>
+      result.current[1]({
+        type: "option2-step3",
+        optionText: "Option 2",
+      })
+    );
 
-    // advance timers to trigger after transition
-    jest.advanceTimersByTime(2000);
-    snapshot = actor.getSnapshot();
-    expect(snapshot.value).toBe("completed");
+    expect(result.current[0].value).toBe("example");
+
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+    expect(result.current[0].value).toBe("completed");
   });
 
   it("accumulates user messages when selecting options", () => {
-    const actor = createActor(onboardingMachine).start();
-    actor.send({ type: "SELECT_OPTION", optionId: "option2-step1", optionText: "Option 2" });
-    actor.send({ type: "SELECT_OPTION", optionId: "option1-step2", optionText: "Option 1" });
+    const { result } = renderHook(() => useOnboardingMachine());
 
-    const snapshot = actor.getSnapshot();
+    act(() =>
+      result.current[1]({
+        type: "option2-step1",
+        optionText: "Option 2",
+      })
+    );
+    act(() =>
+      result.current[1]({
+        type: "option1-step2",
+        optionText: "Option 1",
+      })
+    );
+
     // Initial Paula message + two user messages + step2 Paula message
-    expect(snapshot.context.messages.length).toBeGreaterThanOrEqual(3);
-    expect(snapshot.context.messages.some((m) => m.sender === "user")).toBe(true);
+    expect(result.current[0].context.messages.length).toBeGreaterThanOrEqual(3);
+    expect(
+      result.current[0].context.messages.some(
+        (m: Message) => m.sender === "user"
+      )
+    ).toBe(true);
   });
 });
 

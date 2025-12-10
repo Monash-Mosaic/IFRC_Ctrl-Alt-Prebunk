@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useMachine } from "@xstate/react";
 import { useTranslations } from "next-intl";
-import { onboardingMachine } from "../_machines/onboardingMachine";
+import { useOnboardingMachine } from "../_machines/onboardingMachine";
 import TextMessage from "./TextMessage";
 import OptionButton from "./OptionButton";
-import type { BaseMessage, Message } from "../_machines/onboardingMachine";
+import type { Message } from "../_machines/onboardingMachine";
 import PostMessage from "./PostMessage";
 import PaulaAvatar from "../_icons/PaulaAvatar";
 import EchoAvatar from "../_icons/EchoAvatar";
 
 export default function OnboardingFlow() {
   const t = useTranslations("chat.onboarding");
-  const [state, send] = useMachine(onboardingMachine);
+  const [state, send] = useOnboardingMachine();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom when new messages are added
@@ -28,8 +27,7 @@ export default function OnboardingFlow() {
 
   const handleOptionClick = (optionId: string, translationKey: string) => {
     send({
-      type: "SELECT_OPTION",
-      optionId,
+      type: optionId,
       optionText: translationKey,
     });
   };
