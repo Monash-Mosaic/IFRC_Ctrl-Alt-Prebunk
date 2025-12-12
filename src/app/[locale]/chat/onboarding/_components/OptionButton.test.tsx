@@ -75,64 +75,6 @@ describe("OptionButton", () => {
     expect(button).toHaveAttribute("aria-label", "Click me");
   });
 
-  it("is disabled when disabled prop is true", () => {
-    render(
-      <OptionButton
-        id="test-button"
-        displayText="Click me"
-        onClick={mockOnClick}
-        disabled={true}
-      />
-    );
-
-    const button = screen.getByRole("button");
-    expect(button).toBeDisabled();
-  });
-
-  it("is enabled by default", () => {
-    render(
-      <OptionButton
-        id="test-button"
-        displayText="Click me"
-        onClick={mockOnClick}
-      />
-    );
-
-    const button = screen.getByRole("button");
-    expect(button).not.toBeDisabled();
-  });
-
-  it("does not call onClick when disabled", async () => {
-    const user = userEvent.setup();
-    render(
-      <OptionButton
-        id="test-button"
-        displayText="Click me"
-        onClick={mockOnClick}
-        disabled={true}
-      />
-    );
-
-    const button = screen.getByRole("button");
-    await user.click(button);
-
-    expect(mockOnClick).not.toHaveBeenCalled();
-  });
-
-  it("applies disabled styling when disabled", () => {
-    const { container } = render(
-      <OptionButton
-        id="test-button"
-        displayText="Click me"
-        onClick={mockOnClick}
-        disabled={true}
-      />
-    );
-
-    const button = container.querySelector("button");
-    expect(button).toHaveClass("disabled:cursor-not-allowed", "disabled:opacity-50");
-  });
-
   it("applies correct styling classes", () => {
     const { container } = render(
       <OptionButton

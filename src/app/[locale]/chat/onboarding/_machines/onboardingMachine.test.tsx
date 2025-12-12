@@ -43,8 +43,8 @@ describe("onboardingMachine", () => {
 
     act(() =>
       result.current[1]({
-        type: "option3-step2",
-        optionText: "Option 3",
+        type: "option2-step2",
+        optionText: "Option 2",
       })
     );
     expect(result.current[0].value).toBe("step3");

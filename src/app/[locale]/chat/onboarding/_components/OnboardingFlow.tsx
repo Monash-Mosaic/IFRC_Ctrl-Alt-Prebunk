@@ -5,18 +5,33 @@ import { useLocale, useTranslations } from "next-intl";
 import { useOnboardingMachine } from "../_machines/onboardingMachine";
 import TextMessage from "./TextMessage";
 import OptionButton from "./OptionButton";
-import type { Message, OnboardingContext, OnboardingOptionEvent } from "../_machines/onboardingMachine";
+import type { Message, OnboardingOptionEvent } from "../_machines/onboardingMachine";
 import PostMessage from "./PostMessage";
 import PaulaAvatar from "../_icons/PaulaAvatar";
 import EchoAvatar from "../_icons/EchoAvatar";
 import POSTS from "../posts";
 
+const KEY_STATE = "onboardingState";
+
+const getStateFromStore = () => {
+  const DEFAULT_STATE = { context: undefined, state: undefined };
+  if (typeof window === 'undefined') return DEFAULT_STATE;
+  const state = localStorage.getItem(KEY_STATE);
+  return state ? JSON.parse(state) : DEFAULT_STATE;
+};
+
 export default function OnboardingFlow() {
   const locale = useLocale();
   const t = useTranslations("chat.onboarding");
-  const [state, send, { currentOptions, isCompleted, hasSelectedOption }] = useOnboardingMachine();
+  const { context, state: initialState } = getStateFromStore();
+  const [state, send, { currentOptions, isCompleted }] = useOnboardingMachine(context, initialState);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const post = POSTS[locale];
+
+  useEffect(() => {
+    if (isCompleted) localStorage.removeItem(KEY_STATE);
+    else localStorage.setItem(KEY_STATE, JSON.stringify({ context: state.context, state: state.value }));
+  }, [state, isCompleted]);
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
@@ -74,7 +89,6 @@ export default function OnboardingFlow() {
                 id={option.id}
                 displayText={t(option.translationKey)}
                 onClick={() => handleOptionClick(option.id, option.translationKey)}
-                disabled={hasSelectedOption(option.id)}
               />
             ))}
           </div>

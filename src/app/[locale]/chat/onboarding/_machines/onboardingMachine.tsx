@@ -47,8 +47,8 @@ export type OnboardingOptionEvent = {
 };
 
 export type OnboardingEvent =
+  | { type: "$$initial" }
   | OnboardingOptionEvent
-  | { type: "RESTORE_STATE"; state: OnboardingContext }
   | { type: "AUTO_COMPLETE" };
 
 export interface OnboardingOption {
@@ -75,15 +75,6 @@ export const createPostMessage = (
   timestamp: Date.now(),
 });
 
-const appendUserSelection = (
-  context: OnboardingContext,
-  event: OnboardingOptionEvent
-): OnboardingContext => ({
-  ...context,
-  messages: [...context.messages, createMessage("user", event.optionText)],
-  selectedOptions: [...context.selectedOptions, event.type],
-});
-
 type EffectArgs = {
   context: OnboardingContext;
   event?: OnboardingEvent;
@@ -92,6 +83,15 @@ type EffectArgs = {
   ) => void;
   send: (event: OnboardingEvent) => void;
 }
+
+const appendUserSelection = (
+  context: OnboardingContext,
+  event: OnboardingOptionEvent
+): OnboardingContext => ({
+  ...context,
+  messages: [...context.messages, createMessage("user", event.optionText)],
+  selectedOptions: [...context.selectedOptions, event.type],
+});
 
 const getCurrentOptions = (state: string): OnboardingOption[] => {
   switch (state) {
@@ -145,121 +145,119 @@ const initialContextValue: OnboardingContext = {
   messages: [createMessage("paula", "step1.greeting")],
   selectedOptions: [],
 };
-export const useOnboardingMachine = (initialContext: OnboardingContext = initialContextValue) => {
+export const useOnboardingMachine = (initialContext: OnboardingContext = initialContextValue, initialState: string = "initial") => {
   const [state, send] = useStateMachine({
     id: "onboarding",
     schema: {
       context: t<OnboardingContext>(),
     },
     context: initialContext,
-    initial: "initial",
+    initial: initialState,
     states: {
-    initial: {
-      on: {
-        "option1-step1": "completed",
-        "option2-step1": "step2",
-        "option3-step1": "example",
+      initial: {
+        on: {
+          "option1-step1": "completed",
+          "option2-step1": "step2",
+          "option3-step1": "example",
+        },
+      },
+      step2: {
+        on: {
+          "option1-step2": "completed",
+          "option2-step2": "step3",
+          "option3-step2": "example",
+        },
+        effect({ setContext, event }: EffectArgs) {
+          if (!event || event.type === "AUTO_COMPLETE" || event.type === "$$initial") return;
+
+          setContext((context: OnboardingContext) => {
+            const withSelection = appendUserSelection(context, event);
+
+            return {
+              ...withSelection,
+              messages: [
+                ...withSelection.messages,
+                createMessage("paula", "step2.explanation"),
+              ],
+            };
+          });
+        },
+      },
+      step3: {
+        effect({ setContext, event }: EffectArgs) {
+          if (!event || event.type === "AUTO_COMPLETE" || event.type === "$$initial") return;
+
+          setContext((context: OnboardingContext) => {
+            const withSelection = appendUserSelection(context, event);
+
+            return {
+              ...withSelection,
+              messages: [
+                ...withSelection.messages,
+                createMessage("paula", "step3.tips"),
+              ],
+            };
+          });
+        },
+        on: {
+          "option1-step3": "completed",
+          "option2-step3": "example",
+        },
+      },
+      example: {
+        effect({ setContext, event, send }: EffectArgs) {
+          if (!event || event.type === "AUTO_COMPLETE" || event.type === "$$initial") return;
+
+          setContext((context: OnboardingContext) => {
+            const updated = appendUserSelection(context, event);
+            return {
+              ...updated,
+              messages: [
+                ...updated.messages,
+                createMessage("paula", "example.message"),
+                createPostMessage("echo", {
+                  name: "Echo",
+                  handle: "@climate_truth_warrior",
+                  contentKey: 'echoPost',
+                  mediaUrl: "/images/example/echo-post-img.jpg",
+                  mediaType: "image",
+                }),
+              ],
+            };
+          });
+
+          const timeout = setTimeout(() => send({ type: "AUTO_COMPLETE" }), 2000);
+          return () => clearTimeout(timeout);
+        },
+        on: {
+          AUTO_COMPLETE: "completed",
+        },
+      },
+      completed: {
+        effect({ setContext, event }: EffectArgs) {
+          setContext((context: OnboardingContext) => {
+            const baseContext =
+              event && event.type !== "AUTO_COMPLETE"
+                ? appendUserSelection(context, event as OnboardingOptionEvent)
+                : context;
+
+            return {
+              ...baseContext,
+              messages: [
+                ...baseContext.messages,
+                createMessage("paula", "completed.message"),
+              ],
+            };
+          });
+        },
+        type: "final",
       },
     },
-    step2: {
-      on: {
-        "option1-step2": "completed",
-        "option2-step2": "step3",
-        "option3-step2": "example",
-      },
-      effect({ setContext, event }: EffectArgs) {
-        if (!event || event.type === "AUTO_COMPLETE" || event.type === "RESTORE_STATE") return;
-
-        setContext((context: OnboardingContext) => {
-          const withSelection = appendUserSelection(context, event);
-
-          return {
-            ...withSelection,
-            messages: [
-              ...withSelection.messages,
-              createMessage("paula", "step2.explanation"),
-            ],
-          };
-        });
-      },
-    },
-    step3: {
-      effect({ setContext, event }: EffectArgs) {
-        if (!event || event.type === "AUTO_COMPLETE" || event.type === "RESTORE_STATE") return;
-
-        setContext((context: OnboardingContext) => {
-          const withSelection = appendUserSelection(context, event);
-
-          return {
-            ...withSelection,
-            messages: [
-              ...withSelection.messages,
-              createMessage("paula", "step3.tips"),
-            ],
-          };
-        });
-      },
-      on: {
-        "option1-step3": "completed",
-        "option2-step3": "example",
-      },
-    },
-    example: {
-      effect({ setContext, event, send }: EffectArgs) {
-        if (!event || event.type === "AUTO_COMPLETE" || event.type === "RESTORE_STATE") return;
-
-        setContext((context: OnboardingContext) => {
-          const updated = appendUserSelection(context, event);
-          return {
-            ...updated,
-            messages: [
-              ...updated.messages,
-              createMessage("paula", "example.message"),
-              createPostMessage("echo", {
-                name: "Echo",
-                handle: "@climate_truth_warrior",
-                contentKey: 'echoPost',
-                mediaUrl: "/images/example/echo-post-img.jpg",
-                mediaType: "image",
-              }),
-            ],
-          };
-        });
-
-        const timeout = setTimeout(() => send({ type: "AUTO_COMPLETE" }), 2000);
-        return () => clearTimeout(timeout);
-      },
-      on: {
-        AUTO_COMPLETE: "completed",
-      },
-    },
-    completed: {
-      effect({ setContext, event }: EffectArgs) {
-        setContext((context: OnboardingContext) => {
-          const baseContext =
-            event && event.type !== "AUTO_COMPLETE" && event.type !== "RESTORE_STATE"
-              ? appendUserSelection(context, event as OnboardingOptionEvent)
-              : context;
-
-          return {
-            ...baseContext,
-            messages: [
-              ...baseContext.messages,
-              createMessage("paula", "completed.message"),
-            ],
-          };
-        });
-      },
-      type: "final",
-    },
-  },
   });
 
   const currentState = state.value as string;
   const currentOptions = getCurrentOptions(currentState);
   const isCompleted = currentState === "completed";
-  const hasSelectedOption = (optionId: string) =>
-    state.context.selectedOptions.includes(optionId);
 
   return [
     state,
@@ -267,7 +265,6 @@ export const useOnboardingMachine = (initialContext: OnboardingContext = initial
     {
       currentOptions,
       isCompleted,
-      hasSelectedOption,
     },
   ] as const;
 };
