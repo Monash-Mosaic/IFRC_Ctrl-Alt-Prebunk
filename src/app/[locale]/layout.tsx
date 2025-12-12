@@ -6,7 +6,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 
 import Header from "@/components/header";
-import Navigation from "@/components/navigation";
+import Navigation from "@/components/navigation-bar";
 import PointsCredibilityBar from "@/components/points-credibility-bar";
 import { routing } from "@/i18n/routing";
 import { getDirection, isRTLLocale } from "@/i18n/utils";

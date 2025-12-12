@@ -4,7 +4,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 import createBundleAnalyzer from "@next/bundle-analyzer";
 
 function compose<T>(...fns: ((config: T) => T)[]) {
-  return (config: T) => fns.reduceRight((conf, fn) => fn(conf), config);
+  return (config: T) => fns.reduce((conf, fn) => fn(conf), config);
 }
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
