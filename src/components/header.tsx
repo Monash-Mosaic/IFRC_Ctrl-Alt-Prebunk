@@ -4,7 +4,7 @@ import { Link } from "@/i18n/routing";
 
 
 function Title({
-  width= 573,
+  width = 573,
   height = 71,
   className,
 }: {
