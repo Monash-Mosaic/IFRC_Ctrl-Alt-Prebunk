@@ -11,7 +11,7 @@ import PaulaAvatar from "../_icons/paula-avatar";
 import EchoAvatar from "../_icons/echo-avatar";
 import POSTS from "../posts";
 
-const KEY_STATE = "onboardingState";
+const KEY_STATE = "chat_onboarding_state";
 
 const getStateFromStore = () => {
   const DEFAULT_STATE = { context: undefined, state: undefined };

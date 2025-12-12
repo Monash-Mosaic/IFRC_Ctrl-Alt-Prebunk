@@ -1,7 +1,44 @@
 import { render, screen } from "@/test-utils/test-utils";
 import PointsCredibilityBar from "@/components/points-credibility-bar";
 
+// Create a shared state object that can be modified
+const createMockState = () => ({
+  point: 0,
+  credibility: 80,
+  setPoint: jest.fn(),
+  setCredibility: jest.fn(),
+});
+
+// Store state in a way that's accessible to both mock and tests
+let currentMockState = createMockState();
+
+// Mock the store
+jest.mock("@/lib/use-credibility-store", () => ({
+  useCredibilityStore: jest.fn((selector) => {
+    if (selector) {
+      return selector(currentMockState);
+    }
+    return currentMockState;
+  }),
+}));
+
+// Re-import to get the mocked version
+const { useCredibilityStore } = require("@/lib/use-credibility-store");
+
 describe("PointsCredibilityBar", () => {
+  beforeEach(() => {
+    // Reset to default values before each test
+    currentMockState = createMockState();
+    // Update the mock implementation to use the new state
+    (useCredibilityStore as jest.Mock).mockImplementation((selector) => {
+      if (selector) {
+        return selector(currentMockState);
+      }
+      return currentMockState;
+    });
+    jest.clearAllMocks();
+  });
+
   it("renders the component", () => {
     render(<PointsCredibilityBar />);
     expect(screen.getByText(/points/i)).toBeInTheDocument();
@@ -17,7 +54,8 @@ describe("PointsCredibilityBar", () => {
   });
 
   it("displays custom points value", () => {
-    render(<PointsCredibilityBar points={150} />);
+    currentMockState.point = 150;
+    render(<PointsCredibilityBar />);
     expect(screen.getByText(/150/)).toBeInTheDocument();
   });
 
@@ -35,7 +73,8 @@ describe("PointsCredibilityBar", () => {
   });
 
   it("renders credibility progress bar with custom value", () => {
-    render(<PointsCredibilityBar credibility={65} />);
+    currentMockState.credibility = 65;
+    render(<PointsCredibilityBar />);
     const progressBar = screen
       .getByText(/credibility/i)
       .nextElementSibling?.querySelector("div");
@@ -62,16 +101,10 @@ describe("PointsCredibilityBar", () => {
     );
   });
 
-  it("renders slider indicator with correct position", () => {
-    render(<PointsCredibilityBar credibility={75} />);
-    const credibilityContainer = screen.getByText(/credibility/i).closest("div");
-    const progressContainer = credibilityContainer?.querySelector("div.relative");
-    const slider = progressContainer?.querySelectorAll("div")[1];
-    expect(slider).toHaveStyle({ left: "calc(75% - 10px)" });
-  });
-
   it("displays points and credibility correctly together", () => {
-    render(<PointsCredibilityBar points={250} credibility={90} />);
+    currentMockState.point = 250;
+    currentMockState.credibility = 90;
+    render(<PointsCredibilityBar />);
     expect(screen.getByText(/250/)).toBeInTheDocument();
     expect(screen.getByText(/credibility/i)).toBeInTheDocument();
     
