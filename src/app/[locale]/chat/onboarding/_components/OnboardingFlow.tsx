@@ -20,6 +20,21 @@ const getStateFromStore = () => {
   return state ? JSON.parse(state) : DEFAULT_STATE;
 };
 
+const users = {
+  "user": {
+    name: "You",
+    avatar: null,
+  },
+  "paula": {
+    name: "Paula",
+    avatar: <PaulaAvatar />,
+  },
+  "echo": {
+    name: "Echo",
+    avatar: <EchoAvatar />,
+  },
+}
+
 export default function OnboardingFlow() {
   const locale = useLocale();
   const t = useTranslations("chat.onboarding");
@@ -52,12 +67,13 @@ export default function OnboardingFlow() {
         {state.context.messages.map((message: Message) => {
           switch (message.type) {
             case "text":
+              const sender = users[message.sender as keyof typeof users];
               return (
                 <TextMessage
                   key={message.id}
                   isUser={message.sender === "user"}
-                  senderName={message.sender === "user" ? "You" : message.sender === "paula" ? "Paula" : "Echo"}
-                  senderAvatar={message.sender === "paula" ? <PaulaAvatar /> : message.sender === "echo" ? <EchoAvatar /> : undefined}
+                  senderName={sender.name}
+                  senderAvatar={sender.avatar}
                   displayText={t(message.text)}
                 />
               );
