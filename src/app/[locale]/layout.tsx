@@ -5,9 +5,9 @@ import { hasLocale } from "next-intl";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 
-import Header from "@/components/Header";
-import Navigation from "@/components/Navigation";
-import PointsCredibilityBar from "@/components/PointsCredibilityBar";
+import Header from "@/components/header";
+import Navigation from "@/components/navigation";
+import PointsCredibilityBar from "@/components/points-credibility-bar";
 import { routing } from "@/i18n/routing";
 import { getDirection, isRTLLocale } from "@/i18n/utils";
 

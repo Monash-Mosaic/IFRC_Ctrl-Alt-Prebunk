@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
-import { useOnboardingMachine } from "./onboardingMachine";
-import type { Message } from "./onboardingMachine";
+import { useOnboardingMachine } from "./onboarding-machine";
+import type { Message } from "./onboarding-machine";
 
 jest.useFakeTimers();
 

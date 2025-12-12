@@ -1,6 +1,6 @@
 import { render, screen } from "@/test-utils/test-utils";
 import userEvent from "@testing-library/user-event";
-import OptionButton from "./OptionButton";
+import OptionButton from "./option-button";
 
 describe("OptionButton", () => {
   const mockOnClick = jest.fn();

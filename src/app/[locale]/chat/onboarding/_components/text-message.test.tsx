@@ -1,5 +1,5 @@
 import { render, screen } from "@/test-utils/test-utils";
-import TextMessage from "./TextMessage";
+import TextMessage from "./text-message";
 
 describe("TextMessage", () => {
   const defaultProps = {

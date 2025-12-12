@@ -1,4 +1,4 @@
-import UnderDevelopment from "@/components/UnderDevelopment";
+import UnderDevelopment from "@/components/under-development";
 import { routing } from "@/i18n/routing";
 import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";

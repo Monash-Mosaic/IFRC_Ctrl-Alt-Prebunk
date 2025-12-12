@@ -1,5 +1,5 @@
 import { render, screen } from "@/test-utils/test-utils";
-import Navigation from "@/components/Navigation";
+import Navigation from "@/components/navigation";
 
 // Use the global mock from jest.setup.js
 const mockUsePathname = global.mockUsePathname as unknown as jest.Mock;

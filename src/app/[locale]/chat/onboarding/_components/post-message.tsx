@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ThumbsUp, ThumbsDown, MessageCircle, Send, Video } from "lucide-react";
-import EchoAvatar from "../_icons/EchoAvatar";
+import EchoAvatar from "../_icons/echo-avatar";
 
 interface PostMessageProps {
   name?: string;

@@ -2,13 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useOnboardingMachine } from "../_machines/onboardingMachine";
-import TextMessage from "./TextMessage";
-import OptionButton from "./OptionButton";
-import type { Message, OnboardingOptionEvent } from "../_machines/onboardingMachine";
-import PostMessage from "./PostMessage";
-import PaulaAvatar from "../_icons/PaulaAvatar";
-import EchoAvatar from "../_icons/EchoAvatar";
+import { useOnboardingMachine } from "../_machines/onboarding-machine";
+import TextMessage from "./text-message";
+import OptionButton from "./option-button";
+import type { Message, OnboardingOptionEvent } from "../_machines/onboarding-machine";
+import PostMessage from "./post-message";
+import PaulaAvatar from "../_icons/paula-avatar";
+import EchoAvatar from "../_icons/echo-avatar";
 import POSTS from "../posts";
 
 const KEY_STATE = "onboardingState";

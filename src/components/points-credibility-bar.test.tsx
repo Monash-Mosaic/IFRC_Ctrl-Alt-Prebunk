@@ -1,5 +1,5 @@
 import { render, screen } from "@/test-utils/test-utils";
-import PointsCredibilityBar from "@/components/PointsCredibilityBar";
+import PointsCredibilityBar from "@/components/points-credibility-bar";
 
 describe("PointsCredibilityBar", () => {
   it("renders the component", () => {
