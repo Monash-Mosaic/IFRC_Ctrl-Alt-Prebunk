@@ -1,6 +1,5 @@
-import type React from "react";
 import useStateMachine, { t } from "@cassiozen/usestatemachine";
-import EchoPost from "../_icons/EchoPost.mdx";
+
 
 export type MessageSender = "paula" | "echo" | "user";
 
@@ -21,7 +20,7 @@ export interface PostMessage extends BaseMessage {
   post: {
     name: string;
     handle: string;
-    content: React.ReactNode;
+    contentKey: string;
     mediaUrl?: string;
     mediaType?: "image" | "video";
   };
@@ -51,6 +50,11 @@ export type OnboardingEvent =
   | OnboardingOptionEvent
   | { type: "RESTORE_STATE"; state: OnboardingContext }
   | { type: "AUTO_COMPLETE" };
+
+export interface OnboardingOption {
+  id: string;
+  translationKey: string;
+}
 
 const createMessage = (sender: MessageSender, text: string): TextMessage => ({
   id: `msg-${Date.now()}-${Math.random()}`,
@@ -87,30 +91,82 @@ type EffectArgs = {
     updater: (context: OnboardingContext) => OnboardingContext
   ) => void;
   send: (event: OnboardingEvent) => void;
+}
+
+const getCurrentOptions = (state: string): OnboardingOption[] => {
+  switch (state) {
+    case "initial":
+      return [
+        {
+          id: "option1-step1",
+          translationKey: "step1.option1",
+        },
+        {
+          id: "option2-step1",
+          translationKey: "step1.option2",
+        },
+        {
+          id: "option3-step1",
+          translationKey: "step1.option3",
+        },
+      ];
+    case "step2":
+      return [
+        {
+          id: "option1-step2",
+          translationKey: "step2.option1",
+        },
+        {
+          id: "option2-step2",
+          translationKey: "step2.option2",
+        },
+        {
+          id: "option3-step2",
+          translationKey: "step2.option3",
+        },
+      ];
+    case "step3":
+      return [
+        {
+          id: "option1-step3",
+          translationKey: "step3.option1",
+        },
+        {
+          id: "option2-step3",
+          translationKey: "step3.option2",
+        },
+      ];
+    default:
+      return [];
+  }
 };
 
-export const useOnboardingMachine = () => useStateMachine({
-  id: "onboarding",
-  schema: {
-    context: t<OnboardingContext>(),
-    events: {
-      
+const initialContextValue: OnboardingContext = {
+  messages: [createMessage("paula", "step1.greeting")],
+  selectedOptions: [],
+};
+export const useOnboardingMachine = (initialContext: OnboardingContext = initialContextValue) => {
+  const [state, send] = useStateMachine({
+    id: "onboarding",
+    schema: {
+      context: t<OnboardingContext>(),
     },
-  },
-  context: {
-    messages: [createMessage("paula", "step1.greeting")],
-    selectedOptions: [],
-  },
-  initial: "initial",
-  states: {
+    context: initialContext,
+    initial: "initial",
+    states: {
     initial: {
       on: {
         "option1-step1": "completed",
         "option2-step1": "step2",
-        "option3-step1": "step2",
+        "option3-step1": "example",
       },
     },
     step2: {
+      on: {
+        "option1-step2": "completed",
+        "option2-step2": "step3",
+        "option3-step2": "example",
+      },
       effect({ setContext, event }: EffectArgs) {
         if (!event || event.type === "AUTO_COMPLETE" || event.type === "RESTORE_STATE") return;
 
@@ -125,12 +181,6 @@ export const useOnboardingMachine = () => useStateMachine({
             ],
           };
         });
-      },
-      on: {
-        "option1-step2": "completed",
-        "option2-step2": "step3",
-        "option3-step2": "step3",
-        AUTO_COMPLETE: "completed",
       },
     },
     step3: {
@@ -168,7 +218,7 @@ export const useOnboardingMachine = () => useStateMachine({
               createPostMessage("echo", {
                 name: "Echo",
                 handle: "@climate_truth_warrior",
-                content: <EchoPost />,
+                contentKey: 'echoPost',
                 mediaUrl: "/images/example/echo-post-img.jpg",
                 mediaType: "image",
               }),
@@ -203,4 +253,21 @@ export const useOnboardingMachine = () => useStateMachine({
       type: "final",
     },
   },
-});
+  });
+
+  const currentState = state.value as string;
+  const currentOptions = getCurrentOptions(currentState);
+  const isCompleted = currentState === "completed";
+  const hasSelectedOption = (optionId: string) =>
+    state.context.selectedOptions.includes(optionId);
+
+  return [
+    state,
+    send,
+    {
+      currentOptions,
+      isCompleted,
+      hasSelectedOption,
+    },
+  ] as const;
+};

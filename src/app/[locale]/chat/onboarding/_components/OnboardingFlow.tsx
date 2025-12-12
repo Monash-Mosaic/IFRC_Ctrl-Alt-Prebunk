@@ -1,91 +1,34 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useOnboardingMachine } from "../_machines/onboardingMachine";
 import TextMessage from "./TextMessage";
 import OptionButton from "./OptionButton";
-import type { Message } from "../_machines/onboardingMachine";
+import type { Message, OnboardingContext, OnboardingOptionEvent } from "../_machines/onboardingMachine";
 import PostMessage from "./PostMessage";
 import PaulaAvatar from "../_icons/PaulaAvatar";
 import EchoAvatar from "../_icons/EchoAvatar";
+import POSTS from "../posts";
 
 export default function OnboardingFlow() {
+  const locale = useLocale();
   const t = useTranslations("chat.onboarding");
-  const [state, send] = useOnboardingMachine();
+  const [state, send, { currentOptions, isCompleted, hasSelectedOption }] = useOnboardingMachine();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const post = POSTS[locale];
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [state.context.messages]);
 
-  // Notify parent of state changes
-  useEffect(() => {
-    console.log("State changed:", state.value);
-  }, [state.value]);
-
   const handleOptionClick = (optionId: string, translationKey: string) => {
     send({
       type: optionId,
       optionText: translationKey,
-    });
+    } as OnboardingOptionEvent);
   };
-
-  const getCurrentOptions = () => {
-    const currentState = state.value as string;
-
-    switch (currentState) {
-      case "initial":
-        return [
-          {
-            id: "option1-step1",
-            translationKey: "step1.option1",
-          },
-          {
-            id: "option2-step1",
-            translationKey: "step1.option2",
-          },
-          {
-            id: "option3-step1",
-            translationKey: "step1.option3",
-          },
-        ];
-      case "step2":
-        return [
-          {
-            id: "option1-step2",
-            translationKey: "step2.option1",
-          },
-          {
-            id: "option2-step2",
-            translationKey: "step2.option2",
-          },
-          {
-            id: "option3-step2",
-            translationKey: "step2.option3",
-          },
-        ];
-      case "step3":
-        return [
-          {
-            id: "option1-step3",
-            translationKey: "step3.option1",
-          },
-          {
-            id: "option2-step3",
-            translationKey: "step3.option2",
-          },
-        ];
-      default:
-        return [];
-    }
-  };
-
-  const isCompleted = state.value === "completed";
-  const currentOptions = getCurrentOptions();
-  const hasSelectedOption = (optionId: string) =>
-    state.context.selectedOptions.includes(optionId);
 
   return (
     <div className="flex h-full flex-col">
@@ -109,7 +52,7 @@ export default function OnboardingFlow() {
                   key={message.id}
                   name={message.post.name}
                   handle={message.post.handle}
-                  content={message.post.content}
+                  content={post[message.post.contentKey as keyof typeof post] as React.ReactNode}
                   mediaUrl={message.post.mediaUrl}
                   mediaType={message.post.mediaType}
                 />
@@ -140,11 +83,3 @@ export default function OnboardingFlow() {
     </div>
   );
 }
-
-
-
-
-
-
-
-

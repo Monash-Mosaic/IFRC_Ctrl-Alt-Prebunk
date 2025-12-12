@@ -34,13 +34,9 @@ export default function PostMessage({
         <div className="shrink-0">
           <EchoAvatar width={40} height={40} />
         </div>
-        <div className="flex flex-1 items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-[#0D1B3E]">{name}</h3>
-              <span className="text-xs text-[#6B7280]">{handle}</span>
-            </div>
-          </div>
+        <div className="flex flex-col items-start justify-between">
+          <h3 className="text-sm font-semibold text-[#0D1B3E]">{name}</h3>
+          <p className="text-xs text-[#6B7280]">{handle}</p>
         </div>
       </div>
 
