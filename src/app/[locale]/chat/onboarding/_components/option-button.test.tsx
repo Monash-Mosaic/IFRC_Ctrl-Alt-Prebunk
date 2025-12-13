@@ -9,10 +9,25 @@ describe('OptionButton', () => {
     mockOnClick.mockClear();
   });
 
-  it('renders the button with text', () => {
-    render(<OptionButton id="test-button" displayText="Click me" onClick={mockOnClick} />);
+  it('matches snapshot with default props', () => {
+    const { container } = render(
+      <OptionButton id="test-button" displayText="Click me" onClick={mockOnClick} />
+    );
+    expect(container).toMatchSnapshot();
+  });
 
-    expect(screen.getByText('Click me')).toBeInTheDocument();
+  it('matches snapshot with emoji text', () => {
+    const { container } = render(
+      <OptionButton id="test-button" displayText="🎮 Let's play" onClick={mockOnClick} />
+    );
+    expect(container).toMatchSnapshot();
+  });
+
+  it('matches snapshot when disabled', () => {
+    const { container } = render(
+      <OptionButton id="test-button" displayText="Click me" onClick={mockOnClick} disabled />
+    );
+    expect(container).toMatchSnapshot();
   });
 
   it('calls onClick when clicked', async () => {
@@ -23,12 +38,6 @@ describe('OptionButton', () => {
     await user.click(button);
 
     expect(mockOnClick).toHaveBeenCalledTimes(1);
-  });
-
-  it('displays text content correctly', () => {
-    render(<OptionButton id="test-button" displayText="🎮 Let's play" onClick={mockOnClick} />);
-
-    expect(screen.getByText("🎮 Let's play")).toBeInTheDocument();
   });
 
   it('renders button with correct id attribute', () => {
@@ -43,14 +52,5 @@ describe('OptionButton', () => {
 
     const button = screen.getByRole('button');
     expect(button).toHaveAttribute('aria-label', 'Click me');
-  });
-
-  it('applies correct styling classes', () => {
-    const { container } = render(
-      <OptionButton id="test-button" displayText="Click me" onClick={mockOnClick} />
-    );
-
-    const button = container.querySelector('button');
-    expect(button).toHaveClass('rounded-lg', 'border-2', 'border-dashed', 'bg-[#F5F5F5]');
   });
 });

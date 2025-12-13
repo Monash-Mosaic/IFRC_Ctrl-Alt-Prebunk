@@ -25,11 +25,17 @@ export interface PostMessage extends BaseMessage {
   };
 }
 
-export type Message = TextMessage | PostMessage;
+export interface TypingMessage extends BaseMessage {
+  type: 'typing';
+  typing: boolean;
+};
+
+export type Message = TextMessage | PostMessage | TypingMessage;
 
 export interface OnboardingContext {
   messages: Message[];
   selectedOptions: string[];
+  typing: boolean;
 }
 
 export type OnboardingOptionEvent = {
@@ -54,6 +60,14 @@ export interface OnboardingOption {
   id: string;
   translationKey: string;
 }
+
+const createTypingMessage = (sender: MessageSender): TypingMessage => ({
+  id: `msg-${Date.now()}-${Math.random()}`,
+  sender,
+  type: 'typing',
+  typing: true,
+  timestamp: Date.now(),
+});
 
 const createMessage = (sender: MessageSender, text: string): TextMessage => ({
   id: `msg-${Date.now()}-${Math.random()}`,
@@ -139,13 +153,15 @@ const getCurrentOptions = (state: string): OnboardingOption[] => {
 };
 
 export const initialContextValue: OnboardingContext = {
-  messages: [createMessage('paula', 'step1.greeting')],
+  messages: [createTypingMessage('paula')],
   selectedOptions: [],
+  typing: true,
 };
 export const useOnboardingMachine = (
   initialContext: OnboardingContext = initialContextValue,
   initialState: string = 'initial'
 ) => {
+  const ONBOARDING_TYPING_TIMEOUT = 1000;
   const [state, send] = useStateMachine({
     id: 'onboarding',
     schema: {
@@ -159,6 +175,19 @@ export const useOnboardingMachine = (
           'option1-step1': 'completed',
           'option2-step1': 'step2',
           'option3-step1': 'example',
+        },
+        effect({ setContext, event }: EffectArgs) {
+          if (!event || event.type === 'AUTO_COMPLETE') return;
+          const timeout = setTimeout(() => {
+            setContext((context: OnboardingContext) => {
+              return {
+                ...context,
+                messages: [...context.messages.slice(0, -1), createMessage('paula', 'step1.greeting')],
+                typing: false,
+              };
+            });
+          }, ONBOARDING_TYPING_TIMEOUT);
+          return () => clearTimeout(timeout);
         },
       },
       step2: {
@@ -175,9 +204,30 @@ export const useOnboardingMachine = (
 
             return {
               ...withSelection,
-              messages: [...withSelection.messages, createMessage('paula', 'step2.explanation')],
+              messages: [...withSelection.messages, createTypingMessage('paula')],
+              typing: true,
             };
           });
+          const timeout = setTimeout(() => {
+            setContext((context: OnboardingContext) => {
+              return {
+                ...context,
+                messages: [
+                  ...context.messages.slice(0, -1),
+                  createMessage('paula', 'step2.explanation'),
+                  createPostMessage('echo', {
+                    name: 'Echo',
+                    handle: '@climate_truth_warrior',
+                    contentKey: 'echoPost',
+                    mediaUrl: '/images/example/echo-post-img.jpg',
+                    mediaType: 'image',
+                  }),
+                ],
+                typing: false,
+              };
+            });
+          }, ONBOARDING_TYPING_TIMEOUT);
+          return () => clearTimeout(timeout);
         },
       },
       step3: {
@@ -189,9 +239,20 @@ export const useOnboardingMachine = (
 
             return {
               ...withSelection,
-              messages: [...withSelection.messages, createMessage('paula', 'step3.tips')],
+              messages: [...withSelection.messages, createTypingMessage('paula')],
+              typing: true,
             };
           });
+          const timeout = setTimeout(() => {
+            setContext((context: OnboardingContext) => {
+              return {
+                ...context,
+                messages: [...context.messages.slice(0, -1), createMessage('paula', 'step3.tips')],
+                typing: false,
+              };
+            });
+          }, ONBOARDING_TYPING_TIMEOUT);
+          return () => clearTimeout(timeout);
         },
         on: {
           'option1-step3': 'completed',
@@ -208,19 +269,26 @@ export const useOnboardingMachine = (
               ...updated,
               messages: [
                 ...updated.messages,
-                createMessage('paula', 'example.message'),
-                createPostMessage('echo', {
-                  name: 'Echo',
-                  handle: '@climate_truth_warrior',
-                  contentKey: 'echoPost',
-                  mediaUrl: '/images/example/echo-post-img.jpg',
-                  mediaType: 'image',
-                }),
+                createTypingMessage('paula'),
               ],
+              typing: true,
             };
           });
-
-          const timeout = setTimeout(() => send({ type: 'AUTO_COMPLETE' }), 2000);
+          const timeout = setTimeout(() => {
+            setContext((context: OnboardingContext) => {
+              return {
+                ...context,
+                messages: [...context.messages.slice(0, -1), 
+                  createMessage('paula', 'example.message'),
+                ],
+                typing: false,
+              };
+            });
+            const timeout2 = setTimeout(() => {
+              send({ type: 'AUTO_COMPLETE' });
+              clearTimeout(timeout2);
+            }, 2000);
+          }, ONBOARDING_TYPING_TIMEOUT);
           return () => clearTimeout(timeout);
         },
         on: {
@@ -237,9 +305,20 @@ export const useOnboardingMachine = (
 
             return {
               ...baseContext,
-              messages: [...baseContext.messages, createMessage('paula', 'completed.message')],
+              messages: [...baseContext.messages, createTypingMessage('paula')],
+              typing: true,
             };
           });
+          const timeout = setTimeout(() => {
+            setContext((context: OnboardingContext) => {
+              return {
+                ...context,
+                messages: [...context.messages.slice(0, -1), createMessage('paula', 'completed.message')],
+                typing: false,
+              };
+            });
+          }, ONBOARDING_TYPING_TIMEOUT);
+          return () => clearTimeout(timeout);
         },
         type: 'final',
       },

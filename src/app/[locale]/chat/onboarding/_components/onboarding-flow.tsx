@@ -3,7 +3,8 @@
 import { useEffect, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { initialContextValue, useOnboardingMachine } from '../_machines/onboarding-machine';
-import TextMessage from './text-message';
+import UserTextMessage from './user-text-message';
+import BotTextMessage from './bot-text-message';
 import OptionButton from './option-button';
 import type {
   Message,
@@ -11,30 +12,16 @@ import type {
   OnboardingContext,
 } from '../_machines/onboarding-machine';
 import PostMessage from './post-message';
-import PaulaAvatar from '../_icons/paula-avatar';
-import EchoAvatar from '../_icons/echo-avatar';
 import POSTS from '../_posts';
 import { STORAGE_KEYS, getStorage } from '@/lib/local-storage';
+import TypingMessage from './typing-message';
+import { CHAT_USERS } from '../../_constants/users';
 
 interface StoredOnboardingState {
   context: OnboardingContext | undefined;
   state: string | undefined;
 }
 
-const users = {
-  user: {
-    name: 'You',
-    avatar: null,
-  },
-  paula: {
-    name: 'Paula',
-    avatar: <PaulaAvatar />,
-  },
-  echo: {
-    name: 'Echo',
-    avatar: <EchoAvatar />,
-  },
-};
 
 export default function OnboardingFlow() {
   const locale = useLocale();
@@ -75,17 +62,21 @@ export default function OnboardingFlow() {
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col max-w-md">
       {/* Messages Container */}
       <div className="flex-1 space-y-4 overflow-y-auto px-4 py-6">
         {state.context.messages.map((message: Message) => {
+          const sender = CHAT_USERS[message.sender as keyof typeof CHAT_USERS];
           switch (message.type) {
             case 'text':
-              const sender = users[message.sender as keyof typeof users];
-              return (
-                <TextMessage
+              return message.sender === 'user' ? (
+                <UserTextMessage
                   key={message.id}
-                  isUser={message.sender === 'user'}
+                  displayText={t(message.text)}
+                />
+              ) : (
+                <BotTextMessage
+                  key={message.id}
                   senderName={sender.name}
                   senderAvatar={sender.avatar}
                   displayText={t(message.text)}
@@ -102,6 +93,14 @@ export default function OnboardingFlow() {
                   mediaType={message.post.mediaType}
                 />
               );
+            case 'typing':
+              return (  
+                <TypingMessage
+                  key={message.id}
+                  senderName={sender.name}
+                  senderAvatar={sender.avatar}
+                />
+              );
             default:
               return null;
           }
@@ -110,8 +109,8 @@ export default function OnboardingFlow() {
       </div>
 
       {/* Options Container */}
-      {!isCompleted && currentOptions.length > 0 && (
-        <div className="border-t border-[#E8E9ED] bg-white px-4 py-4">
+      {!state.context.typing && currentOptions.length > 0 && (
+        <div className="border-t border-[#E8E9ED] bg-white px-4 py-4 pb-20 md:pb-4">
           <div className="mx-auto flex max-w-2xl flex-col gap-3">
             {currentOptions.map((option) => (
               <OptionButton

@@ -5,13 +5,31 @@ import type { Message } from './onboarding-machine';
 jest.useFakeTimers();
 
 describe('onboardingMachine', () => {
-  it('starts with initial greeting message', () => {
+  it('starts with initial typing message', () => {
     const { result } = renderHook(() => useOnboardingMachine());
 
     expect(result.current[0].value).toBe('initial');
     expect(result.current[0].context.messages).toHaveLength(1);
     const firstMessage = result.current[0].context.messages[0];
-    expect(firstMessage?.type === 'text' ? firstMessage.text : undefined).toBe('step1.greeting');
+    expect(firstMessage?.type).toBe('typing');
+    expect(firstMessage?.sender).toBe('paula');
+  });
+
+  it('shows greeting message after typing timeout', () => {
+    const { result } = renderHook(() => useOnboardingMachine());
+
+    expect(result.current[0].value).toBe('initial');
+    expect(result.current[0].context.messages).toHaveLength(1);
+    expect(result.current[0].context.messages[0]?.type).toBe('typing');
+
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    const messages = result.current[0].context.messages;
+    const greetingMessage = messages.find((m: Message) => m.type === 'text' && m.text === 'step1.greeting');
+    expect(greetingMessage).toBeDefined();
+    expect(result.current[0].context.typing).toBe(false);
   });
 
   it('goes to completed when selecting option1 in step1', () => {
@@ -72,9 +90,15 @@ describe('onboardingMachine', () => {
 
     expect(result.current[0].value).toBe('example');
 
+    // Advance timers: 1000ms for typing timeout, then 2000ms for auto-complete
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    
     act(() => {
       jest.advanceTimersByTime(2000);
     });
+    
     expect(result.current[0].value).toBe('completed');
   });
 

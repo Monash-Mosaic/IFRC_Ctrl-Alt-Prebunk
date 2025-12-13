@@ -9,6 +9,7 @@ function compose<T>(...fns: ((config: T) => T)[]) {
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const withMDX = createMDX({
+  extension: /\.mdx|\.md$/,
   options: {
     // Customize remark/rehype plugins here if needed
     remarkPlugins: [],
@@ -21,7 +22,6 @@ const withBundleAnalyzer = createBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
   transpilePackages: ['geist'],
   reactStrictMode: true,
 };

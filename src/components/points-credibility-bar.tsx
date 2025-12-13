@@ -23,7 +23,7 @@ export default function PointsCredibilityBar() {
       </div>
 
       {/* Credibility */}
-      <div className="flex flex-1 items-center gap-3 max-w-xs">
+      <div className="flex flex-1 items-center gap-3 max-w-[500px]">
         <span className="text-sm font-medium text-[#0D1B3E]">{t('credibility')}</span>
         <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-white">
           <div

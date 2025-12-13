@@ -9,6 +9,7 @@
   --muted-foreground: #6b7280;
 }
 
+/* postcss-disable-next-line */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
