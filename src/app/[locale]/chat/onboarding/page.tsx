@@ -14,10 +14,10 @@ export default function OnboardingPage() {
   });
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-10rem)] flex-col md:px-4 md:py-6">
+    <div className="mx-auto flex flex-col md:px-4 md:pt-6">
       {/* Headline */}
       <ChatHeadline name={CHAT_USERS.paula.name} />
-      <div className="mx-auto flex items-center justify-center max-w-md flex-col">
+      <div className="mx-auto flex items-center justify-center h-[calc(100vh-10rem)] max-w-md flex-col w-full">
         <OnboardingFlow />
       </div>
     </div>

@@ -62,7 +62,7 @@ export default function OnboardingFlow() {
   };
 
   return (
-    <div className="flex h-full flex-col max-w-md">
+    <div className="flex h-full flex-col w-full">
       {/* Messages Container */}
       <div className="flex-1 space-y-4 overflow-y-auto px-4 py-6">
         {state.context.messages.map((message: Message) => {
@@ -110,7 +110,7 @@ export default function OnboardingFlow() {
 
       {/* Options Container */}
       {!state.context.typing && currentOptions.length > 0 && (
-        <div className="border-t border-[#E8E9ED] bg-white px-4 py-4 pb-20 md:pb-4">
+        <div className="border-t border-[#E8E9ED] bg-white px-4 py-4 md:pb-4">
           <div className="mx-auto flex max-w-2xl flex-col gap-3">
             {currentOptions.map((option) => (
               <OptionButton

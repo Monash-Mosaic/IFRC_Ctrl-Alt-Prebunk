@@ -18,7 +18,7 @@ export default async function Header() {
                 alt={t('ifrcLogoAlt')}
                 height={61.35}
                 width={223.67}
-                className="h-8 w-auto"
+                className="h-8 w-auto bg-white"
               />
             </Link>
           </div>
