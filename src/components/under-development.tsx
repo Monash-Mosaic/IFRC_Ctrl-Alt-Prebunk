@@ -1,7 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from 'next-intl/server';
 
 export default async function UnderDevelopment() {
-  const t = await getTranslations("underDevelopment");
+  const t = await getTranslations('underDevelopment');
 
   return (
     <div className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center p-6">
@@ -24,11 +24,10 @@ export default async function UnderDevelopment() {
           </div>
         </div>
         <h1 className="mb-4 font-mono text-2xl font-bold text-[#0D1B3E] md:text-3xl">
-          {t("title")}
+          {t('title')}
         </h1>
-        <p className="text-lg text-[#6B7280]">{t("message")}</p>
+        <p className="text-lg text-[#6B7280]">{t('message')}</p>
       </div>
     </div>
   );
 }
-

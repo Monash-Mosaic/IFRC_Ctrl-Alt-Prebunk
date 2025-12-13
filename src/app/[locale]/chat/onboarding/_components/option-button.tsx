@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 interface OptionButtonProps {
   id: string;
@@ -7,12 +7,7 @@ interface OptionButtonProps {
   disabled?: boolean;
 }
 
-export default function OptionButton({
-  id,
-  displayText,
-  onClick,
-}: OptionButtonProps) {
-
+export default function OptionButton({ id, displayText, onClick }: OptionButtonProps) {
   return (
     <button
       id={id}

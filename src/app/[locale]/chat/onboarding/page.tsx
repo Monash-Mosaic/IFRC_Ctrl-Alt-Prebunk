@@ -1,14 +1,14 @@
 'use client';
 
-import dynamic from "next/dynamic";
-import Loading from "@/components/loading";
-import { useTranslations } from "next-intl";
+import dynamic from 'next/dynamic';
+import Loading from '@/components/loading';
+import { useTranslations } from 'next-intl';
 
 export default function OnboardingPage() {
-  const t = useTranslations("common");
-  const OnboardingFlow = dynamic(() => import("./_components/onboarding-flow"), {
+  const t = useTranslations('common');
+  const OnboardingFlow = dynamic(() => import('./_components/onboarding-flow'), {
     ssr: false,
-    loading: () => <Loading displayText={t("loading")} /> 
+    loading: () => <Loading displayText={t('loading')} />,
   });
 
   return (

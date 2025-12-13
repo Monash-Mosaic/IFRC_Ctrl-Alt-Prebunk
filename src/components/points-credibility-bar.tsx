@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useCredibilityStore } from "@/lib/use-credibility-store";
-import { useTranslations } from "next-intl";
+import { useCredibilityStore } from '@/lib/use-credibility-store';
+import { useTranslations } from 'next-intl';
 
 export default function PointsCredibilityBar() {
-  const t = useTranslations("header");
+  const t = useTranslations('header');
   const { point, credibility } = useCredibilityStore((state) => state);
 
   return (
@@ -12,7 +12,7 @@ export default function PointsCredibilityBar() {
       {/* Points */}
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-[#0D1B3E]">
-          {t("points")}: {point}
+          {t('points')}: {point}
         </span>
         {/* Badge circles */}
         <div className="flex gap-1">
@@ -24,7 +24,7 @@ export default function PointsCredibilityBar() {
 
       {/* Credibility */}
       <div className="flex flex-1 items-center gap-3 max-w-xs">
-        <span className="text-sm font-medium text-[#0D1B3E]">{t("credibility")}</span>
+        <span className="text-sm font-medium text-[#0D1B3E]">{t('credibility')}</span>
         <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-white">
           <div
             className="absolute left-0 top-0 h-full rounded-full bg-[#2FE89F] transition-all duration-500"
@@ -35,4 +35,3 @@ export default function PointsCredibilityBar() {
     </div>
   );
 }
-

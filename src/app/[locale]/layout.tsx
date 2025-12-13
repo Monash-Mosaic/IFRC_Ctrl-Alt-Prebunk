@@ -1,26 +1,26 @@
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { Geist, Geist_Mono } from "next/font/google";
-import type { Metadata } from "next";
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { hasLocale } from 'next-intl';
+import { Geist, Geist_Mono } from 'next/font/google';
+import type { Metadata } from 'next';
 
-import Header from "@/components/header";
-import Navigation from "@/components/navigation-bar";
-import PointsCredibilityBar from "@/components/points-credibility-bar";
-import { routing } from "@/i18n/routing";
-import { getDirection, isRTLLocale } from "@/i18n/utils";
+import Header from '@/components/header';
+import Navigation from '@/components/navigation-bar';
+import PointsCredibilityBar from '@/components/points-credibility-bar';
+import { routing } from '@/i18n/routing';
+import { getDirection, isRTLLocale } from '@/i18n/utils';
 
-import "../globals.css";
+import '../globals.css';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export function generateStaticParams() {
@@ -33,7 +33,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  
+
   // Ensure that the incoming `locale` is valid
   if (!hasLocale(routing.locales, locale)) {
     return {};
@@ -41,12 +41,12 @@ export async function generateMetadata({
 
   // Enable static rendering
   setRequestLocale(locale);
-  
-  const t = await getTranslations("metadata");
+
+  const t = await getTranslations('metadata');
 
   return {
-    title: t("title"),
-    description: t("description"),
+    title: t('title'),
+    description: t('description'),
   };
 }
 
@@ -77,16 +77,14 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={direction}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${direction}`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased ${direction}`}>
         <NextIntlClientProvider messages={messages}>
           <Header />
           <PointsCredibilityBar />
           <Navigation />
           <main
             className={`min-h-screen bg-white pt-24 pb-20 md:pb-0 ${
-              isRTL ? "md:pr-20" : "md:pl-20"
+              isRTL ? 'md:pr-20' : 'md:pl-20'
             }`}
           >
             {children}

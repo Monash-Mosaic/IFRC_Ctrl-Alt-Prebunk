@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start --turbopack",
+    "start": "next start",
     "analyze": "ANALYZE=true next build --webpack",
     "lint": "eslint",
     "format": "prettier -w .",
@@ -37,11 +37,21 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.22",
+    "cssnano": "^7.1.2",
     "eslint": "^9",
     "eslint-config-next": "16.0.6",
+    "eslint-plugin-compat": "^6.0.2",
+    "eslint-plugin-prettier": "^5.5.4",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "browserslist": [
+    "cover 95%",
+    "last 2 versions",
+    "not op_mini all",
+    "not dead"
+  ]
 }

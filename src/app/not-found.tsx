@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import Error from "next/error";
-import { routing } from "@/i18n/routing";
+import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import Error from 'next/error';
+import { routing } from '@/i18n/routing';
 
 export default function NotFound() {
   const pathname = usePathname();
@@ -11,26 +11,26 @@ export default function NotFound() {
 
   useEffect(() => {
     // Don't redirect /api routes - show standard 404
-    if (pathname?.startsWith("/api")) {
+    if (pathname?.startsWith('/api')) {
       return;
     }
 
     // Redirect non-API routes to default locale
     // The catch-all route will then trigger the locale-specific 404
-    if (pathname && !pathname.startsWith("/api")) {
-      const isLocaleRoute = routing.locales.some((locale) =>
-        pathname.startsWith(`/${locale}`)
-      );
+    if (pathname && !pathname.startsWith('/api')) {
+      const isLocaleRoute = routing.locales.some((locale) => pathname.startsWith(`/${locale}`));
       if (!isLocaleRoute) {
         // Preserve the path and redirect to default locale
-        const pathWithoutLeadingSlash = pathname === "/" ? "" : pathname.slice(1);
-        router.replace(`/${routing.defaultLocale}${pathWithoutLeadingSlash ? `/${pathWithoutLeadingSlash}` : ""}`);
+        const pathWithoutLeadingSlash = pathname === '/' ? '' : pathname.slice(1);
+        router.replace(
+          `/${routing.defaultLocale}${pathWithoutLeadingSlash ? `/${pathWithoutLeadingSlash}` : ''}`
+        );
       }
     }
   }, [pathname, router]);
 
   // For /api routes, show standard Next.js error page
-  if (pathname?.startsWith("/api")) {
+  if (pathname?.startsWith('/api')) {
     return (
       <html lang="en">
         <body>
@@ -53,4 +53,3 @@ export default function NotFound() {
     </html>
   );
 }
-

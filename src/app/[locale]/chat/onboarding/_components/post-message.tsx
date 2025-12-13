@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { ThumbsUp, ThumbsDown, MessageCircle, Send, Video } from "lucide-react";
-import EchoAvatar from "../_icons/echo-avatar";
+import Image from 'next/image';
+import { ThumbsUp, ThumbsDown, MessageCircle, Send, Video } from 'lucide-react';
+import EchoAvatar from '../_icons/echo-avatar';
 
 interface PostMessageProps {
   name?: string;
   handle?: string;
   content: React.ReactNode;
   mediaUrl?: string;
-  mediaType?: "image" | "video";
+  mediaType?: 'image' | 'video';
   onLike?: () => void;
   onDislike?: () => void;
   onComment?: () => void;
@@ -21,7 +21,7 @@ export default function PostMessage({
   handle,
   content,
   mediaUrl,
-  mediaType = "image",
+  mediaType = 'image',
   onLike,
   onDislike,
   onComment,
@@ -50,20 +50,21 @@ export default function PostMessage({
             <div className="aspect-video w-full bg-gradient-to-br from-blue-100 to-blue-200">
               {/* Placeholder for media - in real app this would be an Image or video component */}
               <div className="flex h-full items-center justify-center">
-                {mediaType === "video" && (
+                {mediaType === 'video' && (
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/80 shadow-md">
                     <div className="ml-1 h-0 w-0 border-l-[12px] border-l-[#2FE89F] border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent">
                       <Video size={20} strokeWidth={2} />
                     </div>
                   </div>
                 )}
-                {mediaType === "image" && (
-                    <Image
-                      src={mediaUrl}
-                      alt="Echo post"
-                      width={500}
-                      height={500}
-                      className="w-full h-full object-cover" />
+                {mediaType === 'image' && (
+                  <Image
+                    src={mediaUrl}
+                    alt="Echo post"
+                    width={500}
+                    height={500}
+                    className="w-full h-full object-cover"
+                  />
                 )}
               </div>
             </div>
@@ -109,6 +110,3 @@ export default function PostMessage({
     </div>
   );
 }
-
-
-

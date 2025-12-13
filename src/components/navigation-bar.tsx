@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useTranslations } from "next-intl";
-import { Link, routing, usePathname } from "@/i18n/routing";
-import { Home, MessageSquare, PieChart, Upload, User } from "lucide-react";
+import { useTranslations } from 'next-intl';
+import { Link, routing, usePathname } from '@/i18n/routing';
+import { Home, MessageSquare, PieChart, Upload, User } from 'lucide-react';
 
 interface NavItem {
   href: keyof typeof routing.pathnames;
@@ -12,37 +12,37 @@ interface NavItem {
 }
 
 export default function Navigation() {
-  const t = useTranslations("nav");
+  const t = useTranslations('nav');
   const pathname = usePathname();
 
   const navItems: NavItem[] = [
     {
-      href: "/",
-      labelKey: "home",
+      href: '/',
+      labelKey: 'home',
       icon: <Home size={24} strokeWidth={2} />,
       activeIcon: <Home size={24} fill="currentColor" strokeWidth={1} />,
     },
     {
-      href: "/chat",
-      labelKey: "chat",
+      href: '/chat',
+      labelKey: 'chat',
       icon: <MessageSquare size={24} strokeWidth={2} />,
       activeIcon: <MessageSquare size={24} fill="currentColor" strokeWidth={1} />,
     },
     {
-      href: "/analytics",
-      labelKey: "analytics",
+      href: '/analytics',
+      labelKey: 'analytics',
       icon: <PieChart size={24} strokeWidth={2} />,
       activeIcon: <PieChart size={24} fill="currentColor" strokeWidth={1} />,
     },
     {
-      href: "/share",
-      labelKey: "share",
+      href: '/share',
+      labelKey: 'share',
       icon: <Upload size={24} strokeWidth={2} />,
       activeIcon: <Upload size={24} fill="currentColor" strokeWidth={1} />,
     },
     {
-      href: "/profile",
-      labelKey: "profile",
+      href: '/profile',
+      labelKey: 'profile',
       icon: <User size={24} strokeWidth={2} />,
       activeIcon: <User size={24} fill="currentColor" strokeWidth={1} />,
     },
@@ -55,17 +55,14 @@ export default function Navigation() {
         <nav className="flex flex-1 flex-col justify-center items-center gap-2">
           {navItems.map((item) => {
             const isActive =
-              pathname === item.href ||
-              (item.href !== "/" && pathname.startsWith(item.href));
+              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                  isActive
-                    ? "text-[#E63946]"
-                    : "text-[#0D1B3E] hover:text-[#E63946]"
+                  isActive ? 'text-[#E63946]' : 'text-[#0D1B3E] hover:text-[#E63946]'
                 }`}
               >
                 <span className="transition-transform group-hover:scale-110">
@@ -83,17 +80,14 @@ export default function Navigation() {
         <div className="flex h-16 items-center justify-around px-2">
           {navItems.map((item) => {
             const isActive =
-              pathname === item.href ||
-              (item.href !== "/" && pathname.startsWith(item.href));
+              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                  isActive
-                    ? "text-[#E63946]"
-                    : "text-[#0D1B3E] hover:text-[#E63946]"
+                  isActive ? 'text-[#E63946]' : 'text-[#0D1B3E] hover:text-[#E63946]'
                 }`}
               >
                 <span className="transition-transform group-hover:scale-110">
