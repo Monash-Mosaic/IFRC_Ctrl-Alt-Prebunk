@@ -1,14 +1,15 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
-  --foreground: #0D1B3E;
-  --primary: #E63946;
-  --secondary: #2FE89F;
-  --muted: #E8E9ED;
-  --muted-foreground: #6B7280;
+  --foreground: #0d1b3e;
+  --primary: #e63946;
+  --secondary: #2fe89f;
+  --muted: #e8e9ed;
+  --muted-foreground: #6b7280;
 }
 
+/* postcss-disable-next-line */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -30,7 +31,11 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family:
+    var(--font-geist-sans),
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 /* Safe area insets for mobile devices */
@@ -38,7 +43,7 @@ body {
   .h-safe-area {
     height: env(safe-area-inset-bottom);
   }
-  
+
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -55,12 +60,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C5C9D3;
+  background: #c5c9d3;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
+  background: #9ca3af;
 }
 
 /* Focus styles */
@@ -70,35 +75,35 @@ body {
 }
 
 /* RTL Support */
-[dir="rtl"] {
+[dir='rtl'] {
   direction: rtl;
   text-align: right;
 }
 
-[dir="ltr"] {
+[dir='ltr'] {
   direction: ltr;
   text-align: left;
 }
 
 /* RTL utilities - Tailwind automatically handles rtl: prefix when dir attribute is set */
 /* Custom RTL adjustments for specific components */
-[dir="rtl"] .ltr\:flex-row {
+[dir='rtl'] .ltr\:flex-row {
   flex-direction: row-reverse;
 }
 
 /* Ensure icons and logos maintain their appearance in RTL */
-[dir="rtl"] img,
-[dir="rtl"] svg {
+[dir='rtl'] img,
+[dir='rtl'] svg {
   transform: none;
 }
 
 /* RTL support for fixed positioning */
-[dir="rtl"] aside {
+[dir='rtl'] aside {
   left: auto;
   right: 0;
 }
 
-[dir="ltr"] aside {
+[dir='ltr'] aside {
   left: 0;
   right: auto;
 }

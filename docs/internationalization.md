@@ -12,6 +12,7 @@ This project uses [next-intl](https://next-intl-docs.vercel.app/) for internatio
 ## RTL Support
 
 Arabic (ar) is configured with full RTL support. The layout automatically adjusts:
+
 - Text direction (`dir="rtl"`)
 - Sidebar positioning (right side on desktop)
 - Navigation alignment
@@ -33,4 +34,3 @@ Arabic (ar) is configured with full RTL support. The layout automatically adjust
 - Arabic: `/ar/...`
 
 The root URL (`/`) automatically redirects to the default locale (`/en`).
-

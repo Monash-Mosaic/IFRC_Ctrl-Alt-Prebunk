@@ -1,29 +1,29 @@
-const nextJest = require("next/jest");
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const nextJest = require('next/jest');
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
-  dir: "./",
+  dir: './',
 });
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
-  testEnvironment: "jest-environment-jsdom",
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(mdx|md)$': '<rootDir>/jest.mock.js',
   },
-  testMatch: [
-    "**/?(*.)+(spec|test).[jt]s?(x)",
-  ],
-  testPathIgnorePatterns: ["/node_modules/", "/.next/", "/test-utils/"],
+  testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)'],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/test-utils/'],
   collectCoverageFrom: [
-    "src/components/**/*.{ts,tsx}",
-    "!src/components/**/*.d.ts",
-    "!src/components/**/*.test.{ts,tsx}",
-    "!src/components/index.ts",
+    'src/components/**/*.{ts,tsx}',
+    '!src/components/**/*.d.ts',
+    '!src/components/**/*.test.{ts,tsx}',
+    '!src/components/index.ts',
   ],
+  transformIgnorePatterns: ['/node_modules/(?!(@mdx-js)/)'],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
 module.exports = createJestConfig(customJestConfig);
-
