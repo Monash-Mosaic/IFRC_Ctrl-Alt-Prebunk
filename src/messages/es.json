@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "chat": "Chat",
+    "analytics": "Analítica",
+    "share": "Compartir",
+    "profile": "Perfil"
+  },
+  "header": {
+    "points": "Puntos",
+    "credibility": "Credibilidad",
+    "title": "CTRL + ALT + PREBUNK",
+    "titleMobile": "US!",
+    "ifrcLogoAlt": "Academia Solferino de la FICR",
+    "monashLogoAlt": "MOSAIC de la Universidad de Monash"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error"
+  },
+  "underDevelopment": {
+    "title": "En Desarrollo",
+    "message": "Esta página está actualmente en desarrollo. ¡Vuelve pronto!"
+  },
+  "metadata": {
+    "title": "CTRL + ALT + PREBUNK",
+    "description": "Academia Solferino de la FICR - Plataforma de verificación de hechos y alfabetización mediática"
+  },
+  "chat": {
+    "illustrationAlt": "Red de personas y conexiones de redes sociales",
+    "startOnboarding": "Iniciar chat de incorporación con Paula",
+    "skip": "Omitir",
+    "onboarding": {
+      "step1": {
+        "greeting": "¡Hola! Bienvenido al feed. Soy Paula, y te ayudaré a navegar por este mundo salvaje de información en línea. 👋",
+        "option1": "¡Vamos a hacerlo! Estoy listo.🚀",
+        "option2": "Esto suena complicado...🤔",
+        "option3": "¡Solo muéstrame cómo funciona!🎮"
+      },
+      "step2": {
+        "explanation": "No te preocupes, ¡puedes hacerlo! ¿Ves esa publicación de abajo? Alguien está compartiendo algo sobre el cambio climático. Tu trabajo: decidir si es confiable o una tontería total.",
+        "option1": "¡Ya puedo detectar noticias falsas!",
+        "option2": "¡Entendido! Mantener lo bueno, denunciar lo falso.",
+        "option3": "Espera, ¿cómo sé qué es real?"
+      },
+      "step3": {
+        "tips": "¡Exacto! Aquí está el secreto: Busca lenguaje exagerado, fuentes faltantes y cosas que parecen DEMASIADO locas para ser ciertas. Prueba la primera publicación - ¡te diré cómo lo hiciste!",
+        "option1": "¡De acuerdo, entrando al feed ahora!",
+        "option2": "¿Muéstrame un ejemplo primero?"
+      },
+      "example": {
+        "message": "Aquí hay un ejemplo de publicación con explicaciones. Nota el lenguaje exagerado y las fuentes faltantes - ¡estas son señales de alerta!"
+      },
+      "completed": {
+        "message": "¡El juego comienza! Estás listo para navegar el feed e identificar la desinformación. ¡Buena suerte! 🎮"
+      }
+    }
+  },
+  "errors": {
+    "404": {
+      "title": "Página no encontrada",
+      "description": "La página que buscas no existe.",
+      "backHome": "Volver al inicio"
+    },
+    "500": {
+      "title": "Error del servidor",
+      "description": "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+      "reload": "Recargar"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`OptionButton matches snapshot when disabled 1`] = `
+<div>
+  <button
+    aria-label="Click me"
+    class="flex w-full items-center justify-center gap-2 rounded-3xl border-1 border-dashed bg-[#F5F5F5] px-4 py-3 text-center text-sm font-medium text-[#0D1B3E] transition-all hover:bg-[#00FF9C] focus:outline-none focus:ring-2 focus:ring-[#2FE89F] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    id="test-button"
+  >
+    <span
+      class="flex-1"
+    >
+      Click me
+    </span>
+  </button>
+</div>
+`;
+
+exports[`OptionButton matches snapshot with default props 1`] = `
+<div>
+  <button
+    aria-label="Click me"
+    class="flex w-full items-center justify-center gap-2 rounded-3xl border-1 border-dashed bg-[#F5F5F5] px-4 py-3 text-center text-sm font-medium text-[#0D1B3E] transition-all hover:bg-[#00FF9C] focus:outline-none focus:ring-2 focus:ring-[#2FE89F] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    id="test-button"
+  >
+    <span
+      class="flex-1"
+    >
+      Click me
+    </span>
+  </button>
+</div>
+`;
+
+exports[`OptionButton matches snapshot with emoji text 1`] = `
+<div>
+  <button
+    aria-label="🎮 Let's play"
+    class="flex w-full items-center justify-center gap-2 rounded-3xl border-1 border-dashed bg-[#F5F5F5] px-4 py-3 text-center text-sm font-medium text-[#0D1B3E] transition-all hover:bg-[#00FF9C] focus:outline-none focus:ring-2 focus:ring-[#2FE89F] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    id="test-button"
+  >
+    <span
+      class="flex-1"
+    >
+      🎮 Let's play
+    </span>
+  </button>
+</div>
+`;

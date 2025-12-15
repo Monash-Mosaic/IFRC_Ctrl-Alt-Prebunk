@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "home": "首页",
+    "chat": "聊天",
+    "analytics": "分析",
+    "share": "分享",
+    "profile": "个人资料"
+  },
+  "header": {
+    "points": "积分",
+    "credibility": "可信度",
+    "title": "CTRL + ALT + PREBUNK",
+    "titleMobile": "US!",
+    "ifrcLogoAlt": "国际红十字与红新月运动索尔费里诺学院",
+    "monashLogoAlt": "莫纳什大学MOSAIC"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "发生错误"
+  },
+  "underDevelopment": {
+    "title": "开发中",
+    "message": "此页面正在开发中。请稍后再来查看！"
+  },
+  "metadata": {
+    "title": "CTRL + ALT + PREBUNK",
+    "description": "国际红十字与红新月运动索尔费里诺学院 - 事实核查和媒体素养平台"
+  },
+  "chat": {
+    "illustrationAlt": "人员和社交媒体连接网络",
+    "startOnboarding": "开始与Paula的入门聊天",
+    "skip": "跳过",
+    "onboarding": {
+      "step1": {
+        "greeting": "嘿！欢迎来到信息流。我是Paula，我会帮助你在这个充满信息的网络世界中导航。👋",
+        "option1": "让我们开始吧！我准备好了。🚀",
+        "option2": "这听起来很复杂...🤔",
+        "option3": "就告诉我它是如何工作的！🎮"
+      },
+      "step2": {
+        "explanation": "别担心 - 你能做到的！看到下面的帖子了吗？有人在分享一些关于气候变化的内容。你的工作：判断它是可信的还是完全胡说八道。",
+        "option1": "我已经能识别假新闻了！",
+        "option2": "明白了！保留好的内容，指出假的内容。",
+        "option3": "等等，我怎么知道什么是真的？"
+      },
+      "step3": {
+        "tips": "没错！这是秘密：寻找夸张的语言、缺失的来源，以及看起来太疯狂而不可能是真的内容。试试第一个帖子 - 我会告诉你你做得怎么样！",
+        "option1": "好的，现在进入信息流！",
+        "option2": "先给我看一个例子？"
+      },
+      "example": {
+        "message": "这是一个带解释的示例帖子。注意夸张的语言和缺失的来源 - 这些是危险信号！"
+      },
+      "completed": {
+        "message": "游戏开始！你已经准备好导航信息流并识别错误信息了。祝你好运！🎮"
+      }
+    }
+  },
+  "errors": {
+    "404": {
+      "title": "页面未找到",
+      "description": "您要查找的页面不存在。",
+      "backHome": "返回首页"
+    },
+    "500": {
+      "title": "服务器错误",
+      "description": "出现了问题。请稍后再试。",
+      "reload": "重新加载"
+    }
+  }
+}

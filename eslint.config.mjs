@@ -1,15 +1,37 @@
-// @ts-check
-import next from 'eslint-config-next'
-import eslintPluginPrettier from 'eslint-plugin-prettier'
+import { defineConfig, globalIgnores } from 'eslint/config';
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
+import eslintPluginCompat from 'eslint-plugin-compat';
+import eslintPluginPrettier from 'eslint-plugin-prettier';
 
-export default [
-  ...next,
+const eslintConfig = defineConfig([
   {
-    ignores: ['node_modules/', '.next/', 'out/', 'dist/'],
-    languageOptions: { ecmaVersion: 2023, sourceType: 'module' },
-    plugins: { prettier: eslintPluginPrettier },
-    rules: {
-      'prettier/prettier': 'warn'
-    }
-  }
-]
+    plugins: {
+      compat: eslintPluginCompat,
+      prettier: eslintPluginPrettier,
+    },
+  },
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+    // Test files
+    '**/*.test.ts',
+    '**/*.test.tsx',
+    '**/*.spec.ts',
+    '**/*.spec.tsx',
+    '**/__tests__/**',
+    'coverage/**',
+    'jest.config.js',
+    'jest.setup.js',
+    'postcss.config.mjs',
+    'src/test-utils/**',
+  ]),
+]);
+
+export default eslintConfig;

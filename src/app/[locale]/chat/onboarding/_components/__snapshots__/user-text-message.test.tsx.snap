@@ -1,0 +1,131 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`UserTextMessage matches snapshot with default message 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-end"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+        >
+          <p
+            class="whitespace-pre-wrap text-medium leading-relaxed"
+          >
+            Hello, this is a test message
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UserTextMessage matches snapshot with empty message 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-end"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+        >
+          <p
+            class="whitespace-pre-wrap text-medium leading-relaxed"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UserTextMessage matches snapshot with long message 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-end"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+        >
+          <p
+            class="whitespace-pre-wrap text-medium leading-relaxed"
+          >
+            AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UserTextMessage matches snapshot with multiline text 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-end"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+        >
+          <p
+            class="whitespace-pre-wrap text-medium leading-relaxed"
+          >
+            Line 1
+Line 2
+Line 3
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UserTextMessage matches snapshot with special characters 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-end"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+        >
+          <p
+            class="whitespace-pre-wrap text-medium leading-relaxed"
+          >
+            Hello & &lt;world&gt;!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

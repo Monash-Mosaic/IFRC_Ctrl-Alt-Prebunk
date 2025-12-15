@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ChatHeadline matches snapshot with default props 1`] = `
+<div>
+  <div
+    class="hidden md:block px-4"
+  >
+    <div
+      class="flex items-center gap-3 mb-2"
+    >
+      <img
+        alt="Paula"
+        height="32"
+        src="/images/chat-avatar-icon.png"
+        width="32"
+      />
+      <h2
+        class="font-bold text-black text-lg"
+      >
+        Paula
+      </h2>
+    </div>
+    <div
+      class="border-t border-black"
+    />
+  </div>
+</div>
+`;
+
+exports[`ChatHeadline matches snapshot with different name 1`] = `
+<div>
+  <div
+    class="hidden md:block px-4"
+  >
+    <div
+      class="flex items-center gap-3 mb-2"
+    >
+      <img
+        alt="Echo"
+        height="32"
+        src="/images/chat-avatar-icon.png"
+        width="32"
+      />
+      <h2
+        class="font-bold text-black text-lg"
+      >
+        Echo
+      </h2>
+    </div>
+    <div
+      class="border-t border-black"
+    />
+  </div>
+</div>
+`;
+
+exports[`ChatHeadline matches snapshot with long name 1`] = `
+<div>
+  <div
+    class="hidden md:block px-4"
+  >
+    <div
+      class="flex items-center gap-3 mb-2"
+    >
+      <img
+        alt="Very Long Name That Might Wrap"
+        height="32"
+        src="/images/chat-avatar-icon.png"
+        width="32"
+      />
+      <h2
+        class="font-bold text-black text-lg"
+      >
+        Very Long Name That Might Wrap
+      </h2>
+    </div>
+    <div
+      class="border-t border-black"
+    />
+  </div>
+</div>
+`;
+
+exports[`ChatHeadline matches snapshot with special characters in name 1`] = `
+<div>
+  <div
+    class="hidden md:block px-4"
+  >
+    <div
+      class="flex items-center gap-3 mb-2"
+    >
+      <img
+        alt="Paula & Friends"
+        height="32"
+        src="/images/chat-avatar-icon.png"
+        width="32"
+      />
+      <h2
+        class="font-bold text-black text-lg"
+      >
+        Paula & Friends
+      </h2>
+    </div>
+    <div
+      class="border-t border-black"
+    />
+  </div>
+</div>
+`;
