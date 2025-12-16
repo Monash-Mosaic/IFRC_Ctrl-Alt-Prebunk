@@ -296,30 +296,6 @@ export const useOnboardingMachine = (
         },
       },
       completed: {
-        effect({ setContext, event }: EffectArgs) {
-          setContext((context: OnboardingContext) => {
-            const baseContext =
-              event && event.type !== 'AUTO_COMPLETE'
-                ? appendUserSelection(context, event as OnboardingOptionEvent)
-                : context;
-
-            return {
-              ...baseContext,
-              messages: [...baseContext.messages, createTypingMessage('paula')],
-              typing: true,
-            };
-          });
-          const timeout = setTimeout(() => {
-            setContext((context: OnboardingContext) => {
-              return {
-                ...context,
-                messages: [...context.messages.slice(0, -1), createMessage('paula', 'completed.message')],
-                typing: false,
-              };
-            });
-          }, ONBOARDING_TYPING_TIMEOUT);
-          return () => clearTimeout(timeout);
-        },
         type: 'final',
       },
     },

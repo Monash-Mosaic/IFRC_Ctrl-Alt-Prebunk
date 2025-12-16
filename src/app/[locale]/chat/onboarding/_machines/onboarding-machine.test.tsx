@@ -1,125 +1,129 @@
 import { act, renderHook } from '@testing-library/react';
-import { useOnboardingMachine } from './onboarding-machine';
-import type { Message } from './onboarding-machine';
+import { useOnboardingMachine, type OnboardingOptionEvent } from './onboarding-machine';
 
 jest.useFakeTimers();
 
 describe('onboardingMachine', () => {
-  it('starts with initial typing message', () => {
+  it('matches snapshot with initial state', () => {
     const { result } = renderHook(() => useOnboardingMachine());
 
-    expect(result.current[0].value).toBe('initial');
-    expect(result.current[0].context.messages).toHaveLength(1);
-    const firstMessage = result.current[0].context.messages[0];
-    expect(firstMessage?.type).toBe('typing');
-    expect(firstMessage?.sender).toBe('paula');
+    expect(result.current[0]).toMatchSnapshot();
   });
 
-  it('shows greeting message after typing timeout', () => {
+  it('matches snapshot after typing timeout shows greeting message', () => {
     const { result } = renderHook(() => useOnboardingMachine());
-
-    expect(result.current[0].value).toBe('initial');
-    expect(result.current[0].context.messages).toHaveLength(1);
-    expect(result.current[0].context.messages[0]?.type).toBe('typing');
 
     act(() => {
       jest.advanceTimersByTime(1000);
     });
 
-    const messages = result.current[0].context.messages;
-    const greetingMessage = messages.find((m: Message) => m.type === 'text' && m.text === 'step1.greeting');
-    expect(greetingMessage).toBeDefined();
-    expect(result.current[0].context.typing).toBe(false);
+    expect(result.current[0]).toMatchSnapshot();
   });
 
-  it('goes to completed when selecting option1 in step1', () => {
+  it('matches snapshot when selecting option1 in step1 (completes immediately)', () => {
     const { result } = renderHook(() => useOnboardingMachine());
 
     act(() =>
       result.current[1]({
         type: 'option1-step1',
         optionText: "Let's go",
-      })
+      } as OnboardingOptionEvent)
     );
 
-    expect(result.current[0].value).toBe('completed');
-    expect(result.current[0].context.selectedOptions).toContain('option1-step1');
+    expect(result.current[0]).toMatchSnapshot();
   });
 
-  it('follows step1 -> step2 -> step3 path', () => {
+  it('matches snapshot following step1 -> step2 -> step3 path', () => {
     const { result } = renderHook(() => useOnboardingMachine());
 
     act(() =>
       result.current[1]({
         type: 'option2-step1',
         optionText: 'Option 2',
-      })
+      } as OnboardingOptionEvent)
     );
-    expect(result.current[0].value).toBe('step2');
+    expect(result.current[0]).toMatchSnapshot('after step1 -> step2');
+
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(result.current[0]).toMatchSnapshot('after step2 typing timeout');
 
     act(() =>
       result.current[1]({
         type: 'option2-step2',
         optionText: 'Option 2',
-      })
+      } as OnboardingOptionEvent)
     );
-    expect(result.current[0].value).toBe('step3');
+    expect(result.current[0]).toMatchSnapshot('after step2 -> step3');
+
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(result.current[0]).toMatchSnapshot('after step3 typing timeout');
   });
 
-  it('goes through example and completes after delay', () => {
+  it('matches snapshot going through example and completing after delay', () => {
     const { result } = renderHook(() => useOnboardingMachine());
 
     act(() =>
       result.current[1]({
         type: 'option2-step1',
         optionText: 'Option 2',
-      })
+      } as OnboardingOptionEvent)
     );
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
     act(() =>
       result.current[1]({
         type: 'option2-step2',
         optionText: 'Option 2',
-      })
+      } as OnboardingOptionEvent)
     );
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
     act(() =>
       result.current[1]({
         type: 'option2-step3',
         optionText: 'Option 2',
-      })
+      } as OnboardingOptionEvent)
     );
 
-    expect(result.current[0].value).toBe('example');
+    expect(result.current[0]).toMatchSnapshot('after selecting option2-step3 (example state)');
 
-    // Advance timers: 1000ms for typing timeout, then 2000ms for auto-complete
     act(() => {
       jest.advanceTimersByTime(1000);
     });
-    
+    expect(result.current[0]).toMatchSnapshot('after example typing timeout');
+
     act(() => {
       jest.advanceTimersByTime(2000);
     });
-    
-    expect(result.current[0].value).toBe('completed');
+    expect(result.current[0]).toMatchSnapshot('after auto-complete (completed state)');
   });
 
-  it('accumulates user messages when selecting options', () => {
+  it('matches snapshot accumulating user messages when selecting options', () => {
     const { result } = renderHook(() => useOnboardingMachine());
 
     act(() =>
       result.current[1]({
         type: 'option2-step1',
         optionText: 'Option 2',
-      })
+      } as OnboardingOptionEvent)
     );
+    expect(result.current[0]).toMatchSnapshot('after first option selection');
+
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
     act(() =>
       result.current[1]({
         type: 'option1-step2',
         optionText: 'Option 1',
-      })
+      } as OnboardingOptionEvent)
     );
-
-    // Initial Paula message + two user messages + step2 Paula message
-    expect(result.current[0].context.messages.length).toBeGreaterThanOrEqual(3);
-    expect(result.current[0].context.messages.some((m: Message) => m.sender === 'user')).toBe(true);
+    expect(result.current[0]).toMatchSnapshot('after second option selection');
   });
 });
