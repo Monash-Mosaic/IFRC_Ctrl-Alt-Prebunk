@@ -63,9 +63,16 @@ export default function OnboardingFlow() {
     } as OnboardingOptionEvent);
   };
 
+  // Move navigation and localStorage set to useEffect
+  useEffect(() => {
+    if (isCompleted) {
+      localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
+      router.replace('/');
+    }
+  }, [isCompleted, router]);
+
   if (isCompleted) {
-    localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
-    return router.replace('/');
+    return null;
   }
 
   return (
