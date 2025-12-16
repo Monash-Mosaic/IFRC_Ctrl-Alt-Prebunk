@@ -12,7 +12,7 @@ exports[`UserTextMessage matches snapshot with default message 1`] = `
         class="flex justify-end"
       >
         <div
-          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-[#00FF9C] bg-[#00FF9C]/10"
         >
           <p
             class="whitespace-pre-wrap text-medium leading-relaxed"
@@ -38,7 +38,7 @@ exports[`UserTextMessage matches snapshot with empty message 1`] = `
         class="flex justify-end"
       >
         <div
-          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-[#00FF9C] bg-[#00FF9C]/10"
         >
           <p
             class="whitespace-pre-wrap text-medium leading-relaxed"
@@ -62,7 +62,7 @@ exports[`UserTextMessage matches snapshot with long message 1`] = `
         class="flex justify-end"
       >
         <div
-          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-[#00FF9C] bg-[#00FF9C]/10"
         >
           <p
             class="whitespace-pre-wrap text-medium leading-relaxed"
@@ -88,7 +88,7 @@ exports[`UserTextMessage matches snapshot with multiline text 1`] = `
         class="flex justify-end"
       >
         <div
-          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-[#00FF9C] bg-[#00FF9C]/10"
         >
           <p
             class="whitespace-pre-wrap text-medium leading-relaxed"
@@ -116,7 +116,7 @@ exports[`UserTextMessage matches snapshot with special characters 1`] = `
         class="flex justify-end"
       >
         <div
-          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-dashed border-black bg-[#00FF9C] bg-opacity-10"
+          class="flex px-4 py-3 rounded-l-2xl rounded-tr-2xl border border-[#00FF9C] bg-[#00FF9C]/10"
         >
           <p
             class="whitespace-pre-wrap text-medium leading-relaxed"

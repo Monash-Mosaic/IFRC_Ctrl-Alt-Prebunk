@@ -13,9 +13,10 @@ import type {
 } from '../_machines/onboarding-machine';
 import PostMessage from './post-message';
 import POSTS from '../_posts';
-import { STORAGE_KEYS, getStorage } from '@/lib/local-storage';
+import { STORAGE_KEYS, getStorage, storage as localStorage } from '@/lib/local-storage';
 import TypingMessage from './typing-message';
 import { CHAT_USERS } from '../../_constants/users';
+import { useRouter } from '@/i18n/routing';
 
 interface StoredOnboardingState {
   context: OnboardingContext | undefined;
@@ -35,6 +36,7 @@ export default function OnboardingFlow() {
     context,
     initialState
   );
+  const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const post = POSTS[locale];
 
@@ -60,6 +62,11 @@ export default function OnboardingFlow() {
       optionText: translationKey,
     } as OnboardingOptionEvent);
   };
+
+  if (isCompleted) {
+    localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
+    return router.replace('/');
+  }
 
   return (
     <div className="flex h-full flex-col w-full">
