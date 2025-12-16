@@ -5,5 +5,5 @@ import { useTranslations } from 'next-intl';
 
 export default function AnalyticsPage() {
   const underDevelopment = useTranslations('underDevelopment');
-  return <UnderDevelopment title={underDevelopment('title')} message={underDevelopment('message')}  />;
+  return <UnderDevelopment title={underDevelopment('title')} message={underDevelopment('message')} />;
 }
