@@ -7,7 +7,7 @@ export default async function Header() {
   const t = await getTranslations('header');
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-[#E8E9ED]">
+    <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white">
       <div className="flex h-full items-center justify-center md:justify-between md:px-6">
         {/* Left: IFRC Logo (hidden on mobile) */}
         <div className="hidden items-center gap-2 md:flex">
@@ -18,7 +18,7 @@ export default async function Header() {
                 alt={t('ifrcLogoAlt')}
                 height={61.35}
                 width={223.67}
-                className="h-8 w-auto bg-white"
+                className="h-8 w-auto"
               />
             </Link>
           </div>

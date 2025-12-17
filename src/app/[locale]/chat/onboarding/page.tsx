@@ -1,14 +1,20 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import loadDynamicComponent from 'next/dynamic';
 import Loading from '@/components/loading';
 import { useTranslations } from 'next-intl';
 import ChatHeadline from './_components/chat-headline';
 import { CHAT_USERS } from '../_constants/users';
 
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'default-no-store';
+
+
 export default function OnboardingPage() {
   const t = useTranslations('common');
-  const OnboardingFlow = dynamic(() => import('./_components/onboarding-flow'), {
+  const OnboardingFlow = loadDynamicComponent(() => import('./_components/onboarding-flow'), {
     ssr: false,
     loading: () => <Loading displayText={t('loading')} />,
   });

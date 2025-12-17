@@ -1,0 +1,227 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`BotTextMessage matches snapshot with avatar 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-start"
+  >
+    <div
+      class="flex items-end justify-end"
+    >
+      <div
+        data-testid="sender-avatar"
+      >
+        Avatar
+      </div>
+    </div>
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black"
+        >
+          <p
+            class="whitespace-pre-wrap text-sm leading-relaxed"
+          >
+            Hello, this is a test message
+          </p>
+        </div>
+      </div>
+      <span
+        class="text-xs font-medium text-[#2979FF]"
+      >
+        Paula
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BotTextMessage matches snapshot with custom sender name 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-start"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black"
+        >
+          <p
+            class="whitespace-pre-wrap text-sm leading-relaxed"
+          >
+            Hello, this is a test message
+          </p>
+        </div>
+      </div>
+      <span
+        class="text-xs font-medium text-[#2979FF]"
+      >
+        Custom Sender
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BotTextMessage matches snapshot with default message 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-start"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black"
+        >
+          <p
+            class="whitespace-pre-wrap text-sm leading-relaxed"
+          >
+            Hello, this is a test message
+          </p>
+        </div>
+      </div>
+      <span
+        class="text-xs font-medium text-[#2979FF]"
+      >
+        Paula
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BotTextMessage matches snapshot with empty message 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-start"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black"
+        >
+          <p
+            class="whitespace-pre-wrap text-sm leading-relaxed"
+          />
+        </div>
+      </div>
+      <span
+        class="text-xs font-medium text-[#2979FF]"
+      >
+        Paula
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BotTextMessage matches snapshot with long message 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-start"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black"
+        >
+          <p
+            class="whitespace-pre-wrap text-sm leading-relaxed"
+          >
+            AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+          </p>
+        </div>
+      </div>
+      <span
+        class="text-xs font-medium text-[#2979FF]"
+      >
+        Paula
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BotTextMessage matches snapshot with multiline text 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-start"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black"
+        >
+          <p
+            class="whitespace-pre-wrap text-sm leading-relaxed"
+          >
+            Line 1
+Line 2
+Line 3
+          </p>
+        </div>
+      </div>
+      <span
+        class="text-xs font-medium text-[#2979FF]"
+      >
+        Paula
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BotTextMessage matches snapshot without avatar 1`] = `
+<div>
+  <div
+    class="flex w-full gap-3 justify-start"
+  >
+    <div
+      class="w-full flex-col gap-1 md:max-w-[70%]"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <div
+          class="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black"
+        >
+          <p
+            class="whitespace-pre-wrap text-sm leading-relaxed"
+          >
+            Hello, this is a test message
+          </p>
+        </div>
+      </div>
+      <span
+        class="text-xs font-medium text-[#2979FF]"
+      >
+        Paula
+      </span>
+    </div>
+  </div>
+</div>
+`;

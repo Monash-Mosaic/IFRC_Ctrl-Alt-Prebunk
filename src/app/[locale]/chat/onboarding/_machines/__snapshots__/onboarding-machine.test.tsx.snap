@@ -1,0 +1,702 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`onboardingMachine matches snapshot accumulating user messages when selecting options: after first option selection 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+    ],
+    "selectedOptions": [
+      "option2-step1",
+    ],
+    "typing": true,
+  },
+  "event": {
+    "optionText": "Option 2",
+    "type": "option2-step1",
+  },
+  "nextEvents": [
+    "option1-step2",
+    "option2-step2",
+    "option3-step2",
+  ],
+  "nextEventsT": [
+    "option1-step2",
+    "option2-step2",
+    "option3-step2",
+  ],
+  "value": "step2",
+}
+`;
+
+exports[`onboardingMachine matches snapshot accumulating user messages when selecting options: after second option selection 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step2.explanation",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "post": {
+          "contentKey": "echoPost",
+          "handle": "@climate_truth_warrior",
+          "mediaType": "image",
+          "mediaUrl": "/images/example/echo-post-img.jpg",
+          "name": "Echo",
+        },
+        "sender": "echo",
+        "timestamp": Any<Number>,
+        "type": "post",
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+    ],
+    "selectedOptions": [
+      "option2-step1",
+      "option2-step2",
+    ],
+    "typing": true,
+  },
+  "event": {
+    "optionText": "Option 2",
+    "type": "option2-step2",
+  },
+  "nextEvents": [
+    "option1-step3",
+    "option2-step3",
+  ],
+  "nextEventsT": [
+    "option1-step3",
+    "option2-step3",
+  ],
+  "value": "step3",
+}
+`;
+
+exports[`onboardingMachine matches snapshot after typing timeout shows greeting message 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step1.greeting",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+    ],
+    "selectedOptions": [],
+    "typing": false,
+  },
+  "event": {
+    "type": "$$initial",
+  },
+  "nextEvents": [
+    "option1-step1",
+    "option2-step1",
+    "option3-step1",
+  ],
+  "nextEventsT": [
+    "option1-step1",
+    "option2-step1",
+    "option3-step1",
+  ],
+  "value": "initial",
+}
+`;
+
+exports[`onboardingMachine matches snapshot following step1 -> step2 -> step3 path: after step1 -> step2 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+    ],
+    "selectedOptions": [
+      "option2-step1",
+    ],
+    "typing": true,
+  },
+  "event": {
+    "optionText": "Option 2",
+    "type": "option2-step1",
+  },
+  "nextEvents": [
+    "option1-step2",
+    "option2-step2",
+    "option3-step2",
+  ],
+  "nextEventsT": [
+    "option1-step2",
+    "option2-step2",
+    "option3-step2",
+  ],
+  "value": "step2",
+}
+`;
+
+exports[`onboardingMachine matches snapshot following step1 -> step2 -> step3 path: after step2 -> step3 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step2.explanation",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "post": {
+          "contentKey": "echoPost",
+          "handle": "@climate_truth_warrior",
+          "mediaType": "image",
+          "mediaUrl": "/images/example/echo-post-img.jpg",
+          "name": "Echo",
+        },
+        "sender": "echo",
+        "timestamp": Any<Number>,
+        "type": "post",
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+    ],
+    "selectedOptions": [
+      "option2-step1",
+      "option2-step2",
+    ],
+    "typing": true,
+  },
+  "event": {
+    "optionText": "Option 2",
+    "type": "option2-step2",
+  },
+  "nextEvents": [
+    "option1-step3",
+    "option2-step3",
+  ],
+  "nextEventsT": [
+    "option1-step3",
+    "option2-step3",
+  ],
+  "value": "step3",
+}
+`;
+
+exports[`onboardingMachine matches snapshot following step1 -> step2 -> step3 path: after step2 typing timeout 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step2.explanation",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "post": {
+          "contentKey": "echoPost",
+          "handle": "@climate_truth_warrior",
+          "mediaType": "image",
+          "mediaUrl": "/images/example/echo-post-img.jpg",
+          "name": "Echo",
+        },
+        "sender": "echo",
+        "timestamp": Any<Number>,
+        "type": "post",
+      },
+    ],
+    "selectedOptions": [
+      "option2-step1",
+    ],
+    "typing": false,
+  },
+  "event": {
+    "optionText": "Option 2",
+    "type": "option2-step1",
+  },
+  "nextEvents": [
+    "option1-step2",
+    "option2-step2",
+    "option3-step2",
+  ],
+  "nextEventsT": [
+    "option1-step2",
+    "option2-step2",
+    "option3-step2",
+  ],
+  "value": "step2",
+}
+`;
+
+exports[`onboardingMachine matches snapshot following step1 -> step2 -> step3 path: after step3 typing timeout 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step2.explanation",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "post": {
+          "contentKey": "echoPost",
+          "handle": "@climate_truth_warrior",
+          "mediaType": "image",
+          "mediaUrl": "/images/example/echo-post-img.jpg",
+          "name": "Echo",
+        },
+        "sender": "echo",
+        "timestamp": Any<Number>,
+        "type": "post",
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step3.tips",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+    ],
+    "selectedOptions": [
+      "option2-step1",
+      "option2-step2",
+    ],
+    "typing": false,
+  },
+  "event": {
+    "optionText": "Option 2",
+    "type": "option2-step2",
+  },
+  "nextEvents": [
+    "option1-step3",
+    "option2-step3",
+  ],
+  "nextEventsT": [
+    "option1-step3",
+    "option2-step3",
+  ],
+  "value": "step3",
+}
+`;
+
+exports[`onboardingMachine matches snapshot going through example and completing after delay: after auto-complete (completed state) 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step2.explanation",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "post": {
+          "contentKey": "echoPost",
+          "handle": "@climate_truth_warrior",
+          "mediaType": "image",
+          "mediaUrl": "/images/example/echo-post-img.jpg",
+          "name": "Echo",
+        },
+        "sender": "echo",
+        "timestamp": Any<Number>,
+        "type": "post",
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step3.tips",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "example.message",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+    ],
+    "selectedOptions": [
+      "option2-step1",
+      "option2-step2",
+      "option2-step3",
+    ],
+    "typing": false,
+  },
+  "event": {
+    "type": "AUTO_COMPLETE",
+  },
+  "nextEvents": [],
+  "nextEventsT": [],
+  "value": "completed",
+}
+`;
+
+exports[`onboardingMachine matches snapshot going through example and completing after delay: after example typing timeout 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step2.explanation",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "post": {
+          "contentKey": "echoPost",
+          "handle": "@climate_truth_warrior",
+          "mediaType": "image",
+          "mediaUrl": "/images/example/echo-post-img.jpg",
+          "name": "Echo",
+        },
+        "sender": "echo",
+        "timestamp": Any<Number>,
+        "type": "post",
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step3.tips",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "example.message",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+    ],
+    "selectedOptions": [
+      "option2-step1",
+      "option2-step2",
+      "option2-step3",
+    ],
+    "typing": false,
+  },
+  "event": {
+    "optionText": "Option 2",
+    "type": "option2-step3",
+  },
+  "nextEvents": [
+    "AUTO_COMPLETE",
+  ],
+  "nextEventsT": [
+    "AUTO_COMPLETE",
+  ],
+  "value": "example",
+}
+`;
+
+exports[`onboardingMachine matches snapshot going through example and completing after delay: after selecting option2-step3 (example state) 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step2.explanation",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "post": {
+          "contentKey": "echoPost",
+          "handle": "@climate_truth_warrior",
+          "mediaType": "image",
+          "mediaUrl": "/images/example/echo-post-img.jpg",
+          "name": "Echo",
+        },
+        "sender": "echo",
+        "timestamp": Any<Number>,
+        "type": "post",
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "text": "step3.tips",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "user",
+        "text": "Option 2",
+        "timestamp": Any<Number>,
+        "type": "text",
+      },
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+    ],
+    "selectedOptions": [
+      "option2-step1",
+      "option2-step2",
+      "option2-step3",
+    ],
+    "typing": true,
+  },
+  "event": {
+    "optionText": "Option 2",
+    "type": "option2-step3",
+  },
+  "nextEvents": [
+    "AUTO_COMPLETE",
+  ],
+  "nextEventsT": [
+    "AUTO_COMPLETE",
+  ],
+  "value": "example",
+}
+`;
+
+exports[`onboardingMachine matches snapshot when selecting option1 in step1 (completes immediately) 1`] = `
+{
+  "context": {
+    "messages": [
+      {
+        "id": Any<String>,
+        "sender": "paula",
+        "timestamp": Any<Number>,
+        "type": "typing",
+        "typing": true,
+      },
+    ],
+    "selectedOptions": [],
+    "typing": true,
+  },
+  "event": {
+    "optionText": "Let's go",
+    "type": "option1-step1",
+  },
+  "nextEvents": [],
+  "nextEventsT": [],
+  "value": "completed",
+}
+`;

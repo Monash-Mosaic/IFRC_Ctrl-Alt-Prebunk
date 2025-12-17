@@ -1,18 +1,11 @@
-import UnderDevelopment from '@/components/under-development';
-import { routing } from '@/i18n/routing';
-import { hasLocale } from 'next-intl';
-import { notFound } from 'next/navigation';
+'use client';
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
+import dynamic from 'next/dynamic';
 
-export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+const HomeContent = dynamic(() => import('@/components/home-content'), {
+  ssr: false,
+});
 
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
-
-  return <UnderDevelopment />;
+export default function Home() {
+  return <HomeContent />;
 }
