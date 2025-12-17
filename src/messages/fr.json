@@ -30,6 +30,12 @@
     "illustrationAlt": "Réseau de personnes et de connexions de médias sociaux",
     "startOnboarding": "Commencer le chat d'intégration avec Paula",
     "skip": "Ignorer",
+    "list": {
+      "title": "Messages",
+      "paula": "Paula",
+      "alex": "Alex",
+      "newMessage": "Nouveau message"
+    },
     "onboarding": {
       "step1": {
         "greeting": "Salut ! Bienvenue dans le fil d'actualité. Je suis Paula, et je vais t'aider à naviguer dans ce monde sauvage d'informations en ligne. 👋",

@@ -30,6 +30,12 @@
     "illustrationAlt": "Network of people and social media connections",
     "startOnboarding": "Start onboarding chat with Paula",
     "skip": "Skip",
+    "list": {
+      "title": "Messages",
+      "paula": "Paula",
+      "alex": "Alex",
+      "newMessage": "New message"
+    },
     "onboarding": {
       "step1": {
         "greeting": "Hey! Welcome to the feed. I'm Paula, and I'll help you navigate this wild world of online information. 👋",

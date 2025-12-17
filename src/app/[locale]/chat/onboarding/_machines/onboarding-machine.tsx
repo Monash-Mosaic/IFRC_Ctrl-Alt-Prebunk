@@ -62,7 +62,7 @@ export interface OnboardingOption {
 }
 
 const createTypingMessage = (sender: MessageSender): TypingMessage => ({
-  id: `msg-${Date.now()}-${Math.random()}`,
+  id: `msg-${Date.now()}`,
   sender,
   type: 'typing',
   typing: true,
@@ -70,7 +70,7 @@ const createTypingMessage = (sender: MessageSender): TypingMessage => ({
 });
 
 const createMessage = (sender: MessageSender, text: string): TextMessage => ({
-  id: `msg-${Date.now()}-${Math.random()}`,
+  id: `msg-${Date.now()}`,
   sender,
   type: 'text',
   text,
@@ -81,7 +81,7 @@ export const createPostMessage = (
   sender: MessageSender,
   post: PostMessage['post']
 ): PostMessage => ({
-  id: `msg-${Date.now()}-${Math.random()}`,
+  id: `msg-${Date.now()}`,
   sender,
   type: 'post',
   post,

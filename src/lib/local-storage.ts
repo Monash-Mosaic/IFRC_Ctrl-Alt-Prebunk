@@ -9,7 +9,7 @@ export const STORAGE_KEYS = {
 /**
  * Type for valid storage keys
  */
-type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
+export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
 
 /**
  * Get an item from localStorage
@@ -41,7 +41,7 @@ export const storage = {
    * @param value - The value to store (will be JSON stringified)
    */
   setItem<T = unknown>(key: StorageKey, value: T): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || value === undefined) return;
 
     localStorage.setItem(key, JSON.stringify(value));
   },

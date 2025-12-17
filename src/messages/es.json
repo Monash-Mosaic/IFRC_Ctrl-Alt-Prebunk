@@ -30,6 +30,12 @@
     "illustrationAlt": "Red de personas y conexiones de redes sociales",
     "startOnboarding": "Iniciar chat de incorporación con Paula",
     "skip": "Omitir",
+    "list": {
+      "title": "Mensajes",
+      "paula": "Paula",
+      "alex": "Alex",
+      "newMessage": "Nuevo mensaje"
+    },
     "onboarding": {
       "step1": {
         "greeting": "¡Hola! Bienvenido al feed. Soy Paula, y te ayudaré a navegar por este mundo salvaje de información en línea. 👋",

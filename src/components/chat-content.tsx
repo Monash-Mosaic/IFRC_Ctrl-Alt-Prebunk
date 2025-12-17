@@ -6,9 +6,10 @@ import Link from 'next/link';
 interface ChatContentProps {
   startOnboardingText: string;
   skipText: string;
+  onSkipClick?: () => void;
 }
 
-export default function ChatContent({ startOnboardingText, skipText }: ChatContentProps) {
+export default function ChatContent({ startOnboardingText, skipText, onSkipClick = () => {} }: ChatContentProps) {
   return (
     <div className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center px-4 py-8 md:py-12">
       <div className="flex w-full max-w-md flex-col items-center gap-8">
@@ -29,8 +30,9 @@ export default function ChatContent({ startOnboardingText, skipText }: ChatConte
 
           {/* Secondary Button - Skip */}
           <Link
-            href="/"
+            href="#"
             className="rounded-3xl border-1 border-dashed border-[#011E41] bg-[#E4EAF3] px-6 py-4 text-center font-medium text-black transition-all hover:bg-[#E8E9ED]"
+            onClick={onSkipClick}
           >
             {skipText}
           </Link>
