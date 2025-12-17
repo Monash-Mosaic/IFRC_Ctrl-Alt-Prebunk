@@ -6,11 +6,7 @@ import { useTranslations } from 'next-intl';
 import ChatHeadline from './_components/chat-headline';
 import { CHAT_USERS } from '../_constants/users';
 
-
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const fetchCache = 'default-no-store';
-
 
 export default function OnboardingPage() {
   const t = useTranslations('common');
