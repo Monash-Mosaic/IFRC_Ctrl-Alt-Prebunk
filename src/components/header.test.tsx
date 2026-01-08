@@ -77,20 +77,10 @@ describe('Header', () => {
     expect(logoContainer).toHaveClass('hidden', 'items-center', 'gap-4', 'md:flex');
   });
 
-  it('has correct header styling', async () => {
+  it('matches snapshot', async () => {
     const component = await Header();
-    render(component);
-
-    const header = screen.getByRole('banner');
-    expect(header).toHaveClass(
-      'fixed',
-      'top-0',
-      'left-0',
-      'right-0',
-      'z-50',
-      'h-14',
-      'bg-[#E8E9ED]'
-    );
+    const { container } = render(component);
+    expect(container).toMatchSnapshot();
   });
 
   it('calls getTranslations with correct namespace', async () => {

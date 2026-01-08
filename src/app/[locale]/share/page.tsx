@@ -1,5 +1,9 @@
+'use client';
+
 import UnderDevelopment from '@/components/under-development';
+import { useTranslations } from 'next-intl';
 
 export default function SharePage() {
-  return <UnderDevelopment />;
+  const underDevelopment = useTranslations('underDevelopment');
+  return <UnderDevelopment title={underDevelopment('title')} message={underDevelopment('message')} />;
 }

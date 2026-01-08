@@ -30,6 +30,12 @@
     "illustrationAlt": "Réseau de personnes et de connexions de médias sociaux",
     "startOnboarding": "Commencer le chat d'intégration avec Paula",
     "skip": "Ignorer",
+    "list": {
+      "title": "Messages",
+      "paula": "Paula",
+      "alex": "Alex",
+      "newMessage": "Nouveau message"
+    },
     "onboarding": {
       "step1": {
         "greeting": "Salut ! Bienvenue dans le fil d'actualité. Je suis Paula, et je vais t'aider à naviguer dans ce monde sauvage d'informations en ligne. 👋",
@@ -55,6 +61,19 @@
         "message": "Le jeu commence ! Tu es prêt à naviguer dans le fil et identifier la désinformation. Bonne chance ! 🎮"
       }
     }
+  },
+  "prebunking": {
+    "modalLabel": "Modal d'information de prébunking",
+    "header": {
+      "holdOn": "Attendez !",
+      "misleading": "C'est trompeur !"
+    },
+    "body": {
+      "techniquePrefix": "Cette publication utilise",
+      "context": "La météo n'est pas la même chose que le climat. Ne laissez pas les incidents isolés distraire des données à long terme dans le Rapport mondial sur les catastrophes.",
+      "dataLink": "Voir les données de la FICR sur les tendances croissantes des vagues de chaleur."
+    },
+    "continueButton": "Compris ! Continuer"
   },
   "errors": {
     "404": {

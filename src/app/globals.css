@@ -7,9 +7,12 @@
   --secondary: #2fe89f;
   --muted: #e8e9ed;
   --muted-foreground: #6b7280;
+  --color-ifrc-blue: #011E41;
+  --color-ifrc-red: #EE2435;
+  --color-dunder-green: #00FF9C;
+  --color-dunder-lightgrey: #E4EAF3;
 }
 
-/* postcss-disable-next-line */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

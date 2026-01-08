@@ -62,7 +62,7 @@ export interface OnboardingOption {
 }
 
 const createTypingMessage = (sender: MessageSender): TypingMessage => ({
-  id: `msg-${Date.now()}-${Math.random()}`,
+  id: `msg-${Date.now()}`,
   sender,
   type: 'typing',
   typing: true,
@@ -70,7 +70,7 @@ const createTypingMessage = (sender: MessageSender): TypingMessage => ({
 });
 
 const createMessage = (sender: MessageSender, text: string): TextMessage => ({
-  id: `msg-${Date.now()}-${Math.random()}`,
+  id: `msg-${Date.now()}`,
   sender,
   type: 'text',
   text,
@@ -81,7 +81,7 @@ export const createPostMessage = (
   sender: MessageSender,
   post: PostMessage['post']
 ): PostMessage => ({
-  id: `msg-${Date.now()}-${Math.random()}`,
+  id: `msg-${Date.now()}`,
   sender,
   type: 'post',
   post,
@@ -296,30 +296,6 @@ export const useOnboardingMachine = (
         },
       },
       completed: {
-        effect({ setContext, event }: EffectArgs) {
-          setContext((context: OnboardingContext) => {
-            const baseContext =
-              event && event.type !== 'AUTO_COMPLETE'
-                ? appendUserSelection(context, event as OnboardingOptionEvent)
-                : context;
-
-            return {
-              ...baseContext,
-              messages: [...baseContext.messages, createTypingMessage('paula')],
-              typing: true,
-            };
-          });
-          const timeout = setTimeout(() => {
-            setContext((context: OnboardingContext) => {
-              return {
-                ...context,
-                messages: [...context.messages.slice(0, -1), createMessage('paula', 'completed.message')],
-                typing: false,
-              };
-            });
-          }, ONBOARDING_TYPING_TIMEOUT);
-          return () => clearTimeout(timeout);
-        },
         type: 'final',
       },
     },

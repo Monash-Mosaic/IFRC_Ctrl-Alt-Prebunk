@@ -30,6 +30,12 @@
     "illustrationAlt": "Network of people and social media connections",
     "startOnboarding": "Start onboarding chat with Paula",
     "skip": "Skip",
+    "list": {
+      "title": "Messages",
+      "paula": "Paula",
+      "alex": "Alex",
+      "newMessage": "New message"
+    },
     "onboarding": {
       "step1": {
         "greeting": "Hey! Welcome to the feed. I'm Paula, and I'll help you navigate this wild world of online information. 👋",
@@ -55,6 +61,19 @@
         "message": "Game begins! You're all set to navigate the feed and identify misinformation. Good luck! 🎮"
       }
     }
+  },
+  "prebunking": {
+    "modalLabel": "Prebunking information modal",
+    "header": {
+      "holdOn": "Hold on!",
+      "misleading": "That's misleading!"
+    },
+    "body": {
+      "techniquePrefix": "This post is using",
+      "context": "Weather is not the same as Climate. Don't let isolated incidents distract from long-term data in the World Disasters Report.",
+      "dataLink": "See the IFRC data on increasing heatwave trends."
+    },
+    "continueButton": "Got it! Continue"
   },
   "errors": {
     "404": {

@@ -62,7 +62,7 @@ export default function Navigation() {
                 key={item.href}
                 href={item.href}
                 className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                  isActive ? 'text-[#E63946]' : 'text-[#0D1B3E] hover:text-[#E63946]'
+                  isActive ? 'text-(--color-ifrc-red)' : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
                 }`}
               >
                 <span className="transition-transform group-hover:scale-110">
@@ -87,7 +87,7 @@ export default function Navigation() {
                 key={item.href}
                 href={item.href}
                 className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                  isActive ? 'text-[#E63946]' : 'text-[#0D1B3E] hover:text-[#E63946]'
+                  isActive ? 'text-(--color-ifrc-red)' : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
                 }`}
               >
                 <span className="transition-transform group-hover:scale-110">

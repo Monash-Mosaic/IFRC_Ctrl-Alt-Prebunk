@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { hasLocale } from 'next-intl';
 import { Geist, Geist_Mono } from 'next/font/google';
 import type { Metadata } from 'next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import Header from '@/components/header';
 import Navigation from '@/components/navigation-bar';
@@ -70,7 +71,7 @@ export default async function LocaleLayout({
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
-
+  
   // Determine direction for RTL support
   const direction = getDirection(locale);
   const isRTL = isRTLLocale(locale);
@@ -82,14 +83,15 @@ export default async function LocaleLayout({
           <Header />
           <PointsCredibilityBar />
           <Navigation />
-          <main
-            className={`min-h-screen bg-white pt-24 pb-20 md:pb-0 ${
+          <main id="root"
+            className={`min-h-screen bg-white pt-24 pb-16 md:pb-0 ${
               isRTL ? 'md:pr-20' : 'md:pl-20'
             }`}
           >
             {children}
           </main>
         </NextIntlClientProvider>
+        <SpeedInsights />
       </body>
     </html>
   );

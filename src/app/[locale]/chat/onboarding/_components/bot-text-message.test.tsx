@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils/test-utils';
+import { render } from '@/test-utils/test-utils';
 import BotTextMessage from './bot-text-message';
 
 describe('BotTextMessage', () => {
@@ -7,81 +7,41 @@ describe('BotTextMessage', () => {
     displayText: 'Hello, this is a test message',
   };
 
-  it('renders the message text', () => {
-    render(<BotTextMessage {...defaultProps} />);
-
-    expect(screen.getByText('Hello, this is a test message')).toBeInTheDocument();
+  it('matches snapshot with default message', () => {
+    const { container } = render(<BotTextMessage {...defaultProps} />);
+    expect(container).toMatchSnapshot();
   });
 
-  it('renders sender name', () => {
-    render(<BotTextMessage {...defaultProps} />);
-
-    expect(screen.getByText('Paula')).toBeInTheDocument();
-  });
-
-  it('renders avatar when provided', () => {
+  it('matches snapshot with avatar', () => {
     const mockAvatar = <div data-testid="sender-avatar">Avatar</div>;
-    render(<BotTextMessage {...defaultProps} senderAvatar={mockAvatar} />);
-
-    expect(screen.getByTestId('sender-avatar')).toBeInTheDocument();
+    const { container } = render(<BotTextMessage {...defaultProps} senderAvatar={mockAvatar} />);
+    expect(container).toMatchSnapshot();
   });
 
-  it('does not render avatar when not provided', () => {
-    render(<BotTextMessage {...defaultProps} />);
-
-    expect(screen.queryByTestId('sender-avatar')).not.toBeInTheDocument();
-  });
-
-  it('applies correct alignment classes', () => {
+  it('matches snapshot without avatar', () => {
     const { container } = render(<BotTextMessage {...defaultProps} />);
-
-    const messageContainer = container.querySelector('.flex.w-full.gap-3');
-    expect(messageContainer).toHaveClass('justify-start');
-    expect(messageContainer).not.toHaveClass('justify-end');
+    expect(container).toMatchSnapshot();
   });
 
-  it('applies correct styling classes', () => {
-    const { container } = render(<BotTextMessage {...defaultProps} />);
-
-    const messageBubble = container.querySelector('.px-4.py-3');
-    expect(messageBubble).toHaveClass(
-      'rounded-r-2xl',
-      'rounded-tl-2xl',
-      'border',
-      'border-[#2979FF]',
-      'bg-white',
-      'text-black'
-    );
+  it('matches snapshot with custom sender name', () => {
+    const { container } = render(<BotTextMessage {...defaultProps} senderName="Custom Sender" />);
+    expect(container).toMatchSnapshot();
   });
 
-  it('preserves whitespace in message text', () => {
+  it('matches snapshot with multiline text', () => {
     const multiLineText = 'Line 1\nLine 2\nLine 3';
     const { container } = render(<BotTextMessage {...defaultProps} displayText={multiLineText} />);
-
-    const messageText = container.querySelector('p.whitespace-pre-wrap');
-    expect(messageText).toBeInTheDocument();
-    expect(messageText).toHaveClass('whitespace-pre-wrap');
-    expect(messageText?.textContent).toBe(multiLineText);
+    expect(container).toMatchSnapshot();
   });
 
-  it('handles empty message text', () => {
+  it('matches snapshot with empty message', () => {
     const { container } = render(<BotTextMessage {...defaultProps} displayText="" />);
-
-    const messageText = container.querySelector('p.whitespace-pre-wrap');
-    expect(messageText).toBeInTheDocument();
-    expect(messageText?.textContent).toBe('');
+    expect(container).toMatchSnapshot();
   });
 
-  it('handles long message text', () => {
+  it('matches snapshot with long message', () => {
     const longText = 'A'.repeat(500);
-    render(<BotTextMessage {...defaultProps} displayText={longText} />);
-
-    expect(screen.getByText(longText)).toBeInTheDocument();
-  });
-
-  it('renders with custom sender name', () => {
-    render(<BotTextMessage {...defaultProps} senderName="Custom Sender" />);
-
-    expect(screen.getByText('Custom Sender')).toBeInTheDocument();
+    const { container } = render(<BotTextMessage {...defaultProps} displayText={longText} />);
+    expect(container).toMatchSnapshot();
   });
 });
