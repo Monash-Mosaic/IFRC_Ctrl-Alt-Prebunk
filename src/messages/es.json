@@ -62,6 +62,19 @@
       }
     }
   },
+  "prebunking": {
+    "modalLabel": "Modal de información de prebunking",
+    "header": {
+      "holdOn": "¡Espera!",
+      "misleading": "¡Eso es engañoso!"
+    },
+    "body": {
+      "techniquePrefix": "Esta publicación está usando",
+      "context": "El clima no es lo mismo que el clima. No dejes que los incidentes aislados distraigan de los datos a largo plazo en el Informe Mundial de Desastres.",
+      "dataLink": "Consulta los datos de la FICR sobre las tendencias crecientes de olas de calor."
+    },
+    "continueButton": "¡Entendido! Continuar"
+  },
   "errors": {
     "404": {
       "title": "Página no encontrada",

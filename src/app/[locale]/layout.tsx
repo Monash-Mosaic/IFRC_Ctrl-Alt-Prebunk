@@ -71,7 +71,7 @@ export default async function LocaleLayout({
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
-
+  
   // Determine direction for RTL support
   const direction = getDirection(locale);
   const isRTL = isRTLLocale(locale);
@@ -83,8 +83,8 @@ export default async function LocaleLayout({
           <Header />
           <PointsCredibilityBar />
           <Navigation />
-          <main
-            className={`min-h-screen bg-white pt-24 pb-20 md:pb-0 ${
+          <main id="root"
+            className={`min-h-screen bg-white pt-24 pb-16 md:pb-0 ${
               isRTL ? 'md:pr-20' : 'md:pl-20'
             }`}
           >

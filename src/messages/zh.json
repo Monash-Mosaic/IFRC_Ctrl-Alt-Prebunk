@@ -62,6 +62,19 @@
       }
     }
   },
+  "prebunking": {
+    "modalLabel": "预防性辟谣信息模态框",
+    "header": {
+      "holdOn": "等等！",
+      "misleading": "这是误导性的！"
+    },
+    "body": {
+      "techniquePrefix": "这篇帖子正在使用",
+      "context": "天气不等于气候。不要让孤立的事件分散对《世界灾害报告》中长期数据的注意力。",
+      "dataLink": "查看IFRC关于热浪趋势增加的数据。"
+    },
+    "continueButton": "明白了！继续"
+  },
   "errors": {
     "404": {
       "title": "页面未找到",

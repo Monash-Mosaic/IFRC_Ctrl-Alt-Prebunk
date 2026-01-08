@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { storage, StorageKey } from './local-storage';
 
-export const useLocalStorage = <T = unknown>(key: StorageKey, initialValue: T) => {
-  const [storedValue, setStoredValue] = useState<T>(() => {
+export const useLocalStorage = <T = unknown>(key: StorageKey, initialValue?: T) => {
+  const [storedValue, setStoredValue] = useState<T | undefined>(() => {
     return storage.getItem(key, initialValue);
   });
 

@@ -62,6 +62,19 @@
       }
     }
   },
+  "prebunking": {
+    "modalLabel": "Prebunking information modal",
+    "header": {
+      "holdOn": "Hold on!",
+      "misleading": "That's misleading!"
+    },
+    "body": {
+      "techniquePrefix": "This post is using",
+      "context": "Weather is not the same as Climate. Don't let isolated incidents distract from long-term data in the World Disasters Report.",
+      "dataLink": "See the IFRC data on increasing heatwave trends."
+    },
+    "continueButton": "Got it! Continue"
+  },
   "errors": {
     "404": {
       "title": "Page Not Found",

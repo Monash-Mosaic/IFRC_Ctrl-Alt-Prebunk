@@ -62,6 +62,19 @@
       }
     }
   },
+  "prebunking": {
+    "modalLabel": "Modal d'information de prébunking",
+    "header": {
+      "holdOn": "Attendez !",
+      "misleading": "C'est trompeur !"
+    },
+    "body": {
+      "techniquePrefix": "Cette publication utilise",
+      "context": "La météo n'est pas la même chose que le climat. Ne laissez pas les incidents isolés distraire des données à long terme dans le Rapport mondial sur les catastrophes.",
+      "dataLink": "Voir les données de la FICR sur les tendances croissantes des vagues de chaleur."
+    },
+    "continueButton": "Compris ! Continuer"
+  },
   "errors": {
     "404": {
       "title": "Page introuvable",
