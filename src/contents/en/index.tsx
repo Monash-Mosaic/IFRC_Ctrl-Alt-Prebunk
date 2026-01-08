@@ -6,16 +6,6 @@ export type User = {
   isUser: boolean;
 }
 
-const Paula: User = {
-  id: 'paula',
-  name: 'Paula',
-  isUser: false
-}
-
-const Echo: User = {
-
-}
-
 export type Post = {
   title: string;
   description: string;
@@ -62,10 +52,6 @@ export const content: Record<ContentId, Content> = {
     id: '2',
     type: ContentType.SHARE,
   },
-  '3': {
-    id: '3',
-    type: ContentType.LIKE_DISLIKE,
-  }
 }
 
 export const contentList = Object.values(content);
