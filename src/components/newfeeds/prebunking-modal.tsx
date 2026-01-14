@@ -1,29 +1,25 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Modal from 'react-modal';
 import { useTranslations } from 'next-intl';
-import { ArrowUpLeft, Menu, ArrowRight } from 'lucide-react';
+import { CornerUpLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface PrebunkingModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
-  technique?: string;
-  explanation?: string;
-  dataLink?: string;
-  dataLinkText?: string;
+  content: React.ReactNode; // Compiled React content for the modal body
+  header: React.ReactNode; // Header content for the modal
 }
 
 export default function PrebunkingModal({
   isOpen,
   onClose,
   postId,
-  technique = 'Cherry-Picking',
-  explanation,
-  dataLink,
-  dataLinkText,
+  content,
+  header,
 }: PrebunkingModalProps) {
   const t = useTranslations('prebunking');
 
@@ -53,47 +49,18 @@ export default function PrebunkingModal({
         {/* Red Header Section */}
         <div className="bg-[#E63946] px-6 py-4 flex items-center gap-3">
           <div className="shrink-0" aria-hidden="true">
-            <ArrowUpLeft className="text-white" size={24} strokeWidth={2.5} />
+            <CornerUpLeft className="text-white" size={24} strokeWidth={2.5} />
           </div>
           <div className="text-white">
-            <div className="text-lg font-semibold">{t('header.holdOn')}</div>
-            <div className="text-sm">{t('header.misleading')}</div>
+            {header}
           </div>
         </div>
 
         {/* White Body Section */}
         <div className="bg-white px-6 py-5 space-y-4">
-          <div>
-            <p className="text-[#0D1B3E] text-base leading-relaxed">
-              {t('body.techniquePrefix')} <strong className="font-semibold">{technique}</strong>
-            </p>
+          <div className="space-y-4">
+            {content}
           </div>
-
-          {explanation && (
-            <div className="flex items-start gap-3">
-              <Menu className="text-[#6B7280] mt-1 shrink-0" size={20} strokeWidth={2} aria-hidden="true" />
-              <p className="text-[#0D1B3E] text-sm leading-relaxed">{explanation}</p>
-            </div>
-          )}
-
-          <div className="flex items-start gap-3">
-            <ArrowRight className="text-[#6B7280] mt-1 shrink-0" size={20} strokeWidth={2} aria-hidden="true" />
-            <p className="text-[#0D1B3E] text-sm leading-relaxed">{t('body.context')}</p>
-          </div>
-
-          {dataLink && (
-            <div className="pt-2">
-              <a
-                href={dataLink}
-                target="_blank"
-                rel="no-referrer noopener"
-                className="text-[#E63946] underline font-semibold text-sm hover:text-[#C02D3A] transition-colors"
-                aria-label={dataLinkText ? `${dataLinkText} (opens in new tab)` : `${t('body.dataLink')} (opens in new tab)`}
-              >
-                {dataLinkText || t('body.dataLink')}
-              </a>
-            </div>
-          )}
 
           {/* Continue Button */}
           <div className="pt-4">

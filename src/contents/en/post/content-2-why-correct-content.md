@@ -1,0 +1,1 @@
+This post makes unverified claims about health and medical information. Always verify health-related claims with reputable sources like medical institutions or peer-reviewed research before sharing.

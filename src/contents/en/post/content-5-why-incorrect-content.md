@@ -1,0 +1,1 @@
+Engaging with outdated information as if it were current can mislead others. It's important to verify the timeliness of information and prioritize recent, verified sources.

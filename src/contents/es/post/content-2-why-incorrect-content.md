@@ -1,0 +1,1 @@
+Dar me gusta o compartir información de salud no verificada puede difundir desinformación que puede dañar las decisiones de salud de las personas. Es importante tener cuidado con las afirmaciones médicas, especialmente aquellas no respaldadas por evidencia científica.

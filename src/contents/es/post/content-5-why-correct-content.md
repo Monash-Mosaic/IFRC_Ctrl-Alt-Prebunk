@@ -1,0 +1,1 @@
+Esta publicación presenta información que ha sido superada por investigaciones y evidencia más recientes. Siempre verifica cuándo se publicó la información y si hay información más nueva y precisa disponible.

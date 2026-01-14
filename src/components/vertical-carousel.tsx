@@ -9,7 +9,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 
 type PropType = {
   options?: EmblaOptionsType
-  children?: (emblaApi: EmblaCarouselType | undefined) => React.ReactNode
+  children?: (emblaApi: EmblaCarouselType) => React.ReactNode
 }
 
 

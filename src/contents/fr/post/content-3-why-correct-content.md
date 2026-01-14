@@ -1,0 +1,1 @@
+Cette publication fait référence à des informations de l'Organisation mondiale de la santé, une autorité sanitaire internationale de confiance. Les informations sont basées sur des recherches cliniques approfondies et des preuves. Soutenir des informations de santé fiables provenant de sources autorisées aide à promouvoir la santé publique et la sécurité.

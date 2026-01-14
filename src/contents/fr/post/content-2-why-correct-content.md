@@ -1,0 +1,1 @@
+Cette publication fait des affirmations non vérifiées sur les informations de santé et médicales. Vérifiez toujours les affirmations liées à la santé auprès de sources réputées comme les institutions médicales ou la recherche évaluée par des pairs avant de partager.

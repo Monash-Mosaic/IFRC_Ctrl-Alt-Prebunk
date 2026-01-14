@@ -1,0 +1,1 @@
+This post promotes unfounded conspiracy theories without credible evidence. Conspiracy theories often rely on speculation rather than verifiable facts and can undermine trust in legitimate institutions.

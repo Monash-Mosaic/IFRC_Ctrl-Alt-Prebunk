@@ -2,54 +2,58 @@
 
 import Image from 'next/image';
 import { ThumbsUp, ThumbsDown, MessageCircle, Send, Video } from 'lucide-react';
-import EchoAvatar from '../_icons/echo-avatar';
 import { cn } from '@/lib/utils';
+import type { User } from '@/contents/en';
 
 export interface PostMessageProps {
-  name?: string;
-  avatar?: React.ReactNode;
-  handle?: string;
+  user: User;
   content: React.ReactNode;
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
   className?: string;
-  onLike?: () => void;
-  onDislike?: () => void;
-  onComment?: () => void;
-  onShare?: () => void;
+  likeClassName?: string;
+  dislikeClassName?: string;
+  commentClassName?: string;
+  shareClassName?: string;  
   likeDisabled?: boolean;
   dislikeDisabled?: boolean;
   commentDisabled?: boolean;
   shareDisabled?: boolean;
+  onLike?: () => void;
+  onDislike?: () => void;
+  onComment?: () => void;
+  onShare?: () => void;
 }
 
 export default function PostMessage({
-  name,
-  avatar = <EchoAvatar width={40} height={40} />,
-  handle,
+  user,
   content,
   mediaUrl,
   mediaType = 'image',
   className = '',
-  onLike,
-  onDislike,
-  onComment,
-  onShare,
+  likeClassName = '',
+  dislikeClassName = '',
+  commentClassName = '',
+  shareClassName = '',
   likeDisabled = false,
   dislikeDisabled = false,
   commentDisabled = false,
   shareDisabled = false,
+  onLike,
+  onDislike,
+  onComment,
+  onShare,
 }: PostMessageProps) {
   return (
     <article className={cn("w-full rounded-lg border border-[#E8E9ED] bg-white p-4 shadow-sm", className)}>
       {/* Header with avatar, name, handle, and dropdown */}
       <header className="mb-3 flex items-start gap-3">
         <div className="shrink-0 w-[40px] h-[40px] flex items-center justify-center" aria-hidden="true">
-          {avatar}
+          {user.avatar}
         </div>
         <div className="flex flex-col items-start justify-between">
-          {name && <h3 className="text-sm font-semibold text-[#0D1B3E]">{name}</h3>}
-          {handle && <p className="text-xs text-[#6B7280]">{handle}</p>}
+          {user.name && <h3 className="text-sm font-semibold text-[#0D1B3E]">{user.name}</h3>}
+          {user.handle && <p className="text-xs text-[#6B7280]">{user.handle}</p>}
         </div>
       </header>
 
@@ -91,7 +95,7 @@ export default function PostMessage({
           <button
             onClick={onLike}
             disabled={likeDisabled}
-            className={cn("flex items-center gap-1 text-[#6B7280] transition-colors hover:text-[#2FE89F]", likeDisabled ? 'opacity-50 cursor-not-allowed' : '')}
+            className={cn("flex items-center gap-1 text-[--color-ifrc-blue]/70 transition-colors hover:text-[--color-ifrc-blue]", likeDisabled ? 'opacity-50 cursor-not-allowed' : '', likeClassName)}
             aria-label="Like"
             type="button"
           >
@@ -100,7 +104,7 @@ export default function PostMessage({
           <button
             disabled={dislikeDisabled}
             onClick={onDislike}
-            className={cn("flex items-center gap-1 text-[#6B7280] transition-colors hover:text-[#E63946]", dislikeDisabled ? 'opacity-50 cursor-not-allowed' : '')}
+            className={cn("flex items-center gap-1 text-[--color-ifrc-blue]/70 transition-colors hover:text-[--color-ifrc-blue]", dislikeDisabled ? 'opacity-50 cursor-not-allowed' : '', dislikeClassName)}
             aria-label="Dislike"
             type="button"
           >
@@ -111,7 +115,7 @@ export default function PostMessage({
           <button
             disabled={commentDisabled}
             onClick={onComment}
-            className={cn("flex items-center gap-1 text-[#6B7280] transition-colors hover:text-[#0D1B3E]", commentDisabled ? 'opacity-50 cursor-not-allowed' : '')}
+            className={cn("flex items-center gap-1 text-[--color-ifrc-blue]/70 transition-colors hover:text-[--color-ifrc-blue]", commentDisabled ? 'opacity-50 cursor-not-allowed' : '', commentClassName)}
             aria-label="Comment"
             type="button"
           >
@@ -120,7 +124,7 @@ export default function PostMessage({
           <button
             disabled={shareDisabled}
             onClick={onShare}
-            className={cn("flex items-center gap-1 text-[#6B7280] transition-colors hover:text-[#0D1B3E]", shareDisabled ? 'opacity-50 cursor-not-allowed' : '')}
+            className={cn("flex items-center gap-1 text-[--color-ifrc-blue]/70 transition-colors hover:text-[--color-ifrc-blue]", shareDisabled ? 'opacity-50 cursor-not-allowed' : '', shareClassName)}
             aria-label="Share"
             type="button"
           >

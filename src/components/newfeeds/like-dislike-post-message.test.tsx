@@ -1,6 +1,7 @@
+import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import LikeDislikePostMessage from './like-dislike-post-message';
+import LikeDislikePostMessage, { reducer, initialState } from './like-dislike-post-message';
 
 // Mock PostMessage component
 jest.mock('@/app/[locale]/chat/onboarding/_components/post-message', () => {
@@ -62,10 +63,14 @@ jest.mock('./prebunking-modal', () => {
     isOpen,
     onClose,
     postId,
+    content,
+    header,
   }: {
     isOpen: boolean;
     onClose: () => void;
     postId: string;
+    content: React.ReactNode;
+    header: React.ReactNode;
   }) {
     // Store onClose for testing
     if (isOpen) {
@@ -86,6 +91,110 @@ jest.mock('./prebunking-modal', () => {
 jest.mock('next-intl', () => ({
   useTranslations: jest.fn(() => (key: string) => key),
 }));
+
+describe('reducer', () => {
+  it('should return initial state', () => {
+    expect(initialState).toEqual({
+      isLiked: false,
+      isDisliked: false,
+      showModal: false,
+    });
+  });
+
+  it('should handle TOGGLE_LIKE action when not liked', () => {
+    const state = { isLiked: false, isDisliked: false, showModal: false };
+    const result = reducer(state, { type: 'TOGGLE_LIKE' });
+
+    expect(result).toEqual({
+      isLiked: true,
+      isDisliked: false,
+      showModal: true,
+    });
+  });
+
+  it('should handle TOGGLE_LIKE action when already liked', () => {
+    const state = { isLiked: true, isDisliked: false, showModal: false };
+    const result = reducer(state, { type: 'TOGGLE_LIKE' });
+
+    expect(result).toEqual({
+      isLiked: false,
+      isDisliked: false,
+      showModal: true,
+    });
+  });
+
+  it('should clear isDisliked when TOGGLE_LIKE action is dispatched', () => {
+    const state = { isLiked: false, isDisliked: true, showModal: false };
+    const result = reducer(state, { type: 'TOGGLE_LIKE' });
+
+    expect(result).toEqual({
+      isLiked: true,
+      isDisliked: false,
+      showModal: true,
+    });
+  });
+
+  it('should handle TOGGLE_DISLIKE action when not disliked', () => {
+    const state = { isLiked: false, isDisliked: false, showModal: false };
+    const result = reducer(state, { type: 'TOGGLE_DISLIKE' });
+
+    expect(result).toEqual({
+      isLiked: false,
+      isDisliked: true,
+      showModal: true,
+    });
+  });
+
+  it('should handle TOGGLE_DISLIKE action when already disliked', () => {
+    const state = { isLiked: false, isDisliked: true, showModal: false };
+    const result = reducer(state, { type: 'TOGGLE_DISLIKE' });
+
+    expect(result).toEqual({
+      isLiked: false,
+      isDisliked: false,
+      showModal: true,
+    });
+  });
+
+  it('should clear isLiked when TOGGLE_DISLIKE action is dispatched', () => {
+    const state = { isLiked: true, isDisliked: false, showModal: false };
+    const result = reducer(state, { type: 'TOGGLE_DISLIKE' });
+
+    expect(result).toEqual({
+      isLiked: false,
+      isDisliked: true,
+      showModal: true,
+    });
+  });
+
+  it('should handle CLOSE_MODAL action', () => {
+    const state = { isLiked: true, isDisliked: false, showModal: true };
+    const result = reducer(state, { type: 'CLOSE_MODAL' });
+
+    expect(result).toEqual({
+      isLiked: true,
+      isDisliked: false,
+      showModal: false,
+    });
+  });
+
+  it('should preserve other state properties when handling actions', () => {
+    const state = { isLiked: true, isDisliked: false, showModal: true };
+    const result = reducer(state, { type: 'CLOSE_MODAL' });
+
+    expect(result.isLiked).toBe(true);
+    expect(result.isDisliked).toBe(false);
+    expect(result.showModal).toBe(false);
+  });
+
+  it('should return state unchanged for unknown action types', () => {
+    const state = { isLiked: true, isDisliked: false, showModal: true };
+    // @ts-expect-error - Testing unknown action type
+    const result = reducer(state, { type: 'UNKNOWN_ACTION' });
+
+    expect(result).toEqual(state);
+  });
+});
 
 describe('LikeDislikePostMessage', () => {
   const defaultProps = {
