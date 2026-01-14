@@ -27,6 +27,7 @@ export default function LikeDislikePostMessage({
   mediaUrl,
   mediaType,
   content,
+  ...postMessageProps
 }: LikeDislikePostMessageProps) {
   // Use answer from props (passed from parent)
   const currentAnswer = answer ?? null;
@@ -67,6 +68,7 @@ export default function LikeDislikePostMessage({
       shareDisabled={true}
       mediaUrl={mediaUrl}
       mediaType={mediaType}
+      {...postMessageProps}
     />
   );
 }

@@ -10,7 +10,7 @@ import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-mess
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
 import { ContentType, LikeDislikeContent } from '@/contents/en';
-import { useGameStore } from '@/lib/use-game-store';
+import { createGameStore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import Modal from 'react-modal';
 
@@ -19,16 +19,21 @@ export default function HomeContent() {
   const locale = useLocale();
   const t = useTranslations('chat');
   const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED, false);
-  
-  const { contentList } = CONTENTS[locale as keyof typeof CONTENTS];
+  const { content, contentList } = CONTENTS[locale as keyof typeof CONTENTS];
   const [modalPostId, setModalPostId] = useState<string | null>(null);
+  const useGameStore = createGameStore({
+    answers: {},
+    currentQuestionIndex: 0,
+    questions: contentList.map(item => item.id),
+    questionStore: content,
+  });
   
   const { 
     getAnswer, 
     moveToNextQuestion,
     setAnswer,
     isAnswered,
-    currentQuestionIndex
+    isPostDisabled,
   } = useGameStore();
   const { credibility, setCredibility } = useCredibilityStore();
 
@@ -41,21 +46,7 @@ export default function HomeContent() {
     
     // Check if this specific question is answered
     if (isAnswered(postId)) {
-      // Find the original index in contentList for store tracking
-      const answeredQuestionIndex = contentList.findIndex(item => item.id === postId);
-      
-      if (answeredQuestionIndex !== -1) {
-        // Update currentQuestionIndex to match the answered question
-        // This ensures the store tracks the correct question before moving forward
-        const store = useGameStore.getState();
-        if (store.currentQuestionIndex !== answeredQuestionIndex) {
-          // Directly update the store's currentQuestionIndex
-          useGameStore.setState({ currentQuestionIndex: answeredQuestionIndex });
-        }
-        
-        // Now move to next question (this will increment from the correct index)
-        moveToNextQuestion(contentList);
-      }
+      moveToNextQuestion();
     }
   };
 
@@ -97,11 +88,10 @@ export default function HomeContent() {
     <div className="mx-auto flex flex-col md:px-4 pt-6 overflow-hidden">
       <div className="mx-auto flex items-start justify-start max-w-md flex-col w-full relative overflow-hidden">
         <div className="flex flex-col gap-4">
-          {contentList
-            .map((contentItem) => {
+          {contentList.map((contentItem) => {
               const likeDislikeContent = contentItem as LikeDislikeContent;
               const answer = getAnswer(likeDislikeContent.id);
-              
+              const isDisabled = isPostDisabled(likeDislikeContent.id);
               return (
                 <div key={likeDislikeContent.id} className="pt-4">
                   <LikeDislikePostMessage
@@ -114,6 +104,7 @@ export default function HomeContent() {
                     correctAnswer={likeDislikeContent.correctAnswer}
                     onLike={(postId) => handleOnAnswer(postId, 'like')}
                     onDislike={(postId) => handleOnAnswer(postId, 'dislike')}
+                    isDisabled={isDisabled}
                   />
                 </div>
               );
@@ -123,9 +114,7 @@ export default function HomeContent() {
       
       {/* Modal - shown when a post is answered */}
       {modalPostId && (() => {
-        const contentItem = contentList.find(item => item.id === modalPostId) as LikeDislikeContent | undefined;
-        if (!contentItem || contentItem.type !== ContentType.LIKE_DISLIKE) return null;
-        
+        const contentItem = contentList.find(item => item.id === modalPostId) as LikeDislikeContent | undefined as LikeDislikeContent;
         const modalAnswer = getAnswer(modalPostId);
         if (!modalAnswer) return null;
         

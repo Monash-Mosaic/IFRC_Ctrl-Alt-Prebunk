@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import HomeContent from './home-content';
-import { useGameStore } from '@/lib/use-game-store';
+import { createGameStore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import { STORAGE_KEYS } from '@/lib/local-storage';
 
@@ -19,13 +19,91 @@ jest.mock('@/lib/use-local-storage', () => ({
   useLocalStorage: (...args: any[]) => mockUseLocalStorage(...args),
 }));
 
-jest.mock('@/lib/use-game-store');
+// Mock createGameStore
+const mockGetAnswer = jest.fn();
+const mockSetAnswer = jest.fn();
+const mockIsAnswered = jest.fn();
+const mockIsCurrentQuestionAnswered = jest.fn();
+const mockMoveToNextQuestion = jest.fn();
+const mockIsPostDisabled = jest.fn();
+
+const mockUseGameStore = jest.fn(() => ({
+  getAnswer: mockGetAnswer,
+  setAnswer: mockSetAnswer,
+  isAnswered: mockIsAnswered,
+  isCurrentQuestionAnswered: mockIsCurrentQuestionAnswered,
+  moveToNextQuestion: mockMoveToNextQuestion,
+  isPostDisabled: mockIsPostDisabled,
+  currentQuestionIndex: 0,
+  questions: ['1', '2'],
+  questionStore: {},
+  answers: {},
+}));
+
+jest.mock('@/lib/use-game-store', () => ({
+  createGameStore: jest.fn(() => mockUseGameStore),
+}));
+
 jest.mock('@/lib/use-credibility-store');
 
 jest.mock('@/contents', () => ({
   __esModule: true,
   default: {
     en: {
+      content: {
+        '1': {
+          id: '1',
+          type: 'like_dislike',
+          post: {
+            id: '1',
+            user: {
+              id: 'echo',
+              name: 'Echo',
+              handle: '@echo',
+              avatar: null,
+              isUser: false,
+            },
+            content: <div>Post 1 content</div>,
+            mediaUrl: '/images/posts/post-1.jpg',
+            mediaType: 'image' as const,
+          },
+          correctAnswer: 'like' as const,
+          whyCorrectAnswer: {
+            title: <div>Correct Title 1</div>,
+            content: <div>Correct Content 1</div>,
+          },
+          whyIncorrectAnswer: {
+            title: <div>Incorrect Title 1</div>,
+            content: <div>Incorrect Content 1</div>,
+          },
+        },
+        '2': {
+          id: '2',
+          type: 'like_dislike',
+          post: {
+            id: '2',
+            user: {
+              id: 'echo',
+              name: 'Echo',
+              handle: '@echo',
+              avatar: null,
+              isUser: false,
+            },
+            content: <div>Post 2 content</div>,
+            mediaUrl: '/images/posts/post-2.jpg',
+            mediaType: 'image' as const,
+          },
+          correctAnswer: 'dislike' as const,
+          whyCorrectAnswer: {
+            title: <div>Correct Title 2</div>,
+            content: <div>Correct Content 2</div>,
+          },
+          whyIncorrectAnswer: {
+            title: <div>Incorrect Title 2</div>,
+            content: <div>Incorrect Content 2</div>,
+          },
+        },
+      },
       contentList: [
         {
           id: '1',
@@ -135,42 +213,21 @@ jest.mock('./chat-content', () => {
   };
 });
 
-const mockGetAnswer = jest.fn();
-const mockSetAnswer = jest.fn();
-const mockIsAnswered = jest.fn();
-const mockIsCurrentQuestionAnswered = jest.fn();
-const mockMoveToNextQuestion = jest.fn();
 const mockSetCredibility = jest.fn();
 
 describe('HomeContent', () => {
-  const mockGetState = jest.fn(() => ({ currentQuestionIndex: 0 }));
-  const mockSetState = jest.fn();
-
   beforeEach(() => {
     jest.clearAllMocks();
     
-    (useGameStore as jest.Mock).mockReturnValue({
-      getAnswer: mockGetAnswer,
-      setAnswer: mockSetAnswer,
-      isAnswered: mockIsAnswered,
-      isCurrentQuestionAnswered: mockIsCurrentQuestionAnswered,
-      moveToNextQuestion: mockMoveToNextQuestion,
-      currentQuestionIndex: 0,
-    });
-
-    // Mock getState and setState for direct store access
-    (useGameStore.getState as jest.Mock) = mockGetState;
-    (useGameStore.setState as jest.Mock) = mockSetState;
+    mockGetAnswer.mockReturnValue(null);
+    mockIsAnswered.mockReturnValue(false);
+    mockIsCurrentQuestionAnswered.mockReturnValue(false);
+    mockIsPostDisabled.mockReturnValue(false);
 
     (useCredibilityStore as jest.Mock).mockReturnValue({
       credibility: 80,
       setCredibility: mockSetCredibility,
     });
-
-    mockGetAnswer.mockReturnValue(null);
-    mockIsAnswered.mockReturnValue(false);
-    mockIsCurrentQuestionAnswered.mockReturnValue(false);
-    mockGetState.mockReturnValue({ currentQuestionIndex: 0 });
   });
 
   it('renders chat content when onboarding is not completed', () => {
@@ -256,7 +313,6 @@ describe('HomeContent', () => {
       if (postId === '1' && answerSet) return 'like';
       return null;
     });
-    mockGetState.mockReturnValue({ currentQuestionIndex: 0 });
     
     const user = userEvent.setup();
     render(<HomeContent />);

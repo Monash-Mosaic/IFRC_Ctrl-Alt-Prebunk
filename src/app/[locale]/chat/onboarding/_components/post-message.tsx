@@ -8,6 +8,7 @@ import type { User } from '@/contents/en';
 export interface PostMessageProps {
   user: User;
   content: React.ReactNode;
+  isDisabled?: boolean;
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
   className?: string;
@@ -29,6 +30,7 @@ export default function PostMessage({
   user,
   content,
   mediaUrl,
+  isDisabled = false,
   mediaType = 'image',
   className = '',
   likeClassName = '',
@@ -45,7 +47,7 @@ export default function PostMessage({
   onShare,
 }: PostMessageProps) {
   return (
-    <article className={cn("w-full rounded-lg border border-[#E8E9ED] bg-white p-4 shadow-sm", className)}>
+    <article className={cn("w-full rounded-lg border border-[#E8E9ED] bg-white p-4 shadow-sm", isDisabled ? 'opacity-50 cursor-not-allowed' : '', className)}>
       {/* Header with avatar, name, handle, and dropdown */}
       <header className="mb-3 flex items-start gap-3">
         <div className="shrink-0 w-[40px] h-[40px] flex items-center justify-center" aria-hidden="true">

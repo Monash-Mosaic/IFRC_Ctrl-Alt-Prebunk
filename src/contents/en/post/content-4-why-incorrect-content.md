@@ -1,1 +1,1 @@
-Supporting conspiracy theories helps spread misinformation and can contribute to real-world harm. It's important to verify claims and rely on credible, fact-checked sources.
+Supporting conspiracy theories helps spread misinformation and can contribute to real-world harm. It's important to verify claims and rely on credible, fact-checked sources. [Verify information](https://www.snopes.com/).

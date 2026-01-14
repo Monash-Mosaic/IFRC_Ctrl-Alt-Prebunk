@@ -23,10 +23,6 @@ export default function PrebunkingModal({
 }: PrebunkingModalProps) {
   const t = useTranslations('prebunking');
 
-  const handleContinue = () => {
-    onClose();
-  };
-
   return (
     <Modal
       isOpen={isOpen}
@@ -57,7 +53,7 @@ export default function PrebunkingModal({
           {/* Continue Button */}
           <div className="pt-4">
             <button
-              onClick={handleContinue}
+              onClick={onClose}
               className={cn(
                 'w-full rounded-lg bg-[#011E41] text-white font-semibold py-3 px-4',
                 'transition-colors hover:bg-[#002A5A] active:bg-[#001A3F]',
