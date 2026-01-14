@@ -23,14 +23,6 @@ export default function PrebunkingModal({
 }: PrebunkingModalProps) {
   const t = useTranslations('prebunking');
 
-  useEffect(() => {
-    // Set app element for react-modal accessibility
-    if (typeof window !== 'undefined') {
-      const rootElement = document.getElementById('root') || document.body;
-      Modal.setAppElement(rootElement);
-    }
-  }, []);
-
   const handleContinue = () => {
     onClose();
   };

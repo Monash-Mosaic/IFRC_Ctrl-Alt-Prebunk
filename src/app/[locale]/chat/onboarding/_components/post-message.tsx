@@ -95,40 +95,40 @@ export default function PostMessage({
           <button
             onClick={onLike}
             disabled={likeDisabled}
-            className={cn("flex items-center gap-1 text-[--color-ifrc-blue]/70 transition-colors hover:text-[--color-ifrc-blue]", likeDisabled ? 'opacity-50 cursor-not-allowed' : '', likeClassName)}
+            className={cn("flex items-center gap-1 text-(--color-ifrc-blue)/70 transition-colors hover:text-(--color-ifrc-blue)", likeDisabled ? 'opacity-50 cursor-not-allowed' : '')}
             aria-label="Like"
             type="button"
           >
-            <ThumbsUp size={20} strokeWidth={2} aria-hidden="true" />
+            <ThumbsUp className={likeClassName} size={20} strokeWidth={2} aria-hidden="true" />
           </button>
           <button
             disabled={dislikeDisabled}
             onClick={onDislike}
-            className={cn("flex items-center gap-1 text-[--color-ifrc-blue]/70 transition-colors hover:text-[--color-ifrc-blue]", dislikeDisabled ? 'opacity-50 cursor-not-allowed' : '', dislikeClassName)}
+            className={cn("flex items-center gap-1 text-(--color-ifrc-blue)/70 transition-colors hover:text-(--color-ifrc-blue)", dislikeDisabled ? 'opacity-50 cursor-not-allowed' : '')}
             aria-label="Dislike"
             type="button"
           >
-            <ThumbsDown size={20} strokeWidth={2} aria-hidden="true" />
+            <ThumbsDown className={dislikeClassName} size={20} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
         <div className="flex items-center gap-4">
           <button
             disabled={commentDisabled}
             onClick={onComment}
-            className={cn("flex items-center gap-1 text-[--color-ifrc-blue]/70 transition-colors hover:text-[--color-ifrc-blue]", commentDisabled ? 'opacity-50 cursor-not-allowed' : '', commentClassName)}
+            className={cn("flex items-center gap-1 text-(--color-ifrc-blue)/70 transition-colors hover:text-(--color-ifrc-blue)", commentDisabled ? 'opacity-50 cursor-not-allowed' : '')}
             aria-label="Comment"
             type="button"
           >
-            <MessageCircle size={20} strokeWidth={2} aria-hidden="true" />
+            <MessageCircle className={commentClassName} size={20} strokeWidth={2} aria-hidden="true" />
           </button>
           <button
             disabled={shareDisabled}
             onClick={onShare}
-            className={cn("flex items-center gap-1 text-[--color-ifrc-blue]/70 transition-colors hover:text-[--color-ifrc-blue]", shareDisabled ? 'opacity-50 cursor-not-allowed' : '', shareClassName)}
+            className={cn("flex items-center gap-1 text-(--color-ifrc-blue)/70 transition-colors hover:text-(--color-ifrc-blue)", shareDisabled ? 'opacity-50 cursor-not-allowed' : '')}
             aria-label="Share"
             type="button"
           >
-            <Send size={20} strokeWidth={2} aria-hidden="true" />
+            <Send className={shareClassName} size={20} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </div>
