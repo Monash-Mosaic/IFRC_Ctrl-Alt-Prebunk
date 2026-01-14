@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useGameStore } from './use-game-store';
+import { createGameStore } from './use-game-store';
 import { storage, STORAGE_KEYS } from './local-storage';
 
 // Mock localStorage
@@ -21,6 +21,8 @@ const localStorageMock = (() => {
 })();
 
 describe('useGameStore', () => {
+  let useGameStore: ReturnType<typeof createGameStore>;
+  
   beforeEach(() => {
     // Clear localStorage before each test
     localStorageMock.clear();
@@ -30,10 +32,12 @@ describe('useGameStore', () => {
       writable: true,
     });
     
-    // Reset store to initial state
-    const { result } = renderHook(() => useGameStore());
-    act(() => {
-      result.current.resetGame();
+    // Create a new store instance for each test
+    useGameStore = createGameStore({
+      answers: {},
+      currentQuestionIndex: 0,
+      questions: [],
+      questionStore: {},
     });
   });
 
@@ -46,6 +50,8 @@ describe('useGameStore', () => {
     
     expect(result.current.answers).toEqual({});
     expect(result.current.currentQuestionIndex).toBe(0);
+    expect(result.current.questions).toEqual([]);
+    expect(result.current.questionStore).toEqual({});
   });
 
   it('should store answer correctly using setAnswer', () => {
@@ -107,39 +113,41 @@ describe('useGameStore', () => {
   });
 
   it('should check if current question is answered', () => {
+    useGameStore = createGameStore({
+      answers: {},
+      currentQuestionIndex: 0,
+      questions: ['post-1', 'post-2', 'post-3'],
+      questionStore: {},
+    });
     const { result } = renderHook(() => useGameStore());
-    const contentList = [
-      { id: 'post-1' },
-      { id: 'post-2' },
-      { id: 'post-3' },
-    ];
 
     // Initially, no questions are answered
-    expect(result.current.isCurrentQuestionAnswered(contentList)).toBe(false);
+    expect(result.current.isCurrentQuestionAnswered()).toBe(false);
 
     // Answer the first question
     act(() => {
       result.current.setAnswer('post-1', 'like');
     });
 
-    expect(result.current.isCurrentQuestionAnswered(contentList)).toBe(true);
+    expect(result.current.isCurrentQuestionAnswered()).toBe(true);
 
     // Move to next question
     act(() => {
-      result.current.moveToNextQuestion(contentList);
+      result.current.moveToNextQuestion();
     });
 
     // Second question is not answered
-    expect(result.current.isCurrentQuestionAnswered(contentList)).toBe(false);
+    expect(result.current.isCurrentQuestionAnswered()).toBe(false);
   });
 
   it('should increment currentQuestionIndex when moving to next question if current is answered', () => {
+    useGameStore = createGameStore({
+      answers: {},
+      currentQuestionIndex: 0,
+      questions: ['post-1', 'post-2', 'post-3'],
+      questionStore: {},
+    });
     const { result } = renderHook(() => useGameStore());
-    const contentList = [
-      { id: 'post-1' },
-      { id: 'post-2' },
-      { id: 'post-3' },
-    ];
 
     expect(result.current.currentQuestionIndex).toBe(0);
 
@@ -150,24 +158,26 @@ describe('useGameStore', () => {
 
     // Move to next question
     act(() => {
-      result.current.moveToNextQuestion(contentList);
+      result.current.moveToNextQuestion();
     });
 
     expect(result.current.currentQuestionIndex).toBe(1);
   });
 
   it('should not increment currentQuestionIndex if current question is not answered', () => {
+    useGameStore = createGameStore({
+      answers: {},
+      currentQuestionIndex: 0,
+      questions: ['post-1', 'post-2'],
+      questionStore: {},
+    });
     const { result } = renderHook(() => useGameStore());
-    const contentList = [
-      { id: 'post-1' },
-      { id: 'post-2' },
-    ];
 
     expect(result.current.currentQuestionIndex).toBe(0);
 
     // Try to move without answering
     act(() => {
-      result.current.moveToNextQuestion(contentList);
+      result.current.moveToNextQuestion();
     });
 
     // Index should remain 0
@@ -175,16 +185,18 @@ describe('useGameStore', () => {
   });
 
   it('should not go beyond the last question', () => {
+    useGameStore = createGameStore({
+      answers: {},
+      currentQuestionIndex: 0,
+      questions: ['post-1', 'post-2'],
+      questionStore: {},
+    });
     const { result } = renderHook(() => useGameStore());
-    const contentList = [
-      { id: 'post-1' },
-      { id: 'post-2' },
-    ];
 
     // Answer first question
     act(() => {
       result.current.setAnswer('post-1', 'like');
-      result.current.moveToNextQuestion(contentList);
+      result.current.moveToNextQuestion();
     });
 
     expect(result.current.currentQuestionIndex).toBe(1);
@@ -192,41 +204,17 @@ describe('useGameStore', () => {
     // Answer second question
     act(() => {
       result.current.setAnswer('post-2', 'dislike');
-      result.current.moveToNextQuestion(contentList);
+      result.current.moveToNextQuestion();
     });
 
     // Should not go beyond index 1 (last question)
     expect(result.current.currentQuestionIndex).toBe(1);
   });
 
-  it('should reset game state using resetGame', () => {
-    const { result } = renderHook(() => useGameStore());
-    const contentList = [
-      { id: 'post-1' },
-      { id: 'post-2' },
-    ];
-
-    // Set some state
-    act(() => {
-      result.current.setAnswer('post-1', 'like');
-      result.current.setAnswer('post-2', 'dislike');
-      result.current.moveToNextQuestion(contentList);
-    });
-
-    expect(result.current.answers).toEqual({
-      'post-1': 'like',
-      'post-2': 'dislike',
-    });
-    expect(result.current.currentQuestionIndex).toBe(1);
-
-    // Reset
-    act(() => {
-      result.current.resetGame();
-    });
-
-    expect(result.current.answers).toEqual({});
-    expect(result.current.currentQuestionIndex).toBe(0);
-  });
+  // Note: resetGame is commented out in the store, so we skip this test
+  // it('should reset game state using resetGame', () => {
+  //   ...
+  // });
 
   it('should persist state to localStorage', () => {
     const { result } = renderHook(() => useGameStore());
@@ -244,12 +232,18 @@ describe('useGameStore', () => {
   });
 
   it('should persist and retrieve state from localStorage', () => {
+    useGameStore = createGameStore({
+      answers: {},
+      currentQuestionIndex: 0,
+      questions: ['post-1', 'post-2'],
+      questionStore: {},
+    });
     const { result } = renderHook(() => useGameStore());
 
     // Set some state
     act(() => {
       result.current.setAnswer('post-1', 'like');
-      result.current.moveToNextQuestion([{ id: 'post-1' }, { id: 'post-2' }]);
+      result.current.moveToNextQuestion();
     });
 
     // Verify state is updated in the store

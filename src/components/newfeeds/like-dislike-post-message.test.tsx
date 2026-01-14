@@ -111,6 +111,7 @@ describe('LikeDislikePostMessage', () => {
     },
     content: <div>Test post content</div>,
     correctAnswer: 'like' as const,
+    answer: null as 'like' | 'dislike' | null,
   };
 
   beforeEach(() => {
@@ -193,36 +194,36 @@ describe('LikeDislikePostMessage', () => {
     render(<LikeDislikePostMessage {...defaultProps} correctAnswer="like" answer="like" />);
 
     const likeButton = screen.getByTestId('like-button');
-    expect(likeButton).toHaveClass('fill-[--color-dunder-green]');
+    expect(likeButton).toHaveClass('fill-(--color-dunder-green)');
   });
 
   it('applies incorrect color class to like button when answer is incorrect', () => {
     render(<LikeDislikePostMessage {...defaultProps} correctAnswer="dislike" answer="like" />);
 
     const likeButton = screen.getByTestId('like-button');
-    expect(likeButton).toHaveClass('fill-[--color-dunder-red]');
+    expect(likeButton).toHaveClass('fill-(--color-dunder-red)');
   });
 
   it('applies correct color class to dislike button when answer is correct', () => {
     render(<LikeDislikePostMessage {...defaultProps} correctAnswer="dislike" answer="dislike" />);
 
     const dislikeButton = screen.getByTestId('dislike-button');
-    expect(dislikeButton).toHaveClass('fill-[--color-dunder-green]');
+    expect(dislikeButton).toHaveClass('fill-(--color-dunder-green)');
   });
 
   it('applies incorrect color class to dislike button when answer is incorrect', () => {
     render(<LikeDislikePostMessage {...defaultProps} correctAnswer="like" answer="dislike" />);
 
     const dislikeButton = screen.getByTestId('dislike-button');
-    expect(dislikeButton).toHaveClass('fill-[--color-dunder-red]');
+    expect(dislikeButton).toHaveClass('fill-(--color-dunder-red)');
   });
 
   it('does not apply color class to non-clicked button', () => {
     render(<LikeDislikePostMessage {...defaultProps} correctAnswer="like" answer="like" />);
 
     const dislikeButton = screen.getByTestId('dislike-button');
-    expect(dislikeButton).not.toHaveClass('fill-[--color-dunder-green]');
-    expect(dislikeButton).not.toHaveClass('fill-[--color-dunder-red]');
+    expect(dislikeButton).not.toHaveClass('fill-(--color-dunder-green)');
+    expect(dislikeButton).not.toHaveClass('fill-(--color-dunder-red)');
   });
 
 
@@ -234,8 +235,8 @@ describe('LikeDislikePostMessage', () => {
 
     expect(likeButton).not.toBeDisabled();
     expect(dislikeButton).not.toBeDisabled();
-    expect(likeButton).not.toHaveClass('fill-[--color-dunder-green]');
-    expect(dislikeButton).not.toHaveClass('fill-[--color-dunder-red]');
+    expect(likeButton).not.toHaveClass('fill-(--color-dunder-green)');
+    expect(dislikeButton).not.toHaveClass('fill-(--color-dunder-red)');
   });
 
 });

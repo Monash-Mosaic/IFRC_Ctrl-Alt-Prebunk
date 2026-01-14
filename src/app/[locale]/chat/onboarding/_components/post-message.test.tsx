@@ -26,9 +26,16 @@ describe('PostMessage', () => {
     </div>
   );
 
-  const defaultProps = {
+  const defaultUser = {
+    id: 'echo',
     name: 'Echo',
     handle: '@climate_truth_warrior',
+    avatar: <div data-testid="echo-avatar">Echo Avatar</div>,
+    isUser: false,
+  };
+
+  const defaultProps = {
+    user: defaultUser,
     content: defaultContent,
   };
 
@@ -41,7 +48,12 @@ describe('PostMessage', () => {
   });
 
   it('renders custom name and handle', () => {
-    render(<PostMessage {...defaultProps} name="Custom Name" handle="@custom_handle" />);
+    const customUser = {
+      ...defaultUser,
+      name: 'Custom Name',
+      handle: '@custom_handle',
+    };
+    render(<PostMessage {...defaultProps} user={customUser} />);
 
     expect(screen.getByText('Custom Name')).toBeInTheDocument();
     expect(screen.getByText('@custom_handle')).toBeInTheDocument();
@@ -49,7 +61,7 @@ describe('PostMessage', () => {
 
   it('renders custom content', () => {
     const customContent = <div>Custom post content</div>;
-    render(<PostMessage name="Echo" handle="@climate_truth_warrior" content={customContent} />);
+    render(<PostMessage user={defaultUser} content={customContent} />);
 
     expect(screen.getByText('Custom post content')).toBeInTheDocument();
   });
@@ -138,7 +150,7 @@ describe('PostMessage', () => {
   });
 
   it('handles empty content', () => {
-    render(<PostMessage name="Echo" handle="@climate_truth_warrior" content={<div />} />);
+    render(<PostMessage user={defaultUser} content={<div />} />);
 
     expect(screen.getByText('Echo')).toBeInTheDocument();
     expect(screen.getByText('@climate_truth_warrior')).toBeInTheDocument();
