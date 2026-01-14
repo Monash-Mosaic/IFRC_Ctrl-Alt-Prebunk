@@ -42,7 +42,7 @@ describe('Navigation', () => {
         const parent = link.closest('aside');
         return parent?.classList.contains('md:flex');
       });
-      expect(desktopLink).toHaveClass('text-[#E63946]');
+      expect(desktopLink).toHaveClass('text-(--color-ifrc-red)');
     });
 
     it('does not highlight inactive navigation items', () => {
@@ -54,7 +54,7 @@ describe('Navigation', () => {
         const parent = link.closest('aside');
         return parent?.classList.contains('md:flex');
       });
-      expect(desktopLink).toHaveClass('text-[#0D1B3E]');
+      expect(desktopLink).toHaveClass('text-(--color-ifrc-blue)');
     });
 
     it('highlights chat when on chat route', () => {
@@ -66,7 +66,7 @@ describe('Navigation', () => {
         const parent = link.closest('aside');
         return parent?.classList.contains('md:flex');
       });
-      expect(desktopLink).toHaveClass('text-[#E63946]');
+      expect(desktopLink).toHaveClass('text-(--color-ifrc-red)');
     });
 
     it('has correct sidebar positioning classes', () => {
@@ -137,7 +137,7 @@ describe('Navigation', () => {
 
       const analyticsLinks = screen.getAllByText(/analytics/i);
       const activeLink = analyticsLinks.find((link) =>
-        link.closest('a')?.classList.contains('text-[#E63946]')
+        link.closest('a')?.classList.contains('text-(--color-ifrc-red)')
       );
       expect(activeLink).toBeDefined();
     });
@@ -153,7 +153,7 @@ describe('Navigation', () => {
         const parent = link.closest('aside');
         return parent?.classList.contains('md:flex');
       });
-      expect(desktopLink).toHaveClass('text-[#E63946]');
+      expect(desktopLink).toHaveClass('text-(--color-ifrc-red)');
     });
 
     it('handles root route correctly', () => {
@@ -165,7 +165,7 @@ describe('Navigation', () => {
         const parent = link.closest('aside');
         return parent?.classList.contains('md:flex');
       });
-      expect(desktopLink).toHaveClass('text-[#E63946]');
+      expect(desktopLink).toHaveClass('text-(--color-ifrc-red)');
     });
   });
 });

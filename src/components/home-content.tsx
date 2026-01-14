@@ -6,14 +6,19 @@ import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { STORAGE_KEYS } from '@/lib/local-storage';
 import { useLocalStorage } from '@/lib/use-local-storage';
-import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
 import { ContentType, LikeDislikeContent } from '@/contents/en';
 import { createGameStore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
-import Modal from 'react-modal';
+import ContentCarouselItems from '@/components/content-carousel-items';
 
+import Modal from 'react-modal';
+import { CarouselApi } from '@/components/ui/carousel';
+
+import {
+  Carousel,
+} from "@/components/ui/carousel"
 
 export default function HomeContent() {
   const locale = useLocale();
@@ -21,6 +26,7 @@ export default function HomeContent() {
   const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED, false);
   const { content, contentList } = CONTENTS[locale as keyof typeof CONTENTS];
   const [modalPostId, setModalPostId] = useState<string | null>(null);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const useGameStore = createGameStore({
     answers: {},
     currentQuestionIndex: 0,
@@ -47,8 +53,10 @@ export default function HomeContent() {
     // Check if this specific question is answered
     if (isAnswered(postId)) {
       moveToNextQuestion();
+      carouselApi?.scrollNext();
     }
   };
+
 
   const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
     // Only allow answer if post is not already answered
@@ -84,33 +92,25 @@ export default function HomeContent() {
     return <ChatContent startOnboardingText={t('startOnboarding')} skipText={t('skip')} onSkipClick={handleSkipClick} />;
   }
 
+  // return <CarouselOrientation />;
   return (
     <div className="mx-auto flex flex-col md:px-4 pt-6 overflow-hidden">
-      <div className="mx-auto flex items-start justify-start max-w-md flex-col w-full relative overflow-hidden">
-        <div className="flex flex-col gap-4">
-          {contentList.map((contentItem) => {
-              const likeDislikeContent = contentItem as LikeDislikeContent;
-              const answer = getAnswer(likeDislikeContent.id);
-              const isDisabled = isPostDisabled(likeDislikeContent.id);
-              return (
-                <div key={likeDislikeContent.id} className="pt-4">
-                  <LikeDislikePostMessage
-                    postId={likeDislikeContent.id}
-                    user={likeDislikeContent.post.user}
-                    content={likeDislikeContent.post.content}
-                    mediaUrl={likeDislikeContent.post.mediaUrl}
-                    mediaType={likeDislikeContent.post.mediaType}
-                    answer={answer}
-                    correctAnswer={likeDislikeContent.correctAnswer}
-                    onLike={(postId) => handleOnAnswer(postId, 'like')}
-                    onDislike={(postId) => handleOnAnswer(postId, 'dislike')}
-                    isDisabled={isDisabled}
-                  />
-                </div>
-              );
-            })}
-        </div>
-      </div>
+        <Carousel
+          opts={{
+            align: "start",
+            dragFree: true,
+          }}
+          orientation="vertical"
+          className="mx-auto h-[calc(100dvh-var(--spacing)*46)] md:h-[calc(100vh-var(--spacing)*30)] max-w-md w-full relative overflow-hidden"
+          setApi={setCarouselApi}
+        >
+          <ContentCarouselItems
+            contentList={contentList as LikeDislikeContent[]}
+            getAnswer={getAnswer}
+            isPostDisabled={isPostDisabled}
+            onAnswer={handleOnAnswer}
+          />
+        </Carousel>
       
       {/* Modal - shown when a post is answered */}
       {modalPostId && (() => {
