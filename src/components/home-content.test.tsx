@@ -186,24 +186,21 @@ describe('HomeContent', () => {
 
   it('renders posts when onboarding is completed', () => {
     render(<HomeContent />);
-    // Only the current question (index 0) should be visible
     expect(screen.getByTestId('post-1')).toBeInTheDocument();
-    // post-2 should not be visible since only one question is shown at a time
-    expect(screen.queryByTestId('post-2')).not.toBeInTheDocument();
+    expect(screen.getByTestId('post-2')).toBeInTheDocument();
   });
 
   it('passes answer from game store to LikeDislikePostMessage', () => {
     mockGetAnswer.mockImplementation((postId: string) => {
       if (postId === '1') return 'like';
+      if (postId === '2') return 'dislike';
       return null;
     });
 
     render(<HomeContent />);
     
-    // Only post-1 should be visible (current question at index 0)
     expect(screen.getByTestId('answer-1')).toHaveTextContent('like');
-    // post-2 should not be visible since only one question is shown at a time
-    expect(screen.queryByTestId('answer-2')).not.toBeInTheDocument();
+    expect(screen.getByTestId('answer-2')).toHaveTextContent('dislike');
   });
 
   it('decreases credibility on incorrect answer', async () => {
@@ -327,9 +324,7 @@ describe('HomeContent', () => {
   it('passes correct answer to LikeDislikePostMessage', () => {
     render(<HomeContent />);
     
-    // Only post-1 should be visible (current question at index 0)
     expect(screen.getByTestId('correct-1')).toHaveTextContent('like');
-    // post-2 should not be visible since only one question is shown at a time
-    expect(screen.queryByTestId('correct-2')).not.toBeInTheDocument();
+    expect(screen.getByTestId('correct-2')).toHaveTextContent('dislike');
   });
 });
