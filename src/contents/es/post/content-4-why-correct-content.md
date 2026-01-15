@@ -1,0 +1,1 @@
+Esta publicación promueve teorías de conspiración infundadas sin evidencia creíble. Las teorías de conspiración a menudo se basan en especulación en lugar de hechos verificables y pueden socavar la confianza en las instituciones legítimas.

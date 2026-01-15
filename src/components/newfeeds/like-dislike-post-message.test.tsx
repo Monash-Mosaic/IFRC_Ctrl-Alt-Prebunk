@@ -1,4 +1,5 @@
-import { render, screen } from '@/test-utils/test-utils';
+import React from 'react';
+import { render, screen, act } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import LikeDislikePostMessage from './like-dislike-post-message';
 
@@ -14,6 +15,8 @@ jest.mock('@/app/[locale]/chat/onboarding/_components/post-message', () => {
     dislikeDisabled,
     commentDisabled,
     shareDisabled,
+    likeClassName,
+    dislikeClassName,
   }: any) {
     return (
       <div data-testid="post-message">
@@ -24,6 +27,7 @@ jest.mock('@/app/[locale]/chat/onboarding/_components/post-message', () => {
           data-testid="like-button"
           onClick={onLike}
           disabled={likeDisabled}
+          className={likeClassName}
           aria-label="Like"
         >
           Like
@@ -32,6 +36,7 @@ jest.mock('@/app/[locale]/chat/onboarding/_components/post-message', () => {
           data-testid="dislike-button"
           onClick={onDislike}
           disabled={dislikeDisabled}
+          className={dislikeClassName}
           aria-label="Dislike"
         >
           Dislike
@@ -62,10 +67,14 @@ jest.mock('./prebunking-modal', () => {
     isOpen,
     onClose,
     postId,
+    content,
+    header,
   }: {
     isOpen: boolean;
     onClose: () => void;
     postId: string;
+    content: React.ReactNode;
+    header: React.ReactNode;
   }) {
     // Store onClose for testing
     if (isOpen) {
@@ -87,12 +96,22 @@ jest.mock('next-intl', () => ({
   useTranslations: jest.fn(() => (key: string) => key),
 }));
 
+// Game store is no longer used in this component
+
+
 describe('LikeDislikePostMessage', () => {
   const defaultProps = {
     postId: 'post-123',
-    name: 'Echo',
-    handle: '@echo',
+    user: {
+      id: 'echo',
+      name: 'Echo',
+      handle: '@echo',
+      avatar: null,
+      isUser: false,
+    },
     content: <div>Test post content</div>,
+    correctAnswer: 'like' as const,
+    answer: null as 'like' | 'dislike' | null,
   };
 
   beforeEach(() => {
@@ -103,18 +122,26 @@ describe('LikeDislikePostMessage', () => {
     render(<LikeDislikePostMessage {...defaultProps} />);
 
     expect(screen.getByTestId('post-message')).toBeInTheDocument();
-    expect(screen.getByTestId('post-name')).toHaveTextContent('Echo');
-    expect(screen.getByTestId('post-handle')).toHaveTextContent('@echo');
   });
 
-  it('passes likeDisabled and dislikeDisabled as false', () => {
-    render(<LikeDislikePostMessage {...defaultProps} />);
+  it('passes likeDisabled and dislikeDisabled as false when not answered', () => {
+    render(<LikeDislikePostMessage {...defaultProps} answer={null} />);
 
     const likeButton = screen.getByTestId('like-button');
     const dislikeButton = screen.getByTestId('dislike-button');
 
     expect(likeButton).not.toBeDisabled();
     expect(dislikeButton).not.toBeDisabled();
+  });
+
+  it('passes likeDisabled and dislikeDisabled as true when answered', () => {
+    render(<LikeDislikePostMessage {...defaultProps} answer="like" />);
+
+    const likeButton = screen.getByTestId('like-button');
+    const dislikeButton = screen.getByTestId('dislike-button');
+
+    expect(likeButton).toBeDisabled();
+    expect(dislikeButton).toBeDisabled();
   });
 
   it('passes commentDisabled and shareDisabled as true', () => {
@@ -127,32 +154,10 @@ describe('LikeDislikePostMessage', () => {
     expect(shareButton).toBeDisabled();
   });
 
-  it('shows modal when like button is clicked', async () => {
-    const user = userEvent.setup();
-    render(<LikeDislikePostMessage {...defaultProps} />);
-
-    const likeButton = screen.getByTestId('like-button');
-    await user.click(likeButton);
-
-    expect(screen.getByTestId('prebunking-modal')).toBeInTheDocument();
-    expect(screen.getByTestId('modal-post-id')).toHaveTextContent('post-123');
-  });
-
-  it('shows modal when dislike button is clicked', async () => {
-    const user = userEvent.setup();
-    render(<LikeDislikePostMessage {...defaultProps} />);
-
-    const dislikeButton = screen.getByTestId('dislike-button');
-    await user.click(dislikeButton);
-
-    expect(screen.getByTestId('prebunking-modal')).toBeInTheDocument();
-    expect(screen.getByTestId('modal-post-id')).toHaveTextContent('post-123');
-  });
-
-  it('calls onLike callback with postId when like button is clicked', async () => {
+  it('calls onLike when like button is clicked and not answered', async () => {
     const mockOnLike = jest.fn();
     const user = userEvent.setup();
-    render(<LikeDislikePostMessage {...defaultProps} onLike={mockOnLike} />);
+    render(<LikeDislikePostMessage {...defaultProps} answer={null} onLike={mockOnLike} />);
 
     const likeButton = screen.getByTestId('like-button');
     await user.click(likeButton);
@@ -161,10 +166,10 @@ describe('LikeDislikePostMessage', () => {
     expect(mockOnLike).toHaveBeenCalledWith('post-123');
   });
 
-  it('calls onDislike callback with postId when dislike button is clicked', async () => {
+  it('calls onDislike when dislike button is clicked and not answered', async () => {
     const mockOnDislike = jest.fn();
     const user = userEvent.setup();
-    render(<LikeDislikePostMessage {...defaultProps} onDislike={mockOnDislike} />);
+    render(<LikeDislikePostMessage {...defaultProps} answer={null} onDislike={mockOnDislike} />);
 
     const dislikeButton = screen.getByTestId('dislike-button');
     await user.click(dislikeButton);
@@ -173,114 +178,65 @@ describe('LikeDislikePostMessage', () => {
     expect(mockOnDislike).toHaveBeenCalledWith('post-123');
   });
 
-  it('closes modal when modal close button is clicked', async () => {
+  it('does not call onLike if post is already answered', async () => {
+    const mockOnLike = jest.fn();
     const user = userEvent.setup();
-    render(<LikeDislikePostMessage {...defaultProps} />);
+    render(<LikeDislikePostMessage {...defaultProps} answer="like" onLike={mockOnLike} />);
 
-    // Open modal by clicking like
     const likeButton = screen.getByTestId('like-button');
     await user.click(likeButton);
 
-    expect(screen.getByTestId('prebunking-modal')).toBeInTheDocument();
-
-    // Close modal
-    const closeButton = screen.getByTestId('modal-close');
-    await user.click(closeButton);
-
-    expect(screen.queryByTestId('prebunking-modal')).not.toBeInTheDocument();
+    expect(mockOnLike).not.toHaveBeenCalled();
   });
 
-  it('toggles like state when like button is clicked multiple times', async () => {
-    const user = userEvent.setup();
-    render(<LikeDislikePostMessage {...defaultProps} />);
+
+  it('applies correct color class to like button when answer is correct', () => {
+    render(<LikeDislikePostMessage {...defaultProps} correctAnswer="like" answer="like" />);
 
     const likeButton = screen.getByTestId('like-button');
-
-    // First click - should open modal
-    await user.click(likeButton);
-    expect(screen.getByTestId('prebunking-modal')).toBeInTheDocument();
-
-    // Close modal
-    const closeButton = screen.getByTestId('modal-close');
-    await user.click(closeButton);
-
-    // Second click - should open modal again
-    await user.click(likeButton);
-    expect(screen.getByTestId('prebunking-modal')).toBeInTheDocument();
+    expect(likeButton).toHaveClass('fill-(--color-dunder-green)');
   });
 
-  it('toggles dislike state when dislike button is clicked multiple times', async () => {
-    const user = userEvent.setup();
-    render(<LikeDislikePostMessage {...defaultProps} />);
+  it('applies incorrect color class to like button when answer is incorrect', () => {
+    render(<LikeDislikePostMessage {...defaultProps} correctAnswer="dislike" answer="like" />);
+
+    const likeButton = screen.getByTestId('like-button');
+    expect(likeButton).toHaveClass('fill-(--color-dunder-red)');
+  });
+
+  it('applies correct color class to dislike button when answer is correct', () => {
+    render(<LikeDislikePostMessage {...defaultProps} correctAnswer="dislike" answer="dislike" />);
 
     const dislikeButton = screen.getByTestId('dislike-button');
-
-    // First click - should open modal
-    await user.click(dislikeButton);
-    expect(screen.getByTestId('prebunking-modal')).toBeInTheDocument();
-
-    // Close modal
-    const closeButton = screen.getByTestId('modal-close');
-    await user.click(closeButton);
-
-    // Second click - should open modal again
-    await user.click(dislikeButton);
-    expect(screen.getByTestId('prebunking-modal')).toBeInTheDocument();
+    expect(dislikeButton).toHaveClass('fill-(--color-dunder-green)');
   });
 
-  it('unlikes when dislike is clicked after like', async () => {
-    const user = userEvent.setup();
-    render(<LikeDislikePostMessage {...defaultProps} />);
+  it('applies incorrect color class to dislike button when answer is incorrect', () => {
+    render(<LikeDislikePostMessage {...defaultProps} correctAnswer="like" answer="dislike" />);
 
-    // Click like
-    const likeButton = screen.getByTestId('like-button');
-    await user.click(likeButton);
-
-    // Close modal
-    const closeButton = screen.getByTestId('modal-close');
-    await user.click(closeButton);
-
-    // Click dislike - should open modal and clear like state
     const dislikeButton = screen.getByTestId('dislike-button');
-    await user.click(dislikeButton);
-
-    expect(screen.getByTestId('prebunking-modal')).toBeInTheDocument();
+    expect(dislikeButton).toHaveClass('fill-(--color-dunder-red)');
   });
 
-  it('undislikes when like is clicked after dislike', async () => {
-    const user = userEvent.setup();
-    render(<LikeDislikePostMessage {...defaultProps} />);
+  it('does not apply color class to non-clicked button', () => {
+    render(<LikeDislikePostMessage {...defaultProps} correctAnswer="like" answer="like" />);
 
-    // Click dislike
     const dislikeButton = screen.getByTestId('dislike-button');
-    await user.click(dislikeButton);
+    expect(dislikeButton).not.toHaveClass('fill-(--color-dunder-green)');
+    expect(dislikeButton).not.toHaveClass('fill-(--color-dunder-red)');
+  });
 
-    // Close modal
-    const closeButton = screen.getByTestId('modal-close');
-    await user.click(closeButton);
 
-    // Click like - should open modal and clear dislike state
+  it('works with null answer (not answered yet)', () => {
+    render(<LikeDislikePostMessage {...defaultProps} answer={null} />);
+
     const likeButton = screen.getByTestId('like-button');
-    await user.click(likeButton);
+    const dislikeButton = screen.getByTestId('dislike-button');
 
-    expect(screen.getByTestId('prebunking-modal')).toBeInTheDocument();
+    expect(likeButton).not.toBeDisabled();
+    expect(dislikeButton).not.toBeDisabled();
+    expect(likeButton).not.toHaveClass('fill-(--color-dunder-green)');
+    expect(dislikeButton).not.toHaveClass('fill-(--color-dunder-red)');
   });
 
-  it('passes all PostMessage props correctly', () => {
-    const customContent = <div>Custom content</div>;
-    render(
-      <LikeDislikePostMessage
-        {...defaultProps}
-        name="Custom Name"
-        handle="@custom"
-        content={customContent}
-        mediaUrl="/test.jpg"
-        mediaType="image"
-        className="custom-class"
-      />
-    );
-
-    expect(screen.getByTestId('post-name')).toHaveTextContent('Custom Name');
-    expect(screen.getByTestId('post-handle')).toHaveTextContent('@custom');
-  });
 });

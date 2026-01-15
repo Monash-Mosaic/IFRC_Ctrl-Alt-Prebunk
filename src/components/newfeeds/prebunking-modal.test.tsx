@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import PrebunkingModal from './prebunking-modal';
@@ -55,10 +56,19 @@ jest.mock('next-intl', () => ({
 }));
 
 describe('PrebunkingModal', () => {
+  const defaultHeader = (
+    <>
+      <div className="text-lg font-semibold">Hold on!</div>
+      <div className="text-sm">That&apos;s misleading!</div>
+    </>
+  );
+
   const defaultProps = {
     isOpen: true,
     onClose: jest.fn(),
     postId: 'post-123',
+    content: <div>Test content</div>,
+    header: defaultHeader,
   };
 
   beforeEach(() => {
@@ -79,63 +89,17 @@ describe('PrebunkingModal', () => {
     expect(screen.queryByTestId('modal-content')).not.toBeInTheDocument();
   });
 
-  it('displays the default technique name', () => {
-    render(<PrebunkingModal {...defaultProps} />);
+  it('displays custom header content', () => {
+    const customHeader = (
+      <>
+        <div className="text-lg font-semibold">Custom Title</div>
+        <div className="text-sm">Custom subtitle</div>
+      </>
+    );
+    render(<PrebunkingModal {...defaultProps} header={customHeader} />);
 
-    expect(screen.getByText(/This post is using/)).toBeInTheDocument();
-    expect(screen.getByText('Cherry-Picking')).toBeInTheDocument();
-  });
-
-  it('displays custom technique name', () => {
-    render(<PrebunkingModal {...defaultProps} technique="False Equivalence" />);
-
-    expect(screen.getByText('False Equivalence')).toBeInTheDocument();
-  });
-
-  it('displays explanation when provided', () => {
-    const explanation = 'This is a custom explanation text.';
-    render(<PrebunkingModal {...defaultProps} explanation={explanation} />);
-
-    expect(screen.getByText(explanation)).toBeInTheDocument();
-  });
-
-  it('does not display explanation when not provided', () => {
-    render(<PrebunkingModal {...defaultProps} />);
-
-    // The explanation section should not be rendered
-    const menuIcon = screen.queryByRole('img', { hidden: true });
-    // We can't easily test for absence of explanation without a test-id, but we can verify the structure
-    expect(screen.getByText(/Weather is not the same as Climate/)).toBeInTheDocument();
-  });
-
-  it('displays data link when provided', () => {
-    const dataLink = 'https://example.com/data';
-    const dataLinkText = 'View IFRC Data';
-    render(<PrebunkingModal {...defaultProps} dataLink={dataLink} dataLinkText={dataLinkText} />);
-
-    const link = screen.getByRole('link', { name: dataLinkText });
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', dataLink);
-    expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveAttribute('rel', 'no-referrer noopener');
-  });
-
-  it('displays default data link text when dataLink is provided but dataLinkText is not', () => {
-    const dataLink = 'https://example.com/data';
-    render(<PrebunkingModal {...defaultProps} dataLink={dataLink} />);
-
-    const link = screen.getByRole('link', { name: 'See the IFRC data on increasing heatwave trends.' });
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', dataLink);
-  });
-
-  it('does not display data link when dataLink is not provided', () => {
-    render(<PrebunkingModal {...defaultProps} />);
-
-    const links = screen.queryAllByRole('link');
-    // Only check that there are no data links (there might be other links)
-    const dataLinks = links.filter(link => link.textContent?.includes('IFRC data'));
-    expect(dataLinks).toHaveLength(0);
+    expect(screen.getByText('Custom Title')).toBeInTheDocument();
+    expect(screen.getByText('Custom subtitle')).toBeInTheDocument();
   });
 
   it('calls onClose when continue button is clicked', async () => {
@@ -160,11 +124,11 @@ describe('PrebunkingModal', () => {
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-  it('displays context message', () => {
-    render(<PrebunkingModal {...defaultProps} />);
+  it('displays custom content', () => {
+    const customContent = <div>Custom content message</div>;
+    render(<PrebunkingModal {...defaultProps} content={customContent} />);
 
-    expect(screen.getByText(/Weather is not the same as Climate/)).toBeInTheDocument();
-    expect(screen.getByText(/Don't let isolated incidents distract/)).toBeInTheDocument();
+    expect(screen.getByText('Custom content message')).toBeInTheDocument();
   });
 
   it('has correct modal accessibility attributes', () => {

@@ -37,8 +37,20 @@ export const usePrevNextButtons = (
   useEffect(() => {
     if (!emblaApi) return
 
-    onSelect(emblaApi)
+    // Subscribe to events first
     emblaApi.on('reInit', onSelect).on('select', onSelect)
+
+    // Defer initial state update to avoid synchronous setState in effect
+    // Use requestAnimationFrame to defer until after render
+    const rafId = requestAnimationFrame(() => {
+      onSelect(emblaApi)
+    })
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      emblaApi.off('reInit', onSelect)
+      emblaApi.off('select', onSelect)
+    }
   }, [emblaApi, onSelect])
 
   return {

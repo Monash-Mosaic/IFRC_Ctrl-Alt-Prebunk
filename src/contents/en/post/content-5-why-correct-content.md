@@ -1,0 +1,1 @@
+This post presents information that has been superseded by more recent research and evidence. Always check when information was published and whether newer, more accurate information is available. [Find current research](https://scholar.google.com/).

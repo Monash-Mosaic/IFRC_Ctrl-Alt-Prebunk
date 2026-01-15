@@ -1,0 +1,1 @@
+Ne pas aimer cette publication indiquerait que vous rejetez des preuves scientifiques bien établies. Les informations proviennent de recherches évaluées par des pairs et de sources de données vérifiées. Rejeter des informations scientifiques précises peut contribuer à une mauvaise compréhension de problèmes importants comme le changement climatique.

@@ -1,0 +1,1 @@
+Soutenir les théories du complot aide à propager la désinformation et peut contribuer à un préjudice réel dans le monde. Il est important de vérifier les affirmations et de s'appuyer sur des sources crédibles et vérifiées.

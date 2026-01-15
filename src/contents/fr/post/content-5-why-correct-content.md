@@ -1,0 +1,1 @@
+Cette publication présente des informations qui ont été remplacées par des recherches et des preuves plus récentes. Vérifiez toujours quand les informations ont été publiées et si des informations plus récentes et plus précises sont disponibles.

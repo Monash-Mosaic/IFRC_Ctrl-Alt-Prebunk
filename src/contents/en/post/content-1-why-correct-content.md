@@ -1,0 +1,1 @@
+This post shares information from peer-reviewed scientific research published in a reputable journal. The data is verifiable and comes from established climate monitoring systems. Supporting accurate scientific information helps promote evidence-based understanding of climate change. [Learn more about climate research](https://www.ipcc.ch/).

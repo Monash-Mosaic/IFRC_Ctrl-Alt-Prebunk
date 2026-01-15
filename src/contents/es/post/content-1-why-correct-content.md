@@ -1,0 +1,1 @@
+Esta publicación comparte información de investigación científica revisada por pares publicada en una revista acreditada. Los datos son verificables y provienen de sistemas establecidos de monitoreo climático. Apoyar información científica precisa ayuda a promover la comprensión basada en evidencia del cambio climático.

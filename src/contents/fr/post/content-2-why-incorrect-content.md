@@ -1,0 +1,1 @@
+Aimer ou partager des informations de santé non vérifiées peut propager la désinformation qui peut nuire aux décisions de santé des gens. Il est important d'être prudent avec les affirmations médicales, en particulier celles non étayées par des preuves scientifiques.

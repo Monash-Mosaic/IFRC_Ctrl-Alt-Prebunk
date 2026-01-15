@@ -1,0 +1,1 @@
+No dar me gusta a esta publicación indicaría que rechazas evidencia científica bien establecida. La información proviene de investigación revisada por pares y fuentes de datos verificadas. Rechazar información científica precisa puede contribuir a la incomprensión de problemas importantes como el cambio climático.
