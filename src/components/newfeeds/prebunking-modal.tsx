@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 export interface PrebunkingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onContinue?: () => void;
   postId: string;
   technique?: string;
   explanation?: string;
@@ -19,6 +20,7 @@ export interface PrebunkingModalProps {
 export default function PrebunkingModal({
   isOpen,
   onClose,
+  onContinue,
   postId,
   technique = 'Cherry-Picking',
   explanation,
@@ -36,6 +38,7 @@ export default function PrebunkingModal({
   }, []);
 
   const handleContinue = () => {
+    onContinue?.();
     onClose();
   };
 

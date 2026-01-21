@@ -8,12 +8,14 @@ export interface LikeDislikePostMessageProps extends Omit<PostMessageProps, 'lik
   postId: string;
   onLike?: (postId: string) => void;
   onDislike?: (postId: string) => void;
+  onEngaged?: (postId: string) => void;
 }
 
 export default function LikeDislikePostMessage({
   postId,
   onLike,
   onDislike,
+  onEngaged,
   ...postMessageProps
 }: LikeDislikePostMessageProps) {
   const [isLiked, setIsLiked] = useState(false);
@@ -27,6 +29,8 @@ export default function LikeDislikePostMessage({
     setIsLiked(!isLiked);
     setShowModal(true);
     onLike?.(postId);
+    // Mark as engaged immediately when like/dislike is clicked
+    onEngaged?.(postId);
   };
 
   const handleDislike = () => {
@@ -36,10 +40,19 @@ export default function LikeDislikePostMessage({
     setIsDisliked(!isDisliked);
     setShowModal(true);
     onDislike?.(postId);
+    // Mark as engaged immediately when like/dislike is clicked
+    onEngaged?.(postId);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
+  };
+
+  const handleContinue = () => {
+    setShowModal(false);
+    // Ensure engagement is tracked when user clicks Continue
+    // (in case it wasn't tracked earlier, though it should be)
+    onEngaged?.(postId);
   };
 
   return (
@@ -56,6 +69,7 @@ export default function LikeDislikePostMessage({
       <PrebunkingModal
         isOpen={showModal}
         onClose={handleCloseModal}
+        onContinue={handleContinue}
         postId={postId}
       />
     </>
