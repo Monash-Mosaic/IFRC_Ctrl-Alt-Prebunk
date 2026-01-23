@@ -112,95 +112,98 @@ export default function HomeContent() {
   return (
     <div className="mx-auto flex flex-col md:px-4 pt-6 overflow-hidden">
       <div className="mx-auto flex items-start justify-start h-[calc(100dvh-var(--spacing)*46)] md:h-[calc(100vh-var(--spacing)*30)] max-w-md flex-col w-full relative overflow-hidden">
-        <div className="flex-1 w-full h-full">
+        <div className="flex-1 w-full h-full flex items-center gap-4">
+          {/* Carousel Container */}
+          <div className="flex-1 h-full">
+            <VerticalCarousel
+              options={{
+                axis: 'y',
+                // CHANGED: snap scrolling like Shorts/quizzes (one at a time)
+                dragFree: false,
+                skipSnaps: false,
+                align: 'start',
+                slidesToScroll: 1,
+                containScroll: 'trimSnaps',
+                watchDrag: true,
+              }}
+              // NEW: lock forward nav if user hasn't engaged with current post
+              lockNext={!hasEngagedCurrent && canGoNext}
+              // NEW: get embla api in parent for arrow + index tracking
+              onApi={(api) => setEmblaApi(api)}
+            >
+              {(api) => {
+                return messages.map((message, index) => {
+                  const isActive = api?.selectedScrollSnap() === index;
+                  return (
+                    <div
+                      className={cn(
+                        'transform-gpu flex-shrink-0 w-full',
+                        isActive ? 'opacity-100' : 'opacity-70'
+                      )}
+                      style={{
+                        // Each slide should be the full height of the carousel container
+                        // This ensures proper scrolling with snap points
+                        height: '100%',
+                        minHeight: '100%',
+                      }}
+                      key={message.id}
+                    >
+                      <div className="h-full pt-4 overflow-y-auto">
+                        <LikeDislikePostMessage
+                          postId={message.id}
+                          name={message.post.name}
+                          handle={message.post.handle}
+                          content={message.post.contentKey}
+                          mediaUrl={message.post.mediaUrl}
+                          mediaType={message.post.mediaType as 'image' | 'video'}
+                          // NEW: mark engagement when user completes interaction
+                          onEngaged={handleEngaged}
+                        />
+                      </div>
+                    </div>
+                  );
+                });
+              }}
+            </VerticalCarousel>
+          </div>
 
-        {/* Up arrow (Previous post) */}
-        <button
-          type="button"
-          onClick={handlePrevious}
-          disabled={!prevEnabled}
-          className={cn(
-            'absolute right-2 top-1/2 -translate-y-1/2 z-20 -translate-y-[60px]',
-            'rounded-full w-12 h-12 flex items-center justify-center',
-            'transition-all hover:scale-110 active:scale-95 shadow-lg',
-            'bg-[#011E41] hover:bg-[#002A5A] active:bg-[#001A3F]',
-            !prevEnabled
-              ? 'opacity-30 cursor-not-allowed bg-[#6B7280] hover:bg-[#6B7280]'
-              : 'cursor-pointer'
-          )}
-          aria-label="Previous post"
-        >
-          <ChevronUp size={24} className="text-white" strokeWidth={2.5} aria-hidden="true" />
-        </button>
+          {/* Navigation Buttons - Outside on the right */}
+          <div className="flex flex-col items-center justify-center gap-4 h-full py-4">
+            {/* Up arrow (Previous post) */}
+            <button
+              type="button"
+              onClick={handlePrevious}
+              disabled={!prevEnabled}
+              className={cn(
+                'rounded-full w-12 h-12 flex items-center justify-center',
+                'transition-all hover:scale-110 active:scale-95 shadow-lg',
+                'bg-[#011E41] hover:bg-[#002A5A] active:bg-[#001A3F]',
+                !prevEnabled
+                  ? 'opacity-30 cursor-not-allowed bg-[#6B7280] hover:bg-[#6B7280]'
+                  : 'cursor-pointer'
+              )}
+              aria-label="Previous post"
+            >
+              <ChevronUp size={24} className="text-white" strokeWidth={2.5} aria-hidden="true" />
+            </button>
 
-        {/* Down arrow (Next post) */}
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={!nextEnabled}
-          className={cn(
-            'absolute right-2 top-1/2 -translate-y-1/2 z-30 translate-y-[60px]',
-            'rounded-full w-12 h-12 flex items-center justify-center',
-            'transition-all hover:scale-110 active:scale-95 shadow-lg',
-            nextEnabled
-              ? 'bg-[#2FE89F] hover:bg-[#00FF9C] active:bg-[#26D68F] cursor-pointer opacity-100'
-              : 'bg-[#6B7280] opacity-50 cursor-not-allowed hover:bg-[#6B7280]'
-          )}
-          aria-label="Next post"
-        >
-          <ChevronDown size={24} className="text-[#011E41]" strokeWidth={2.5} aria-hidden="true" />
-        </button>
-
-        <VerticalCarousel
-          options={{
-            axis: 'y',
-            // CHANGED: snap scrolling like Shorts/quizzes (one at a time)
-            dragFree: false,
-            skipSnaps: false,
-            align: 'start',
-            slidesToScroll: 1,
-            containScroll: 'trimSnaps',
-            watchDrag: true,
-          }}
-          // NEW: lock forward nav if user hasn't engaged with current post
-          lockNext={!hasEngagedCurrent && canGoNext}
-          // NEW: get embla api in parent for arrow + index tracking
-          onApi={(api) => setEmblaApi(api)}
-        >
-          {(api) => {
-            return messages.map((message, index) => {
-              const isActive = api?.selectedScrollSnap() === index;
-              return (
-                <div
-                  className={cn(
-                    'transform-gpu flex-shrink-0 w-full',
-                    isActive ? 'opacity-100' : 'opacity-70'
-                  )}
-                  style={{ 
-                    // Each slide should be the full height of the carousel container
-                    // This ensures proper scrolling with snap points
-                    height: '100%',
-                    minHeight: '100%',
-                  }}
-                  key={message.id}
-                >
-                  <div className="h-full pt-4 overflow-y-auto">
-                    <LikeDislikePostMessage
-                      postId={message.id}
-                      name={message.post.name}
-                      handle={message.post.handle}
-                      content={message.post.contentKey}
-                      mediaUrl={message.post.mediaUrl}
-                      mediaType={message.post.mediaType as 'image' | 'video'}
-                      // NEW: mark engagement when user completes interaction
-                      onEngaged={handleEngaged}
-                    />
-                  </div>
-                </div>
-              );
-            });
-          }}
-        </VerticalCarousel>
+            {/* Down arrow (Next post) */}
+            <button
+              type="button"
+              onClick={handleNext}
+              disabled={!nextEnabled}
+              className={cn(
+                'rounded-full w-12 h-12 flex items-center justify-center',
+                'transition-all hover:scale-110 active:scale-95 shadow-lg',
+                nextEnabled
+                  ? 'bg-[#2FE89F] hover:bg-[#00FF9C] active:bg-[#26D68F] cursor-pointer opacity-100'
+                  : 'bg-[#6B7280] opacity-50 cursor-not-allowed hover:bg-[#6B7280]'
+              )}
+              aria-label="Next post"
+            >
+              <ChevronDown size={24} className="text-[#011E41]" strokeWidth={2.5} aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
