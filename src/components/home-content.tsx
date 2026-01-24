@@ -110,11 +110,11 @@ export default function HomeContent() {
   }
 
   return (
-    <div className="mx-auto flex flex-col md:px-4 pt-6 overflow-hidden">
-      <div className="mx-auto flex items-start justify-start h-[calc(100dvh-var(--spacing)*46)] md:h-[calc(100vh-var(--spacing)*30)] max-w-md flex-col w-full relative overflow-hidden">
-        <div className="flex-1 w-full h-full flex items-center gap-4">
+    <div className="mx-auto flex flex-col md:px-4 overflow-hidden h-screen">
+      <div className="mx-auto flex items-center justify-center h-screen max-w-md w-full relative overflow-hidden">
+        <div className="w-full flex items-center gap-4 justify-center">
           {/* Carousel Container */}
-          <div className="flex-1 h-full">
+          <div className="flex-1 h-[70vh] flex items-center justify-center">
             <VerticalCarousel
               options={{
                 axis: 'y',
@@ -148,7 +148,7 @@ export default function HomeContent() {
                       }}
                       key={message.id}
                     >
-                      <div className="h-full pt-4 overflow-y-auto">
+                      <div className="h-full flex items-center justify-center overflow-y-auto">
                         <LikeDislikePostMessage
                           postId={message.id}
                           name={message.post.name}
@@ -168,7 +168,7 @@ export default function HomeContent() {
           </div>
 
           {/* Navigation Buttons - Outside on the right */}
-          <div className="flex flex-col items-center justify-center gap-4 h-full py-4">
+          <div className="flex flex-col items-center justify-center gap-4 h-[70vh]">
             {/* Up arrow (Previous post) */}
             <button
               type="button"
