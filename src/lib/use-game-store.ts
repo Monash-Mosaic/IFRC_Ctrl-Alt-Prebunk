@@ -36,13 +36,15 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
       },
       setAnswer: (postId: string, answer: 'like' | 'dislike') => {
         const state = get();
-        // Allow users to change their answer - always update
-        set({
-          answers: {
-            ...state.answers,
-            [postId]: answer,
-          },
-        });
+        // Only set answer if not already answered (immutability)
+        if (!state.answers[postId]) {
+          set({
+            answers: {
+              ...state.answers,
+              [postId]: answer,
+            },
+          });
+        }
       },
       getAnswer: (postId: string) => {
         const state = get();

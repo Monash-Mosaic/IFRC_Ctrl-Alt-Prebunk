@@ -16,8 +16,8 @@ import type { EmblaCarouselType } from 'embla-carousel';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import VerticalCarousel from '@/components/vertical-carousel';
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
-import Toast from '@/components/toast';
 import { cn } from '@/lib/utils';
+import Toast from '@/components/toast';
 
 export default function HomeContent() {
   const locale = useLocale();
@@ -45,7 +45,6 @@ export default function HomeContent() {
     isAnswered,
     isPostDisabled,
   } = useGameStore();
-
   const { credibility, setCredibility } = useCredibilityStore();
 
   const handleSkipClick = () => {
@@ -90,30 +89,25 @@ export default function HomeContent() {
   };
 
   const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
-    // Allow users to change their answer - always set the new answer
-    const previousAnswer = getAnswer(postId);
-    setAnswer(postId, answer);
+    // Only allow answer if post is not already answered
+    if (!isAnswered(postId)) {
+      setAnswer(postId, answer);
 
-    // Find the content item to check correctness
-    const contentItem = contentList.find(item => item.id === postId) as LikeDislikeContent | undefined;
-    if (contentItem && contentItem.type === ContentType.LIKE_DISLIKE) {
-      const isCorrect = answer === contentItem.correctAnswer;
+      // Find the content item to check correctness
+      const contentItem = contentList.find(item => item.id === postId) as LikeDislikeContent | undefined;
+      if (contentItem && contentItem.type === ContentType.LIKE_DISLIKE) {
+        const isCorrect = answer === contentItem.correctAnswer;
 
-      // Only decrease credibility if this is a new incorrect answer
-      // (not if they're changing from incorrect to correct, or if already answered correctly)
-      if (!isCorrect && !previousAnswer) {
-        // First time answering incorrectly
-        const newCredibility = Math.max(0, credibility - 5);
-        setCredibility(newCredibility);
-      } else if (!isCorrect && previousAnswer && previousAnswer === contentItem.correctAnswer) {
-        // Changed from correct to incorrect
-        const newCredibility = Math.max(0, credibility - 5);
-        setCredibility(newCredibility);
+        // Decrease credibility if incorrect
+        if (!isCorrect) {
+          const newCredibility = Math.max(0, credibility - 5);
+          setCredibility(newCredibility);
+        }
       }
-    }
 
-    // Show modal after answer is set
-    setModalPostId(postId);
+      // Show modal after answer is set
+      setModalPostId(postId);
+    }
   };
 
   useEffect(() => {
@@ -126,29 +120,35 @@ export default function HomeContent() {
 
   const handleNext = () => {
     if (!emblaApi) return;
-    if (!nextEnabled) {
-      // Check if we're on the last post
-      const isLastPost = selectedIndex === contentList.length - 1;
-      if (isLastPost) {
-        setToastMessage(t('noMorePosts') || "You've reached the end! 🎉 No more posts to see.");
-        setShowToast(true);
-      }
+    
+    // Check if we're at the last post
+    const isLastPost = selectedIndex === contentList.length - 1;
+    if (isLastPost || !canGoNext) {
+      setToastMessage('You\'re already on the last post');
+      setShowToast(true);
       return;
     }
+    
+    if (!nextEnabled) {
+      setToastMessage('Please engage with this post before moving to the next one');
+      setShowToast(true);
+      return;
+    }
+    
     emblaApi.scrollNext();
   };
 
   const handlePrevious = () => {
     if (!emblaApi) return;
-    if (!prevEnabled) {
-      // Check if we're on the first post
-      const isFirstPost = selectedIndex === 0;
-      if (isFirstPost) {
-        setToastMessage(t('earliestPost') || "This is the earliest post! 📌 You're at the beginning.");
-        setShowToast(true);
-      }
+    
+    // Check if we're at the first post
+    const isFirstPost = selectedIndex === 0;
+    if (isFirstPost || !canGoPrev) {
+      setToastMessage('You\'re already on the first post');
+      setShowToast(true);
       return;
     }
+    
     emblaApi.scrollPrev();
   };
 
@@ -180,8 +180,7 @@ export default function HomeContent() {
                   const likeDislikeContent = contentItem as LikeDislikeContent;
                   const isActive = api?.selectedScrollSnap() === index;
                   const answer = getAnswer(likeDislikeContent.id);
-                  // Always allow interaction - users can change their answer
-                  const isDisabled = false;
+                  const isDisabled = isPostDisabled(likeDislikeContent.id);
 
                   return (
                     <div
@@ -195,10 +194,7 @@ export default function HomeContent() {
                       }}
                       key={likeDislikeContent.id}
                     >
-                      <div
-                        className="h-full flex items-center justify-center overflow-y-auto"
-                        style={{ pointerEvents: 'auto', position: 'relative', zIndex: 1 }}
-                      >
+                      <div className="h-full flex items-center justify-center overflow-y-auto">
                         <LikeDislikePostMessage
                           postId={likeDislikeContent.id}
                           user={likeDislikeContent.post.user}
@@ -227,11 +223,10 @@ export default function HomeContent() {
               onClick={handlePrevious}
               className={cn(
                 'rounded-full w-12 h-12 flex items-center justify-center',
-                'transition-all hover:scale-110 active:scale-95 shadow-lg',
-                'bg-[#011E41] hover:bg-[#002A5A] active:bg-[#001A3F]',
+                'transition-all shadow-lg',
                 !prevEnabled
                   ? 'opacity-30 cursor-not-allowed bg-[#6B7280] hover:bg-[#6B7280]'
-                  : 'cursor-pointer'
+                  : 'hover:scale-110 active:scale-95 bg-[#011E41] hover:bg-[#002A5A] active:bg-[#001A3F] cursor-pointer'
               )}
               aria-label="Previous post"
               aria-disabled={!prevEnabled}
@@ -245,9 +240,9 @@ export default function HomeContent() {
               onClick={handleNext}
               className={cn(
                 'rounded-full w-12 h-12 flex items-center justify-center',
-                'transition-all hover:scale-110 active:scale-95 shadow-lg',
+                'transition-all shadow-lg',
                 nextEnabled
-                  ? 'bg-[#2FE89F] hover:bg-[#00FF9C] active:bg-[#26D68F] cursor-pointer opacity-100'
+                  ? 'bg-[#2FE89F] hover:bg-[#00FF9C] active:bg-[#26D68F] cursor-pointer opacity-100 hover:scale-110 active:scale-95'
                   : 'bg-[#6B7280] opacity-50 cursor-not-allowed hover:bg-[#6B7280]'
               )}
               aria-label="Next post"
@@ -291,8 +286,10 @@ export default function HomeContent() {
       <Toast
         message={toastMessage || ''}
         isVisible={showToast}
-        onClose={() => setShowToast(false)}
-        duration={3000}
+        onClose={() => {
+          setShowToast(false);
+          setToastMessage(null);
+        }}
       />
     </div>
   );
