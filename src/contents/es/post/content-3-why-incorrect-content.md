@@ -1,0 +1,1 @@
+No dar me gusta a esta publicación indicaría que rechazas información de autoridades de salud establecidas. Las pautas de la OMS se basan en investigación científica rigurosa y están diseñadas para proteger la salud pública. Rechazar información de salud confiable puede socavar los esfuerzos de salud pública y la seguridad.

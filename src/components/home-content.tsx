@@ -1,69 +1,54 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import ChatContent from '@/components/chat-content';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { STORAGE_KEYS } from '@/lib/local-storage';
 import { useLocalStorage } from '@/lib/use-local-storage';
-import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
-import POSTS from '@/app/[locale]/chat/onboarding/_posts';
-import VerticalCarousel from '@/components/vertical-carousel';
-import { cn } from '@/lib/utils';
-
-import { useEffect, useState } from 'react';
+import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
+import CONTENTS from '@/contents';
+import { ContentType, LikeDislikeContent } from '@/contents/en';
+import { createGameStore } from '@/lib/use-game-store';
+import { useCredibilityStore } from '@/lib/use-credibility-store';
+import Modal from 'react-modal';
 import type { EmblaCarouselType } from 'embla-carousel';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-
-// Configuration for posts - easily modifiable
-const POSTS_CONFIG = [
-  {
-    name: 'Echo Post 1',
-    handle: '@echo',
-    mediaUrl: '/images/example/echo-post-img.jpg',
-    mediaType: 'image' as const,
-  },
-  {
-    name: 'Echo Post 2',
-    handle: '@echo',
-    mediaUrl: '/images/example/echo-post-img.jpg',
-    mediaType: 'image' as const,
-  },
-  {
-    name: 'Echo Post 3',
-    handle: '@echo',
-    mediaUrl: '/images/example/echo-post-img.jpg',
-    mediaType: 'image' as const,
-  },
-] as const;
+import VerticalCarousel from '@/components/vertical-carousel';
+import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
+import { cn } from '@/lib/utils';
 
 export default function HomeContent() {
   const locale = useLocale();
   const t = useTranslations('chat');
   const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED, false);
-  const post = POSTS[locale];
-
-  // Dynamically generate messages from configuration
-  const messages = POSTS_CONFIG.map((postConfig, index) => ({
-    id: String(index + 1),
-    type: 'post' as const,
-    post: {
-      name: postConfig.name,
-      handle: postConfig.handle,
-      contentKey: post.echoPost,
-      mediaUrl: postConfig.mediaUrl,
-      mediaType: postConfig.mediaType,
-    },
-  }));
+  
+  const { content, contentList } = CONTENTS[locale as keyof typeof CONTENTS];
+  const [modalPostId, setModalPostId] = useState<string | null>(null);
+  const [emblaApi, setEmblaApi] = useState<EmblaCarouselType | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  
+  const useGameStore = createGameStore({
+    answers: {},
+    currentQuestionIndex: 0,
+    questions: contentList.map(item => item.id),
+    questionStore: content,
+  });
+  
+  const { 
+    getAnswer, 
+    moveToNextQuestion,
+    setAnswer,
+    isAnswered,
+    isPostDisabled,
+  } = useGameStore();
+  const { credibility, setCredibility } = useCredibilityStore();
 
   const handleSkipClick = () => {
     setOnboardingCompleted(true);
   };
 
-  // NEW: Embla + engagement state (per post)
-  const [emblaApi, setEmblaApi] = useState<EmblaCarouselType | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [engaged, setEngaged] = useState<Record<string, boolean>>({});
-
+  // Track selected index for navigation buttons
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -76,22 +61,52 @@ export default function HomeContent() {
     };
   }, [emblaApi]);
 
-  const selectedPostId = messages[selectedIndex]?.id;
-  const hasEngagedCurrent = selectedPostId ? !!engaged[selectedPostId] : false;
+  const selectedPostId = contentList[selectedIndex]?.id;
+  const hasEngagedCurrent = selectedPostId ? isAnswered(selectedPostId) : false;
   const canGoNext = !!emblaApi?.canScrollNext();
   const canGoPrev = !!emblaApi?.canScrollPrev();
   const nextEnabled = hasEngagedCurrent && canGoNext;
   const prevEnabled = canGoPrev;
 
-  const handleEngaged = (postId: string) => {
-    setEngaged((prev) => {
-      // Only update if not already engaged to avoid unnecessary re-renders
-      if (prev[postId]) {
-        return prev;
-      }
-      return { ...prev, [postId]: true };
-    });
+  const handleOnCloseModal = (postId: string) => {
+    setModalPostId(null);
+    
+    // Check if this specific question is answered
+    if (isAnswered(postId)) {
+      moveToNextQuestion();
+      emblaApi?.scrollNext();
+    }
   };
+
+  const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
+    // Only allow answer if post is not already answered
+    if (!isAnswered(postId)) {
+      setAnswer(postId, answer);
+      
+      // Find the content item to check correctness
+      const contentItem = contentList.find(item => item.id === postId) as LikeDislikeContent | undefined;
+      if (contentItem && contentItem.type === ContentType.LIKE_DISLIKE) {
+        const isCorrect = answer === contentItem.correctAnswer;
+        
+        // Decrease credibility if incorrect
+        if (!isCorrect) {
+          const newCredibility = Math.max(0, credibility - 5);
+          setCredibility(newCredibility);
+        }
+      }
+      
+      // Show modal after answer is set
+      setModalPostId(postId);
+    }
+  };
+  
+  useEffect(() => {
+    // Set app element for react-modal accessibility
+    if (typeof window !== 'undefined') {
+      const rootElement = document.getElementById('root') || document.body;
+      Modal.setAppElement(rootElement);
+    }
+  }, []);
 
   const handleNext = () => {
     if (!emblaApi) return;
@@ -112,13 +127,12 @@ export default function HomeContent() {
   return (
     <div className="mx-auto flex flex-col md:px-4 overflow-hidden h-screen">
       <div className="mx-auto flex items-center justify-center h-screen max-w-md w-full relative overflow-hidden">
-        <div className="w-full flex items-center gap-4 justify-center">
+        <div className="w-full flex items-center gap-4 justify-center h-full">
           {/* Carousel Container */}
           <div className="flex-1 h-[70vh] flex items-center justify-center">
             <VerticalCarousel
               options={{
                 axis: 'y',
-                // CHANGED: snap scrolling like Shorts/quizzes (one at a time)
                 dragFree: false,
                 skipSnaps: false,
                 align: 'start',
@@ -126,14 +140,16 @@ export default function HomeContent() {
                 containScroll: 'trimSnaps',
                 watchDrag: true,
               }}
-              // NEW: lock forward nav if user hasn't engaged with current post
               lockNext={!hasEngagedCurrent && canGoNext}
-              // NEW: get embla api in parent for arrow + index tracking
               onApi={(api) => setEmblaApi(api)}
             >
               {(api) => {
-                return messages.map((message, index) => {
+                return contentList.map((contentItem, index) => {
+                  const likeDislikeContent = contentItem as LikeDislikeContent;
                   const isActive = api?.selectedScrollSnap() === index;
+                  const answer = getAnswer(likeDislikeContent.id);
+                  const isDisabled = isPostDisabled(likeDislikeContent.id);
+                  
                   return (
                     <div
                       className={cn(
@@ -141,23 +157,23 @@ export default function HomeContent() {
                         isActive ? 'opacity-100' : 'opacity-70'
                       )}
                       style={{
-                        // Each slide should be the full height of the carousel container
-                        // This ensures proper scrolling with snap points
                         height: '100%',
                         minHeight: '100%',
                       }}
-                      key={message.id}
+                      key={likeDislikeContent.id}
                     >
                       <div className="h-full flex items-center justify-center overflow-y-auto">
                         <LikeDislikePostMessage
-                          postId={message.id}
-                          name={message.post.name}
-                          handle={message.post.handle}
-                          content={message.post.contentKey}
-                          mediaUrl={message.post.mediaUrl}
-                          mediaType={message.post.mediaType as 'image' | 'video'}
-                          // NEW: mark engagement when user completes interaction
-                          onEngaged={handleEngaged}
+                          postId={likeDislikeContent.id}
+                          user={likeDislikeContent.post.user}
+                          content={likeDislikeContent.post.content}
+                          mediaUrl={likeDislikeContent.post.mediaUrl}
+                          mediaType={likeDislikeContent.post.mediaType}
+                          answer={answer}
+                          correctAnswer={likeDislikeContent.correctAnswer}
+                          onLike={(postId) => handleOnAnswer(postId, 'like')}
+                          onDislike={(postId) => handleOnAnswer(postId, 'dislike')}
+                          isDisabled={isDisabled}
                         />
                       </div>
                     </div>
@@ -206,6 +222,33 @@ export default function HomeContent() {
           </div>
         </div>
       </div>
+
+      {/* Modal - shown when a post is answered */}
+      {modalPostId && (() => {
+        const contentItem = contentList.find(item => item.id === modalPostId) as LikeDislikeContent | undefined;
+        if (!contentItem) return null;
+        
+        const modalAnswer = getAnswer(modalPostId);
+        if (!modalAnswer) return null;
+        
+        const isCorrect = modalAnswer === contentItem.correctAnswer;
+        const reasonContent = isCorrect 
+          ? contentItem.whyCorrectAnswer.content 
+          : contentItem.whyIncorrectAnswer.content;
+        const reasonHeader = isCorrect 
+          ? contentItem.whyCorrectAnswer.title 
+          : contentItem.whyIncorrectAnswer.title;
+        
+        return (
+          <PrebunkingModal
+            isOpen={true}
+            onClose={() => handleOnCloseModal(modalPostId)}
+            postId={modalPostId}
+            content={reasonContent}
+            header={reasonHeader}
+          />
+        );
+      })()}
     </div>
   );
 }

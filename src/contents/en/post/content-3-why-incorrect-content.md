@@ -1,0 +1,1 @@
+Disliking this post would indicate you reject information from established health authorities. The WHO guidelines are based on rigorous scientific research and are designed to protect public health. Rejecting reliable health information can undermine public health efforts and safety. [Learn about WHO guidelines](https://www.who.int/publications/).

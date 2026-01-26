@@ -1,0 +1,1 @@
+Cette publication promeut des théories du complot infondées sans preuve crédible. Les théories du complot reposent souvent sur la spéculation plutôt que sur des faits vérifiables et peuvent saper la confiance dans les institutions légitimes.

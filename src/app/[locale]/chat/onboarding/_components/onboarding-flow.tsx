@@ -100,8 +100,7 @@ export default function OnboardingFlow() {
               return (
                 <PostMessage
                   key={message.id}
-                  name={message.post.name}
-                  handle={message.post.handle}
+                  user={CHAT_USERS[message.sender as keyof typeof CHAT_USERS]}
                   content={post[message.post.contentKey as keyof typeof post] as React.ReactNode}
                   mediaUrl={message.post.mediaUrl}
                   mediaType={message.post.mediaType}

@@ -1,0 +1,1 @@
+Ne pas aimer cette publication indiquerait que vous rejetez des informations provenant d'autorités sanitaires établies. Les directives de l'OMS sont basées sur des recherches scientifiques rigoureuses et sont conçues pour protéger la santé publique. Rejeter des informations de santé fiables peut nuire aux efforts de santé publique et à la sécurité.

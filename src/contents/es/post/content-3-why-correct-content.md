@@ -1,0 +1,1 @@
+Esta publicación hace referencia a información de la Organización Mundial de la Salud, una autoridad de salud internacional confiable. La información se basa en extensa investigación clínica y evidencia. Apoyar información de salud confiable de fuentes autorizadas ayuda a promover la salud pública y la seguridad.

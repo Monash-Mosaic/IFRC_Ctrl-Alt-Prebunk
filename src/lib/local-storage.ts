@@ -4,6 +4,7 @@
 export const STORAGE_KEYS = {
   CHAT_ONBOARDING_STATE: 'chat_onboarding_state',
   ONBOARDING_COMPLETED: 'onboarding_completed',
+  GAME_STATE: 'game_state',
 } as const;
 
 /**

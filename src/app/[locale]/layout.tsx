@@ -91,7 +91,7 @@ export default async function LocaleLayout({
             {children}
           </main>
         </NextIntlClientProvider>
-        <SpeedInsights />
+        {/* <SpeedInsights /> */}
       </body>
     </html>
   );

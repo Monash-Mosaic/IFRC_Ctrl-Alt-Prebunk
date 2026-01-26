@@ -1,0 +1,1 @@
+Liking or sharing unverified health information can spread misinformation that may harm people's health decisions. It's important to be cautious with medical claims, especially those not backed by scientific evidence. [Find reliable health sources](https://www.cdc.gov/).

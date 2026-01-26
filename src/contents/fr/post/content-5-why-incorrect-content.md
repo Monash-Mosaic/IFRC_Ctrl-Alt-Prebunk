@@ -1,0 +1,1 @@
+Interagir avec des informations obsolètes comme si elles étaient actuelles peut induire les autres en erreur. Il est important de vérifier l'actualité des informations et de privilégier les sources récentes et vérifiées.

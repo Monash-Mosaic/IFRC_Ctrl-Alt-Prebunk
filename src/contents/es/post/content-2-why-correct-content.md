@@ -1,0 +1,1 @@
+Esta publicación hace afirmaciones no verificadas sobre información de salud y médica. Siempre verifica las afirmaciones relacionadas con la salud con fuentes confiables como instituciones médicas o investigaciones revisadas por pares antes de compartir.

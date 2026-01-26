@@ -1,0 +1,1 @@
+Cette publication partage des informations provenant de recherches scientifiques évaluées par des pairs publiées dans une revue réputée. Les données sont vérifiables et proviennent de systèmes établis de surveillance du climat. Soutenir des informations scientifiques précises aide à promouvoir la compréhension fondée sur des preuves du changement climatique.
