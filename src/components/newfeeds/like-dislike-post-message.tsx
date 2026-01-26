@@ -36,14 +36,20 @@ export default function LikeDislikePostMessage({
   const hasAnswered = currentAnswer !== null && currentAnswer !== undefined;
   const isCorrect = currentAnswer === correctAnswer;
 
-  const handleLike = () => {
-    if (!hasAnswered && !isDisabled) {
+  const handleLike = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Always allow clicking - users can change their answer
+    if (!isDisabled) {
       onLike?.(postId);
     }
   };
 
-  const handleDislike = () => {
-    if (!hasAnswered && !isDisabled) {
+  const handleDislike = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Always allow clicking - users can change their answer
+    if (!isDisabled) {
       onDislike?.(postId);
     }
   };
@@ -56,21 +62,27 @@ export default function LikeDislikePostMessage({
     ? (isCorrect ? colors.correctClass : colors.incorrectClass)
     : '';
 
+  // Don't pass isDisabled to PostMessage - it adds cursor-not-allowed to the whole article
+  // We only use it to control button disabled state
+  const { isDisabled: _, ...restPostMessageProps } = postMessageProps;
+
   return (
-    <PostMessage
-      user={user}
-      content={content}
-      onLike={handleLike}
-      onDislike={handleDislike}
-      likeClassName={likeClassName}
-      dislikeClassName={dislikeClassName}
-      likeDisabled={hasAnswered || isDisabled}
-      dislikeDisabled={hasAnswered || isDisabled}
-      commentDisabled={true}
-      shareDisabled={true}
-      mediaUrl={mediaUrl}
-      mediaType={mediaType}
-      {...postMessageProps}
-    />
+    <div style={{ pointerEvents: 'auto', position: 'relative', zIndex: 1 }}>
+      <PostMessage
+        user={user}
+        content={content}
+        onLike={handleLike}
+        onDislike={handleDislike}
+        likeClassName={likeClassName}
+        dislikeClassName={dislikeClassName}
+        likeDisabled={isDisabled}
+        dislikeDisabled={isDisabled}
+        commentDisabled={true}
+        shareDisabled={true}
+        mediaUrl={mediaUrl}
+        mediaType={mediaType}
+        {...restPostMessageProps}
+      />
+    </div>
   );
 }

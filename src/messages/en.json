@@ -30,6 +30,8 @@
     "illustrationAlt": "Network of people and social media connections",
     "startOnboarding": "Start onboarding chat with Paula",
     "skip": "Skip",
+    "noMorePosts": "You've reached the end! 🎉 No more posts to see.",
+    "earliestPost": "This is the earliest post! 📌 You're at the beginning.",
     "list": {
       "title": "Messages",
       "paula": "Paula",

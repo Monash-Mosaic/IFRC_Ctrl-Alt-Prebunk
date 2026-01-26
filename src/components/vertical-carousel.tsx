@@ -31,11 +31,16 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   }, [emblaApi, onApi])
 
   useEffect(() => {
-    if (!emblaApi || !lockNext) return
+    if (!emblaApi) return
     
     let lastIndex = emblaApi.selectedScrollSnap()
     
     const preventNextScroll = () => {
+      if (!lockNext) {
+        lastIndex = emblaApi.selectedScrollSnap()
+        return
+      }
+      
       const currentIndex = emblaApi.selectedScrollSnap()
       // If user scrolled forward while locked, scroll back
       if (currentIndex > lastIndex) {
@@ -49,6 +54,47 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
 
     return () => {
       emblaApi.off('select', preventNextScroll)
+    }
+  }, [emblaApi, lockNext])
+
+  // Prevent wheel scrolling when locked (touch scrolling is handled by select event)
+  useEffect(() => {
+    if (!emblaApi) return
+    
+    const container = emblaApi.containerNode()
+    let lastIndex = emblaApi.selectedScrollSnap()
+    
+    const updateLastIndex = () => {
+      lastIndex = emblaApi.selectedScrollSnap()
+    }
+    
+    const preventWheelScroll = (e: WheelEvent) => {
+      // Don't interfere with interactions on buttons
+      const target = e.target as HTMLElement
+      if (target.closest('button, a, input, select, textarea')) {
+        return
+      }
+      
+      if (!lockNext) {
+        updateLastIndex()
+        return
+      }
+      
+      const currentIndex = emblaApi.selectedScrollSnap()
+      // If scrolling down (forward) while locked, prevent it
+      if (e.deltaY > 0 && currentIndex >= lastIndex) {
+        e.preventDefault()
+        e.stopPropagation()
+      } else if (e.deltaY < 0) {
+        // Allow scrolling back - update lastIndex
+        updateLastIndex()
+      }
+    }
+
+    container.addEventListener('wheel', preventWheelScroll, { passive: false })
+
+    return () => {
+      container.removeEventListener('wheel', preventWheelScroll)
     }
   }, [emblaApi, lockNext])
 
