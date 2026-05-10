@@ -1,0 +1,13 @@
+{
+  "/[locale]/[...rest]/page": "app/[locale]/[...rest]/page.js",
+  "/[locale]/analytics/page": "app/[locale]/analytics/page.js",
+  "/[locale]/chat/onboarding/page": "app/[locale]/chat/onboarding/page.js",
+  "/[locale]/chat/page": "app/[locale]/chat/page.js",
+  "/[locale]/page": "app/[locale]/page.js",
+  "/[locale]/profile/page": "app/[locale]/profile/page.js",
+  "/[locale]/share/page": "app/[locale]/share/page.js",
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js"
+}
