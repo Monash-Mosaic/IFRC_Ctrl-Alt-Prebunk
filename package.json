@@ -14,6 +14,7 @@
     "test:coverage": "jest --coverage",
     "preview": "opennextjs-cloudflare build && wrangler dev",
     "upload": "opennextjs-cloudflare build && wrangler versions upload",
+    "build:search": "node scripts/build-search.mjs",
     "ci:build": "next build",
     "ci:test": "jest",
     "ci:lint": "eslint",

@@ -41,8 +41,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
           NEXT_PUBLIC_GIT_TAG: ${{ github.event.release.tag_name }}
-          NEXT_PUBLIC_GA_ID: ${{ env.NEXT_PUBLIC_GA_ID }}
-          NEXT_PUBLIC_CF_BEACON_TOKEN: ${{ env.NEXT_PUBLIC_CF_BEACON_TOKEN }}
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_CF_BEACON_TOKEN: ${{ vars.NEXT_PUBLIC_CF_BEACON_TOKEN }}
         run: |
           LOG=$(npm run upload -- --preview-alias staging --tag $NEXT_PUBLIC_GIT_TAG 2>&1 | tee /dev/stderr)
           VERSION_ID=$(echo "$LOG" | grep -oE 'Worker Version ID: [0-9a-f-]+' | awk '{print $4}')

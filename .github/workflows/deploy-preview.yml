@@ -11,6 +11,7 @@ permissions:
   checks: write
   statuses: write
   pull-requests: write
+  issues: write
 
 jobs:
   security_gates:
@@ -20,6 +21,7 @@ jobs:
         checks: write
         pull-requests: write
         contents: write
+        issues: write
 
     steps:
       - name: Checkout code
@@ -52,6 +54,8 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v3
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          header: jest-coverage
           message: ${{ steps.coverage.outputs.report }}
 
       - name: Build
@@ -107,7 +111,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           NEXT_PUBLIC_GIT_TAG: main
           NEXT_PUBLIC_SITE_URL: ${{ format('{0}-{1}.{2}.workers.dev', steps.preview.outputs.branch_slug, vars.CLOUDFLARE_WORKER_NAME, vars.CLOUDFLARE_WORKERS_SUBDOMAIN) }}
-          NEXT_PUBLIC_GA_ID: ${{ env.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
         run: |
           LOG=$(npm run upload -- --preview-alias ${{ steps.preview.outputs.branch_slug }} --tag $NEXT_PUBLIC_GIT_TAG 2>&1 | tee /dev/stderr)
           VERSION_ID=$(echo "$LOG" | grep -oE 'Worker Version ID: [0-9a-f-]+' | awk '{print $4}')
@@ -123,9 +127,9 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          NEXT_PUBLIC_SITE_URL: ${{ env.NEXT_PUBLIC_PREVIEW_SITE_URL }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_PREVIEW_SITE_URL }}
           NEXT_PUBLIC_GIT_TAG: ${{ steps.preview.outputs.branch_slug }}
-          NEXT_PUBLIC_GA_ID: ${{ env.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
         run: |
           LOG=$(npm run upload -- --tag main 2>&1 | tee /dev/stderr)
           VERSION_ID=$(echo "$LOG" | grep -oE 'Worker Version ID: [0-9a-f-]+' | awk '{print $4}')
