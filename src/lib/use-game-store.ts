@@ -4,15 +4,15 @@ import { STORAGE_KEYS } from './local-storage';
 import { ContentBase, ContentId } from '@/contents/en';
 
 interface GameState {
-  answers: Record<string, 'like' | 'dislike'>;
+  answers: Record<string, string>;
   currentQuestionIndex: number;
   questions: Array<ContentId>;
   questionStore: Record<ContentId, ContentBase>;
 }
 
 interface GameStore extends GameState {
-  setAnswer: (postId: string, answer: 'like' | 'dislike') => void;
-  getAnswer: (postId: string) => 'like' | 'dislike' | null;
+  setAnswer: (postId: string, answer: string) => void;
+  getAnswer: (postId: string) => string | null;
   isAnswered: (postId: string) => boolean;
   isCurrentQuestionAnswered: (contentList: Array<{ id: string }>) => boolean;
   isPostDisabled: (postId: string) => boolean;
@@ -34,7 +34,7 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
         const currentQuestion = state.questions[state.currentQuestionIndex];
         return currentQuestion !== postId;
       },
-      setAnswer: (postId: string, answer: 'like' | 'dislike') => {
+      setAnswer: (postId: string, answer: string) => {
         const state = get();
         // Only set answer if not already answered (immutability)
         if (!state.answers[postId]) {

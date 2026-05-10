@@ -8,7 +8,7 @@ import { STORAGE_KEYS } from '@/lib/local-storage';
 import { useLocalStorage } from '@/lib/use-local-storage';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
-import { ContentType, LikeDislikeContent } from '@/contents/en';
+import { Content, ContentType, LikeDislikeContent, MCQContent } from '@/contents/en';
 import { createGameStore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import ContentCarouselItems from '@/components/content-carousel-items';
@@ -33,9 +33,9 @@ export default function HomeContent() {
     questions: contentList.map(item => item.id),
     questionStore: content,
   });
-  
-  const { 
-    getAnswer, 
+
+  const {
+    getAnswer,
     moveToNextQuestion,
     setAnswer,
     isAnswered,
@@ -49,39 +49,45 @@ export default function HomeContent() {
 
   const handleOnCloseModal = (postId: string) => {
     setModalPostId(null);
-    
-    // Check if this specific question is answered
     if (isAnswered(postId)) {
       moveToNextQuestion();
       carouselApi?.scrollNext();
     }
   };
 
-
-  const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
-    // Only allow answer if post is not already answered
-    if (!isAnswered(postId)) {
-      setAnswer(postId, answer);
-      
-      // Find the content item to check correctness
-      const contentItem = contentList.find(item => item.id === postId) as LikeDislikeContent | undefined;
-      if (contentItem && contentItem.type === ContentType.LIKE_DISLIKE) {
-        const isCorrect = answer === contentItem.correctAnswer;
-        
-        // Decrease credibility if incorrect
-        if (!isCorrect) {
-          const newCredibility = Math.max(0, credibility - 5);
-          setCredibility(newCredibility);
-        }
-      }
-      
-      // Show modal after answer is set
-      setModalPostId(postId);
+  const handleOnMCQContinue = (postId: string) => {
+    if (isAnswered(postId)) {
+      moveToNextQuestion();
+      carouselApi?.scrollNext();
     }
   };
-  
+
+  const handleOnAnswer = (postId: string, answer: string) => {
+    if (!isAnswered(postId)) {
+      setAnswer(postId, answer);
+
+      const contentItem = contentList.find(item => item.id === postId) as Content | undefined;
+      if (!contentItem) return;
+
+      if (contentItem.type === ContentType.LIKE_DISLIKE) {
+        const ldContent = contentItem as LikeDislikeContent;
+        const isCorrect = answer === ldContent.correctAnswer;
+        if (!isCorrect) {
+          setCredibility(Math.max(0, credibility - 5));
+        }
+        setModalPostId(postId);
+      } else if (contentItem.type === ContentType.MCQ) {
+        const mcqContent = contentItem as MCQContent;
+        const isCorrect = answer === mcqContent.correctOptionId;
+        if (!isCorrect) {
+          setCredibility(Math.max(0, credibility - 5));
+        }
+        // Overlay is handled inside MCQPostMessage; no modal needed here
+      }
+    }
+  };
+
   useEffect(() => {
-    // Set app element for react-modal accessibility
     if (typeof window !== 'undefined') {
       const rootElement = document.getElementById('root') || document.body;
       Modal.setAppElement(rootElement);
@@ -92,7 +98,6 @@ export default function HomeContent() {
     return <ChatContent startOnboardingText={t('startOnboarding')} skipText={t('skip')} onSkipClick={handleSkipClick} />;
   }
 
-  // return <CarouselOrientation />;
   return (
     <div className="mx-auto flex flex-col md:px-4 pt-6 overflow-hidden">
         <Carousel
@@ -105,31 +110,33 @@ export default function HomeContent() {
           setApi={setCarouselApi}
         >
           <ContentCarouselItems
-            contentList={contentList as LikeDislikeContent[]}
+            contentList={contentList as Content[]}
             getAnswer={getAnswer}
             isPostDisabled={isPostDisabled}
             onAnswer={handleOnAnswer}
+            onContinue={handleOnMCQContinue}
           />
         </Carousel>
-      
-      {/* Modal - shown when a post is answered */}
+
+      {/* Like/Dislike modal */}
       {modalPostId && (() => {
-        const contentItem = contentList.find(item => item.id === modalPostId) as LikeDislikeContent | undefined as LikeDislikeContent;
+        const contentItem = contentList.find(item => item.id === modalPostId) as LikeDislikeContent | undefined;
+        if (!contentItem) return null;
         const modalAnswer = getAnswer(modalPostId);
         if (!modalAnswer) return null;
-        
+
         const isCorrect = modalAnswer === contentItem.correctAnswer;
-        const reasonContent = isCorrect 
-          ? contentItem.whyCorrectAnswer.content 
+        const reasonContent = isCorrect
+          ? contentItem.whyCorrectAnswer.content
           : contentItem.whyIncorrectAnswer.content;
-        const reasonHeader = isCorrect 
-          ? contentItem.whyCorrectAnswer.title 
+        const reasonHeader = isCorrect
+          ? contentItem.whyCorrectAnswer.title
           : contentItem.whyIncorrectAnswer.title;
-        
+
         return (
           <PrebunkingModal
             isOpen={true}
-            onClose={() => handleOnCloseModal(modalPostId)}
+            onClose={() => handleOnCloseLikeDislikeModal(modalPostId)}
             postId={modalPostId}
             content={reasonContent}
             header={reasonHeader}
