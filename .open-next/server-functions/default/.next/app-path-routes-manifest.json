@@ -1,0 +1,13 @@
+{
+  "/[locale]/[...rest]/page": "/[locale]/[...rest]",
+  "/[locale]/analytics/page": "/[locale]/analytics",
+  "/[locale]/chat/onboarding/page": "/[locale]/chat/onboarding",
+  "/[locale]/chat/page": "/[locale]/chat",
+  "/[locale]/page": "/[locale]",
+  "/[locale]/profile/page": "/[locale]/profile",
+  "/[locale]/share/page": "/[locale]/share",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/favicon.ico/route": "/favicon.ico",
+  "/page": "/"
+}
