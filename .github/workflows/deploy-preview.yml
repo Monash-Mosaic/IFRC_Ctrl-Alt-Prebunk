@@ -95,6 +95,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Ensure local env file for tooling
+        run: node scripts/ensure-env.mjs
+
+      - name: Inject D1 database IDs into Wrangler config
+        env:
+          CF_D1_SEARCH_DB_ID: ${{ secrets.CF_D1_SEARCH_DB_ID }}
+        run: node scripts/ci/inject-d1-database-ids.mjs
+
       - name: Build search index
         if: ${{ (github.event_name == 'pull_request' && github.event.action != 'closed') || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
         env:

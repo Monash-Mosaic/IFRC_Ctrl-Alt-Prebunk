@@ -52,7 +52,7 @@ function applyJsoncUpdate(configRaw, path, value) {
 async function run() {
   const prodId = requireEnv('CF_D1_SEARCH_DB_ID');
 
-  assertUuid('CF_D1_SEARCH_DB_ID_PROD', prodId);
+  assertUuid('CF_D1_SEARCH_DB_ID', prodId);
 
   const configRaw = await readFile(wranglerConfigPath, 'utf8');
 
