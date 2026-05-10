@@ -27,21 +27,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Ensure local env file for tooling
-        run: node scripts/ensure-env.mjs
-
-      - name: Inject D1 database IDs into Wrangler config
-        env:
-          CF_D1_SEARCH_DB_ID: ${{ secrets.CF_D1_SEARCH_DB_ID }}
-        run: node scripts/ci/inject-d1-database-ids.mjs
-
-      - name: Build search index (staging)
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          NEXT_PUBLIC_GIT_TAG: ${{ github.event.release.tag_name }}
-        run: npm run build:search
-
       - name: Deploy to Cloudflare (staging)
         id: deploy
         env:
@@ -59,54 +44,6 @@ jobs:
           echo "version_id=$VERSION_ID" >> "$GITHUB_OUTPUT"
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
           echo "branch_preview_url=$BRANCH_PREVIEW_URL" >> "$GITHUB_OUTPUT"
-
-      - name: Resolve staging namespace retention set
-        id: staging_namespaces
-        uses: actions/github-script@v8
-        with:
-          script: |
-            function normalizeNamespace(value) {
-              if (typeof value !== 'string') return null;
-              const trimmed = value.trim();
-              if (!trimmed) return null;
-              const normalized = trimmed
-                .toLowerCase()
-                .replace(/[^a-z0-9_]+/g, '_')
-                .replace(/_+/g, '_')
-                .replace(/^_+|_+$/g, '');
-              return normalized || null;
-            }
-
-            const releases = await github.paginate(github.rest.repos.listReleases, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100,
-            });
-
-            const published = releases
-              .filter((release) => !release.draft)
-              .sort((a, b) => {
-                const aDate = new Date(a.published_at || a.created_at || 0).getTime();
-                const bDate = new Date(b.published_at || b.created_at || 0).getTime();
-                return bDate - aDate;
-              });
-
-            const allNamespaces = [];
-            for (const release of published) {
-              const namespace = normalizeNamespace(release.tag_name);
-              if (namespace) {
-                allNamespaces.push(namespace);
-              }
-            }
-
-            const uniqueNamespaces = [...new Set(allNamespaces)];
-            const keepNamespaces = uniqueNamespaces.slice(0, 10);
-
-            core.info(
-              `Staging namespace retention: keep=${keepNamespaces.length} total_candidates=${uniqueNamespaces.length}`
-            );
-            core.setOutput('all', JSON.stringify(uniqueNamespaces));
-            core.setOutput('keep', JSON.stringify(keepNamespaces));
 
       - name: Adding Version ID to Release Notes
         env:
@@ -132,13 +69,3 @@ jobs:
           gh release upload "$TAG" metadata.json --repo="$GITHUB_REPOSITORY" --clobber
           # Edit the release with the updated notes
           gh release edit "$TAG" --repo="$GITHUB_REPOSITORY" --notes "$UPDATED_BODY"
-
-      - name: Remove old staging FlexSearch tables
-        if: ${{ steps.staging_namespaces.outputs.all != '[]' }}
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          FLEXSEARCH_DB_ENV: production
-          FLEXSEARCH_CANDIDATE_NAMESPACES: ${{ steps.staging_namespaces.outputs.all }}
-          FLEXSEARCH_KEEP_NAMESPACES: ${{ steps.staging_namespaces.outputs.keep }}
-        run: node scripts/ci/cleanup-flexsearch-tables.mjs

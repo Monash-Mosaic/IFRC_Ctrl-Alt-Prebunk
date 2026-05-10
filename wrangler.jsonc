@@ -6,14 +6,6 @@
     "compatibility_flags": [
         "nodejs_compat"
     ],
-    "d1_databases": [
-        {
-            "binding": "SEARCH_DB",
-            "database_name": "ctrl-alt-prebunk-search",
-            "database_id": "00000000-0000-4000-8000-000000000001",
-            "remote": true
-        }
-    ],
     "assets": {
         "directory": ".open-next/assets"
     },
