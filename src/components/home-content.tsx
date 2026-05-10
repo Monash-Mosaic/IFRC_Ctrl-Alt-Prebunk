@@ -337,6 +337,7 @@ export default function HomeContent() {
             postId={modalPostId}
             content={reasonContent}
             header={reasonHeader}
+            isCorrect={isCorrect}
           />
         );
       })()}

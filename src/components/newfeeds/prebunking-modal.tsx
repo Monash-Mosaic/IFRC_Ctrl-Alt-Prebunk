@@ -13,6 +13,8 @@ export interface PrebunkingModalProps {
   postId: string;
   content: React.ReactNode; // Compiled React content for the modal body
   header: React.ReactNode; // Header content for the modal
+  /** Correct answer → dunder green header; incorrect → dunder red */
+  isCorrect: boolean;
 }
 
 export default function PrebunkingModal({
@@ -22,6 +24,7 @@ export default function PrebunkingModal({
   postId,
   content,
   header,
+  isCorrect,
 }: PrebunkingModalProps) {
   const t = useTranslations('prebunking');
 
@@ -49,19 +52,34 @@ export default function PrebunkingModal({
       shouldCloseOnEsc={true}
     >
       <div className="relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" data-post-id={postId}>
-        {/* Red Header Section */}
-        <div className="bg-[#E63946] px-6 py-4 flex items-center gap-3">
+        <div
+          className={cn(
+            'px-6 py-4 flex items-center gap-3',
+            isCorrect ? 'bg-(--color-dunder-green)' : 'bg-(--color-dunder-red)'
+          )}
+          data-result={isCorrect ? 'correct' : 'incorrect'}
+        >
           <div className="shrink-0" aria-hidden="true">
-            <CornerUpLeft className="text-white" size={24} strokeWidth={2.5} />
+            <CornerUpLeft
+              className={cn(
+                isCorrect ? 'text-[color:var(--light-black,#000)]' : 'text-white'
+              )}
+              size={24}
+              strokeWidth={2.5}
+            />
           </div>
-          <div className="text-white">
+          <div
+            className={cn(
+              isCorrect ? 'text-[color:var(--light-black,#000)]' : 'text-white'
+            )}
+          >
             {header}
           </div>
         </div>
 
         {/* White Body Section */}
         <div className="bg-white px-6 py-5 space-y-4">
-          <div className="space-y-4">
+          <div className="space-y-4 [&_a]:!text-(--color-dunder-red) [&_a:hover]:opacity-80">
             {content}
           </div>
 
