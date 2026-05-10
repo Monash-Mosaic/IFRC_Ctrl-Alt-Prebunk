@@ -57,9 +57,9 @@ jobs:
         uses: ArtiomTr/jest-coverage-report-action@v2
         id: coverage
         with:
-          # Do not set coverage-file: that skips running Jest and expects a pre-generated report.json
-          test-script: npm run ci:test:coverage
+          test-script: npm run test:coverage
           skip-step: install
+          annotations: none
           output: comment, report-markdown
 
       - name: Post coverage comment
