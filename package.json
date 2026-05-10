@@ -13,7 +13,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "preview": "opennextjs-cloudflare build && wrangler dev",
-    "upload": "opennextjs-cloudflare build && wrangler deploy",
+    "upload": "opennextjs-cloudflare build && wrangler versions upload",
     "ci:build": "next build",
     "ci:test": "jest",
     "ci:lint": "eslint",
