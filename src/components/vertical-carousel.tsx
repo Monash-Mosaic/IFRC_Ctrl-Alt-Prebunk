@@ -65,8 +65,13 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
       aria-label="Content carousel"
       role="region"
     >
-      <div className="overflow-hidden h-full w-full" ref={emblaRef} aria-live="polite" aria-atomic="false">
-        <div className="flex touch-pan-y touch-pinch-zoom flex-col h-full">
+      <div
+        className="h-full w-full overflow-hidden overscroll-y-contain touch-pan-y"
+        ref={emblaRef}
+        aria-live="polite"
+        aria-atomic="false"
+      >
+        <div className="flex h-full touch-pan-y touch-pinch-zoom flex-col">
           {children?.(emblaApi)}
         </div>
       </div>

@@ -42,8 +42,8 @@ export default function PrebunkingModal({
     <Modal
       isOpen={isOpen}
       onRequestClose={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 outline-none"
-      overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 outline-none"
+      overlayClassName="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity"
       contentLabel={t('modalLabel')}
       shouldCloseOnOverlayClick={true}
       shouldCloseOnEsc={true}

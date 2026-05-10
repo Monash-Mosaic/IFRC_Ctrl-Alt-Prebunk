@@ -157,11 +157,30 @@ export default function HomeContent() {
   }
 
   return (
-    <div className="mx-auto flex flex-col md:px-4 overflow-hidden h-screen">
-      <div className="mx-auto flex items-center justify-center h-screen max-w-md w-full relative overflow-hidden">
-        <div className="w-full flex items-center gap-4 justify-center h-full">
-          {/* Carousel Container */}
-          <div className="flex-1 h-[70vh] flex items-center justify-center">
+    <div
+      className={cn(
+        'mx-auto flex w-full max-w-md flex-col overflow-hidden overscroll-y-contain md:max-w-none md:overflow-visible md:px-4',
+        // Mobile: height matches main padding (pt-24 header+credibility + pb-16 bottom nav), not h-screen — avoids extra page scroll & top/bottom gaps
+        'max-md:h-[calc(100dvh-10rem-env(safe-area-inset-bottom,0px))] max-md:min-h-0 max-md:touch-pan-y',
+        'md:h-screen',
+      )}
+    >
+      {/* overflow-visible on md so desktop nav buttons are not clipped on hover (scale + shadow) */}
+      <div
+        className={cn(
+          'relative mx-auto flex w-full max-w-md flex-col overflow-visible md:px-1',
+          'h-full min-h-0 max-md:justify-start max-md:items-stretch',
+          'md:h-screen md:items-center md:justify-center',
+        )}
+      >
+        <div
+          className={cn(
+            'flex min-h-0 w-full flex-1 flex-col md:h-full md:flex-row md:items-center md:justify-center md:gap-4 md:pr-1',
+            'max-md:items-stretch',
+          )}
+        >
+          {/* Carousel: fills mobile column; desktop keeps 70vh to pair with side arrows */}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col items-stretch justify-stretch max-md:h-full md:h-[70vh] md:items-center md:justify-center">
             <VerticalCarousel
               options={{
                 axis: 'y',
@@ -185,8 +204,8 @@ export default function HomeContent() {
                   return (
                     <div
                       className={cn(
-                        'transform-gpu flex-shrink-0 w-full',
-                        isActive ? 'opacity-100' : 'opacity-70'
+                        'w-full shrink-0 transform-gpu',
+                        isActive ? 'opacity-100' : 'opacity-70',
                       )}
                       style={{
                         height: '100%',
@@ -194,7 +213,7 @@ export default function HomeContent() {
                       }}
                       key={likeDislikeContent.id}
                     >
-                      <div className="h-full flex items-center justify-center overflow-y-auto">
+                      <div className="flex h-full items-center justify-center overflow-y-auto">
                         <LikeDislikePostMessage
                           postId={likeDislikeContent.id}
                           user={likeDislikeContent.post.user}
@@ -215,8 +234,8 @@ export default function HomeContent() {
             </VerticalCarousel>
           </div>
 
-          {/* Navigation Buttons - Outside on the right */}
-          <div className="flex flex-col items-center justify-center gap-4 h-[70vh]">
+          {/* Desktop only — stays visible behind modal; overlay (z-[100]) blocks interaction */}
+          <div className="relative z-10 hidden h-[70vh] shrink-0 flex-col items-center justify-center gap-4 md:flex md:py-2 md:pl-1">
             {/* Up arrow (Previous post) */}
             <button
               type="button"
