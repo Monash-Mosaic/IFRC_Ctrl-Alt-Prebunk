@@ -13,6 +13,7 @@
   --color-dunder-green: #00FF9C;
   --color-dunder-red: #FF1E56;
   --color-dunder-lightgrey: #E4EAF3;
+  --light-black: #000;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.13 0.028 261.692);
