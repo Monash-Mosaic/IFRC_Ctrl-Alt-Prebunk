@@ -13,8 +13,8 @@ export default function Error({
   const t = useTranslations('errors.500');
 
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error('Error:', error);
+    // Avoid logging Error objects or dynamic fields (CWE-532). Digest is shown in UI when present.
+    console.error('Locale route error boundary triggered');
   }, [error]);
 
   return (

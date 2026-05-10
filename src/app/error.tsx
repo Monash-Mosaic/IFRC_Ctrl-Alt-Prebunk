@@ -14,8 +14,8 @@ export default function RootError({
   const router = useRouter();
 
   useEffect(() => {
-    // Log error for debugging
-    console.error('Root error:', error);
+    // Avoid logging Error objects or dynamic fields (CWE-532).
+    console.error('Root error boundary triggered');
 
     // Don't redirect /api routes - they should handle their own errors
     if (pathname?.startsWith('/api')) {

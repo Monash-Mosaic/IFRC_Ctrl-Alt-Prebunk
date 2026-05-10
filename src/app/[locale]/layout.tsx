@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import { hasLocale } from 'next-intl';
 import { Geist, Geist_Mono } from 'next/font/google';
 import type { Metadata } from 'next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import Header from '@/components/header';
 import Navigation from '@/components/navigation-bar';
