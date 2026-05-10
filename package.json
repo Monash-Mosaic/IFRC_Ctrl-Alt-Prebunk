@@ -14,7 +14,11 @@
     "test:coverage": "jest --coverage",
     "preview": "opennextjs-cloudflare build && wrangler dev",
     "upload": "opennextjs-cloudflare build && wrangler deploy",
-    "ci:build": "next build"
+    "ci:build": "next build",
+    "ci:test": "jest",
+    "ci:lint": "eslint",
+    "ci:format": "prettier -w .",
+    "ci:test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@cassiozen/usestatemachine": "^1.0.0",
