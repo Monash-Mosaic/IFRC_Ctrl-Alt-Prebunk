@@ -46,9 +46,10 @@ export default function HomeContent() {
     isGameCompleted,
     getCorrectAnswers,
     incrCorrectAnswers,
-    getNumQuestions
+    getNumQuestions,
+    resetGame
   } = useGameStore();
-  const { credibility, setCredibility } = useCredibilityStore();
+  const { credibility, setCredibility, resetCredibility } = useCredibilityStore();
 
   const handleSkipClick = () => {
     setOnboardingCompleted(true);
@@ -88,6 +89,12 @@ export default function HomeContent() {
       setModalPostId(postId);
     }
   };
+
+  const handleRestartSimulation = () => {
+    resetGame();
+    resetCredibility();
+    setOnboardingCompleted(false);
+  }
   
   useEffect(() => {
     // Set app element for react-modal accessibility
@@ -104,7 +111,11 @@ export default function HomeContent() {
   if(isGameCompleted()) {
     return (
       <div className="flex py-4 items-center justify-center">
-        <GameComplete correctAnswers={getCorrectAnswers()} totalQuestions={getNumQuestions()} />
+        <GameComplete 
+          correctAnswers={getCorrectAnswers()} 
+          totalQuestions={getNumQuestions()} 
+          restartGame={handleRestartSimulation} 
+        />
       </div>
     );
   }

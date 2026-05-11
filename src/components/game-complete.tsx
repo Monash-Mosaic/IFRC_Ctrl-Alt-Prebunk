@@ -3,9 +3,10 @@
 interface GameCompleteProps {
     correctAnswers: number;
     totalQuestions: number;
+    restartGame: () => void;
 }
 
-export default function GameComplete({ correctAnswers, totalQuestions }: GameCompleteProps) {
+export default function GameComplete({ correctAnswers, totalQuestions, restartGame }: GameCompleteProps) {
     return (
         <div className="w-full max-w-sm rounded-3xl bg-[#E4EAF3] px-6 py-8 text-center shadow-sm">
             <p className="mx-auto max-w-xs text-[15px] leading-7 text-slate-700">
@@ -37,7 +38,7 @@ export default function GameComplete({ correctAnswers, totalQuestions }: GameCom
                     Share my progress
                 </button>
 
-                <button className="rounded-full bg-[#011E41] px-6 py-4 text-base font-semibold text-white transition hover:bg-[#002552]">
+                <button className="rounded-full bg-[#011E41] px-6 py-4 text-base font-semibold text-white transition hover:bg-[#002552]" onClick={restartGame}>
                     Restart simulation
                 </button>
             </div>

@@ -23,18 +23,22 @@ interface GameStore extends GameState {
   getCorrectAnswers: () => number;
   incrCorrectAnswers: () => void;
   getNumQuestions: () => number;
-  // resetGame: () => void;
+  resetGame: () => void;
+}
+
+const initialGameState = {
+  answers: {},
+  currentQuestionIndex: 0,
+  gameCompleted: false,
+  correctAnswers: 0
 }
 
 export const createGameStore = (initialState?: Partial<GameState>) => create<GameStore>()(
   persist(
     (set, get) => ({
-      answers: {},
-      currentQuestionIndex: 0,
+      ...initialGameState,
       questions: [],
       questionStore: {},
-      gameCompleted: false,
-      correctAnswers: 0,
       ...initialState,
       isPostDisabled: (postId: string) => {
         const state = get();
@@ -105,11 +109,10 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
       getNumQuestions: () => {
         const state = get();
         return state.questions.length;
-      }
-      // resetGame: () => {
-      //   // Clear persisted storage
-
-      // },
+      },
+      resetGame: () => {
+        set(initialGameState);
+      },
     }),
     {
       name: STORAGE_KEYS.GAME_STATE,
