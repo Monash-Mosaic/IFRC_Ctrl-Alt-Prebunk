@@ -12,6 +12,7 @@ import { ContentType, LikeDislikeContent } from '@/contents/en';
 import { createGameStore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import ContentCarouselItems from '@/components/content-carousel-items';
+import GameComplete from '@/components/game-complete';
 
 import Modal from 'react-modal';
 import { CarouselApi } from '@/components/ui/carousel';
@@ -102,7 +103,9 @@ export default function HomeContent() {
 
   if(isGameCompleted()) {
     return (
-      <h1>You scored {getCorrectAnswers()} out of {getNumQuestions()}</h1>
+      <div className="flex py-4 items-center justify-center">
+        <GameComplete correctAnswers={getCorrectAnswers()} totalQuestions={getNumQuestions()} />
+      </div>
     );
   }
 
