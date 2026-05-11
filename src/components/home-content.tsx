@@ -32,6 +32,8 @@ export default function HomeContent() {
     currentQuestionIndex: 0,
     questions: contentList.map(item => item.id),
     questionStore: content,
+    gameCompleted: false,
+    correctAnswers: 0
   });
   
   const { 
@@ -40,6 +42,10 @@ export default function HomeContent() {
     setAnswer,
     isAnswered,
     isPostDisabled,
+    isGameCompleted,
+    getCorrectAnswers,
+    incrCorrectAnswers,
+    getNumQuestions
   } = useGameStore();
   const { credibility, setCredibility } = useCredibilityStore();
 
@@ -59,8 +65,8 @@ export default function HomeContent() {
 
 
   const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
-    // Only allow answer if post is not already answered
-    if (!isAnswered(postId)) {
+    // Only allow answer if post is not already answered and is not disabled
+    if (!isAnswered(postId) && !isPostDisabled(postId)) {
       setAnswer(postId, answer);
       
       // Find the content item to check correctness
@@ -72,6 +78,8 @@ export default function HomeContent() {
         if (!isCorrect) {
           const newCredibility = Math.max(0, credibility - 5);
           setCredibility(newCredibility);
+        } else {
+          incrCorrectAnswers();
         }
       }
       
@@ -90,6 +98,12 @@ export default function HomeContent() {
 
   if (!onboardingCompleted) {
     return <ChatContent startOnboardingText={t('startOnboarding')} skipText={t('skip')} onSkipClick={handleSkipClick} />;
+  }
+
+  if(isGameCompleted()) {
+    return (
+      <h1>You scored {getCorrectAnswers()} out of {getNumQuestions()}</h1>
+    );
   }
 
   // return <CarouselOrientation />;

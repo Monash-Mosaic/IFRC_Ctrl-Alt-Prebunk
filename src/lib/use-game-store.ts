@@ -8,6 +8,8 @@ interface GameState {
   currentQuestionIndex: number;
   questions: Array<ContentId>;
   questionStore: Record<ContentId, ContentBase>;
+  gameCompleted: boolean;
+  correctAnswers: number;
 }
 
 interface GameStore extends GameState {
@@ -17,6 +19,10 @@ interface GameStore extends GameState {
   isCurrentQuestionAnswered: (contentList: Array<{ id: string }>) => boolean;
   isPostDisabled: (postId: string) => boolean;
   moveToNextQuestion: () => void;
+  isGameCompleted: () => boolean;
+  getCorrectAnswers: () => number;
+  incrCorrectAnswers: () => void;
+  getNumQuestions: () => number;
   // resetGame: () => void;
 }
 
@@ -27,6 +33,8 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
       currentQuestionIndex: 0,
       questions: [],
       questionStore: {},
+      gameCompleted: false,
+      correctAnswers: 0,
       ...initialState,
       isPostDisabled: (postId: string) => {
         const state = get();
@@ -73,9 +81,31 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
             set({
               currentQuestionIndex: nextIndex,
             });
+          } else {
+            set({
+              gameCompleted: true,
+            });
           }
         }
       },
+      isGameCompleted: () => {
+        const state = get();
+        return state.gameCompleted;
+      },
+      getCorrectAnswers: () => {
+        const state = get();
+        return state.correctAnswers;
+      },
+      incrCorrectAnswers: () => {
+        const state = get();
+        set({
+          correctAnswers: state.correctAnswers + 1,
+        });
+      },
+      getNumQuestions: () => {
+        const state = get();
+        return state.questions.length;
+      }
       // resetGame: () => {
       //   // Clear persisted storage
 
