@@ -2,10 +2,11 @@
 
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 
 export default function PointsCredibilityBar() {
   const t = useTranslations('header');
-  const { point, credibility } = useCredibilityStore((state) => state);
+  const { point, credibility, badges } = useCredibilityStore((state) => state);
 
   return (
     <div className="flex justify-between fixed top-14 left-0 right-0 z-40 flex h-10 items-center gap-4 border-t border-white/50 bg-[#E8E9ED] px-4 md:px-6">
@@ -16,9 +17,16 @@ export default function PointsCredibilityBar() {
         </span>
         {/* Badge circles */}
         <div className="flex gap-1">
-          <div className="h-5 w-5 rounded-full bg-[#C5C9D3]" />
-          <div className="h-5 w-5 rounded-full bg-[#C5C9D3]" />
-          <div className="h-5 w-5 rounded-full bg-[#C5C9D3]" />
+          {badges.map((badge, index) => (
+            <Image
+              key={`${badge}-${index}`}
+              src="/images/trophy.png"
+              alt={badge}
+              width={20}
+              height={20}
+              className="object-contain"
+            />
+          ))}
         </div>
       </div>
 

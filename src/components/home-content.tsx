@@ -33,7 +33,10 @@ export default function HomeContent() {
     questions: contentList.map(item => item.id),
     questionStore: content,
   });
-  
+
+  useEffect(() => {
+  console.log('Content List:', content);
+}, []);
   const { 
     getAnswer, 
     moveToNextQuestion,
@@ -41,7 +44,11 @@ export default function HomeContent() {
     isAnswered,
     isPostDisabled,
   } = useGameStore();
-  const { credibility, setCredibility } = useCredibilityStore();
+  const { credibility, setCredibility, point, setPoint, initCredibility, correctAnswers, setCorrectAnswers} = useCredibilityStore();
+
+  useEffect(() => {
+  initCredibility(contentList.length);
+}, [contentList.length]);
 
   const handleSkipClick = () => {
     setOnboardingCompleted(true);
@@ -70,8 +77,11 @@ export default function HomeContent() {
         
         // Decrease credibility if incorrect
         if (!isCorrect) {
-          const newCredibility = Math.max(0, credibility - 5);
+          const newCredibility = Math.max(0, credibility - 1);
           setCredibility(newCredibility);
+        } else {
+          setPoint(point + 5);
+          setCorrectAnswers(correctAnswers + 1)
         }
       }
       
