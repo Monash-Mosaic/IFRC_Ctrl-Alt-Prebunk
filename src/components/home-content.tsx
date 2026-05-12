@@ -110,7 +110,7 @@ export default function HomeContent() {
 
   if(isGameCompleted()) {
     return (
-      <div className="flex py-4 items-center justify-center">
+      <div className="flex min-h-[calc(100vh-6rem)] flex-col py-4 items-center justify-center">
         <GameComplete 
           correctAnswers={getCorrectAnswers()} 
           totalQuestions={getNumQuestions()} 
