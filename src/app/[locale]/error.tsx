@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 
 export default function Error({
@@ -11,11 +10,6 @@ export default function Error({
   reset: () => void;
 }) {
   const t = useTranslations('errors.500');
-
-  useEffect(() => {
-    // Avoid logging Error objects or dynamic fields (CWE-532). Digest is shown in UI when present.
-    console.error('Locale route error boundary triggered');
-  }, [error]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
