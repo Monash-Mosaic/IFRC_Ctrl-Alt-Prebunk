@@ -1,51 +1,62 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface CredibilityStore {
-  point: number;
+  points: number;
   credibility: number;
-  totalQuestions: number;
-  badges: string[];
-  correctAnswers: number
-  setPoint: (point: number) => void;
-  setCredibility: (credibility: number) => void;
+  initialCredibility: number;
+  earnedBadges: string[];
+  clickedLinks: string[];
+  addPoints: (amount: number) => void;
+  decreaseCredibility: () => void;
   initCredibility: (totalQuestions: number) => void;
-  updateBadges: () => void;
-  setCorrectAnswers: (correctAnswers: number) => void;
+  updateBadges: (totalQuestions: number) => void;
 }
 
-export const useCredibilityStore = create<CredibilityStore>((set, get) => ({
-  point: 0,
-  credibility: 0,
-  totalQuestions: 0,
-  badges: [],
-  correctAnswers: 0,
+export const useCredibilityStore = create<CredibilityStore>()(
+  persist(
+    (set, get) => ({
+      points: 0,
+      credibility: 0,
+      initialCredibility: 0,
+      earnedBadges: [],
+      clickedLinks: [],
 
-  setPoint: (point) => set({ point }),
-  setCredibility: (credibility) => set({ credibility }),
-  initCredibility: (totalQuestions) =>
-    set({
-      totalQuestions,
-      credibility: totalQuestions / 2,
+      addPoints: (amount) => {
+        set((state) => ({ points: state.points + amount }));
+      },
+      decreaseCredibility: () => {
+        set((state) => ({ credibility: Math.max(0, state.credibility - 1) }));
+      },
+      initCredibility: (totalQuestions) => {
+        if (get().initialCredibility === 0) {
+          const initial = Math.floor(totalQuestions / 2);
+          set({
+            initialCredibility: initial,
+            credibility: initial,
+          });
+        }
+      },
+      updateBadges: (totalQuestions) => {
+        const { points, earnedBadges } = get();
+        const correctAnswers = points / 5;
+        const progress = correctAnswers / totalQuestions;
+        const badges = [...earnedBadges];
+
+        if (progress >= 0.33 && !badges.includes('Misinformation Fighter')) {
+          badges.push('Misinformation Fighter');
+        }
+        if (progress >= 0.66 && !badges.includes('Prebunking Hero')) {
+          badges.push('Prebunking Hero');
+        }
+        if (progress >= 1 && !badges.includes('Prebunking Champion')) {
+          badges.push('Prebunking Champion');
+        }
+
+        set({ earnedBadges: badges });
+      },
     }),
-  updateBadges: () => {
-    const state = get();
-
-    const progress =
-      state.correctAnswers / state.totalQuestions;
-
-    let badges: string[] = [];
-
-    if (progress >= 0.33) {
-      badges.push('Misinformation Fighter');
+    {
+      name: 'credibility_state',
     }
-    if (progress >= 0.66) {
-      badges.push('Prebunking Hero');
-    }
-    if (progress >= 1) {
-      badges.push('Prebunking Champion');
-    }
-
-    set({ badges });
-  },
-  setCorrectAnswers: (correctAnswers) => set({ correctAnswers })
-}));
+  ));

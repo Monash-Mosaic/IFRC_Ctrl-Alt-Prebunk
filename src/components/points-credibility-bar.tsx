@@ -6,18 +6,18 @@ import Image from 'next/image';
 
 export default function PointsCredibilityBar() {
   const t = useTranslations('header');
-  const { point, credibility, badges } = useCredibilityStore((state) => state);
+  const { points, credibility, earnedBadges } = useCredibilityStore((state) => state);
 
   return (
     <div className="flex justify-between fixed top-14 left-0 right-0 z-40 flex h-10 items-center gap-4 border-t border-white/50 bg-[#E8E9ED] px-4 md:px-6">
       {/* Points */}
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-[#0D1B3E]">
-          {t('points')}: {point}
+          {t('points')}: {points}
         </span>
         {/* Badge circles */}
         <div className="flex gap-1">
-          {badges.map((badge, index) => (
+          {earnedBadges.map((badge, index) => (
             <Image
               key={`${badge}-${index}`}
               src="/images/trophy.png"

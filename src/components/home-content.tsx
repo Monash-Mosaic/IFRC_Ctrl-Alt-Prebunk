@@ -44,7 +44,7 @@ export default function HomeContent() {
     isAnswered,
     isPostDisabled,
   } = useGameStore();
-  const { credibility, setCredibility, point, setPoint, initCredibility, correctAnswers, setCorrectAnswers} = useCredibilityStore();
+  const { addPoints, decreaseCredibility, initCredibility, updateBadges} = useCredibilityStore();
 
   useEffect(() => {
   initCredibility(contentList.length);
@@ -77,11 +77,10 @@ export default function HomeContent() {
         
         // Decrease credibility if incorrect
         if (!isCorrect) {
-          const newCredibility = Math.max(0, credibility - 1);
-          setCredibility(newCredibility);
+          decreaseCredibility();
         } else {
-          setPoint(point + 5);
-          setCorrectAnswers(correctAnswers + 1)
+          addPoints(5)
+          updateBadges(contentList.length)
         }
       }
       
