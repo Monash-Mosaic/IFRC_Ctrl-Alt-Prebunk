@@ -1,15 +1,48 @@
 {
-    "$schema": "./node_modules/wrangler/config-schema.json",
-    "name": "ctrl-alt-prebunk",
-    "main": ".open-next/worker.js",
-    "compatibility_date": "2026-05-09",
-    "compatibility_flags": [
-        "nodejs_compat"
-    ],
-    "assets": {
-        "directory": ".open-next/assets"
-    },
-    "observability": {
-        "enabled": true
-    }
+	/**
+    * Wrangler configuration file for Cloudflare Workers
+    * For more information, see: https://developers.cloudflare.com/workers/platform/sites/configuration
+    IMPORTANT:
+     - Root wrangler configuration file is for production environment.
+     - Preview (a.k.a Development) environment configuration is under the "env" key.
+    */
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "ctrl-alt-prebunk",
+	"main": ".open-next/worker.js",
+	"compatibility_date": "2024-12-30",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public",
+	],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS",
+		"run_worker_first": false,
+	},
+	"services": [
+		{
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "ctrl-alt-prebunk",
+		}
+	],
+	"images": {
+		"binding": "IMAGES"
+	},
+	"observability": {
+		"enabled": true,
+		"logs": {
+			"enabled": true,
+			"invocation_logs": true,
+		},
+		"traces": {
+			"enabled": true,
+		},
+	},
+	"logpush": true,
+	"vars": {
+		"ENVIRONMENT": "production",
+	},
+	// Using worker.dev domain for staging (production preview) environment
+	"preview_urls": true,
+	"workers_dev": true,
 }
