@@ -27,6 +27,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Inject public env for build
+        env:
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_GIT_TAG: ${{ github.event.release.tag_name }}
+          NEXT_PUBLIC_CF_BEACON_TOKEN: ${{ vars.NEXT_PUBLIC_CF_BEACON_TOKEN }}
+        run: npm run inject-env
+
       - name: Deploy to Cloudflare (staging)
         id: deploy
         env:

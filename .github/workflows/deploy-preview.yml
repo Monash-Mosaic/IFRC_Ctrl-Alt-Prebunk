@@ -96,6 +96,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Inject public env for build
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_SITE_URL: ${{ format('https://{0}-{1}.{2}.workers.dev', steps.preview.outputs.branch_slug, vars.CLOUDFLARE_WORKER_NAME, vars.CLOUDFLARE_WORKERS_SUBDOMAIN) }}
+          NEXT_PUBLIC_GIT_TAG: ${{ steps.preview.outputs.branch_slug }}
+        run: npm run inject-env
+
       - name: Deploy to Cloudflare (branch preview)
         id: deploy
         if: ${{ github.event_name == 'pull_request' }}
@@ -113,6 +121,14 @@ jobs:
           echo "version_id=$VERSION_ID" >> "$GITHUB_OUTPUT"
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
           echo "branch_preview_url=$BRANCH_PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Inject public env for main deploy
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        env:
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_PREVIEW_SITE_URL }}
+          NEXT_PUBLIC_GIT_TAG: ${{ steps.preview.outputs.branch_slug }}
+        run: npm run inject-env
 
       - name: Deploy to Cloudflare (main branch only)
         id: deploy_preview_main

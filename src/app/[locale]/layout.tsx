@@ -6,6 +6,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import type { Metadata } from 'next';
 
 import CloudflareWebPerformance from '@/components/cloudflare-web-performance';
+import GoogleAnalytics from '@/components/google-analytics';
 import Header from '@/components/header';
 import Navigation from '@/components/navigation-bar';
 import PointsCredibilityBar from '@/components/points-credibility-bar';
@@ -91,6 +92,7 @@ export default async function LocaleLayout({
             {children}
           </main>
         </NextIntlClientProvider>
+        <GoogleAnalytics />
         <CloudflareWebPerformance />
       </body>
     </html>
