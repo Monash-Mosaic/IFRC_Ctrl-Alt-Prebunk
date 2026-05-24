@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, act } from '@/test-utils/test-utils';
+import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import LikeDislikePostMessage from './like-dislike-post-message';
 
@@ -11,12 +11,14 @@ jest.mock('@/app/[locale]/chat/onboarding/_components/post-message', () => {
     content,
     onLike,
     onDislike,
+    onShare,
     likeDisabled,
     dislikeDisabled,
     commentDisabled,
     shareDisabled,
     likeClassName,
     dislikeClassName,
+    shareClassName,
   }: any) {
     return (
       <div data-testid="post-message">
@@ -50,7 +52,9 @@ jest.mock('@/app/[locale]/chat/onboarding/_components/post-message', () => {
         </button>
         <button
           data-testid="share-button"
+          onClick={onShare}
           disabled={shareDisabled}
+          className={shareClassName}
           aria-label="Share"
         >
           Share
@@ -111,7 +115,7 @@ describe('LikeDislikePostMessage', () => {
     },
     content: <div>Test post content</div>,
     correctAnswer: 'like' as const,
-    answer: null as 'like' | 'dislike' | null,
+    answer: null as 'like' | 'dislike' | 'share' | null,
   };
 
   beforeEach(() => {
@@ -144,14 +148,14 @@ describe('LikeDislikePostMessage', () => {
     expect(dislikeButton).toBeDisabled();
   });
 
-  it('passes commentDisabled and shareDisabled as true', () => {
+  it('passes commentDisabled as true and shareDisabled as false when not answered', () => {
     render(<LikeDislikePostMessage {...defaultProps} />);
 
     const commentButton = screen.getByTestId('comment-button');
     const shareButton = screen.getByTestId('share-button');
 
     expect(commentButton).toBeDisabled();
-    expect(shareButton).toBeDisabled();
+    expect(shareButton).not.toBeDisabled();
   });
 
   it('calls onLike when like button is clicked and not answered', async () => {
@@ -178,6 +182,18 @@ describe('LikeDislikePostMessage', () => {
     expect(mockOnDislike).toHaveBeenCalledWith('post-123');
   });
 
+  it('calls onShare when share button is clicked and not answered', async () => {
+    const mockOnShare = jest.fn();
+    const user = userEvent.setup();
+    render(<LikeDislikePostMessage {...defaultProps} answer={null} onShare={mockOnShare} />);
+
+    const shareButton = screen.getByTestId('share-button');
+    await user.click(shareButton);
+
+    expect(mockOnShare).toHaveBeenCalledTimes(1);
+    expect(mockOnShare).toHaveBeenCalledWith('post-123');
+  });
+
   it('does not call onLike if post is already answered', async () => {
     const mockOnLike = jest.fn();
     const user = userEvent.setup();
@@ -187,6 +203,17 @@ describe('LikeDislikePostMessage', () => {
     await user.click(likeButton);
 
     expect(mockOnLike).not.toHaveBeenCalled();
+  });
+
+  it('does not call onShare if post is already answered', async () => {
+    const mockOnShare = jest.fn();
+    const user = userEvent.setup();
+    render(<LikeDislikePostMessage {...defaultProps} answer="share" onShare={mockOnShare} />);
+
+    const shareButton = screen.getByTestId('share-button');
+    await user.click(shareButton);
+
+    expect(mockOnShare).not.toHaveBeenCalled();
   });
 
 
@@ -224,6 +251,20 @@ describe('LikeDislikePostMessage', () => {
     const dislikeButton = screen.getByTestId('dislike-button');
     expect(dislikeButton).not.toHaveClass('fill-(--color-dunder-green)');
     expect(dislikeButton).not.toHaveClass('fill-(--color-dunder-red)');
+  });
+
+  it('applies correct color class to share button when sharing a trustworthy post', () => {
+    render(<LikeDislikePostMessage {...defaultProps} correctAnswer="like" answer="share" />);
+
+    const shareButton = screen.getByTestId('share-button');
+    expect(shareButton).toHaveClass('fill-(--color-dunder-green)');
+  });
+
+  it('applies incorrect color class to share button when sharing a misleading post', () => {
+    render(<LikeDislikePostMessage {...defaultProps} correctAnswer="dislike" answer="share" />);
+
+    const shareButton = screen.getByTestId('share-button');
+    expect(shareButton).toHaveClass('fill-(--color-dunder-red)');
   });
 
 

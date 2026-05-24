@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils/test-utils';
+import { fireEvent, render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import PostMessage from './post-message';
 
@@ -132,6 +132,62 @@ describe('PostMessage', () => {
     await user.click(shareButton);
 
     expect(mockOnShare).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables interaction buttons when the post is disabled', async () => {
+    const mockOnLike = jest.fn();
+    const mockOnDislike = jest.fn();
+    const mockOnComment = jest.fn();
+    const mockOnShare = jest.fn();
+    const user = userEvent.setup();
+
+    render(
+      <PostMessage
+        {...defaultProps}
+        isDisabled
+        onLike={mockOnLike}
+        onDislike={mockOnDislike}
+        onComment={mockOnComment}
+        onShare={mockOnShare}
+      />
+    );
+
+    const likeButton = screen.getByLabelText('Like');
+    const dislikeButton = screen.getByLabelText('Dislike');
+    const commentButton = screen.getByLabelText('Comment');
+    const shareButton = screen.getByLabelText('Share');
+
+    expect(likeButton).toBeDisabled();
+    expect(dislikeButton).toBeDisabled();
+    expect(commentButton).toBeDisabled();
+    expect(shareButton).toBeDisabled();
+
+    await user.click(likeButton);
+    await user.click(dislikeButton);
+    await user.click(commentButton);
+    await user.click(shareButton);
+
+    expect(mockOnLike).not.toHaveBeenCalled();
+    expect(mockOnDislike).not.toHaveBeenCalled();
+    expect(mockOnComment).not.toHaveBeenCalled();
+    expect(mockOnShare).not.toHaveBeenCalled();
+  });
+
+  it('keeps action pointer events from bubbling to the carousel', () => {
+    const mockParentPointerDown = jest.fn();
+
+    render(
+      <div onPointerDown={mockParentPointerDown}>
+        <PostMessage {...defaultProps} />
+      </div>
+    );
+
+    fireEvent.pointerDown(screen.getByLabelText('Like'));
+    fireEvent.pointerDown(screen.getByLabelText('Dislike'));
+    fireEvent.pointerDown(screen.getByLabelText('Comment'));
+    fireEvent.pointerDown(screen.getByLabelText('Share'));
+
+    expect(mockParentPointerDown).not.toHaveBeenCalled();
   });
 
   it('renders all interaction buttons', () => {
