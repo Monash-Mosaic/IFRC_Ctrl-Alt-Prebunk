@@ -14,9 +14,6 @@ export default function RootError({
   const router = useRouter();
 
   useEffect(() => {
-    // Log error for debugging
-    console.error('Root error:', error);
-
     // Don't redirect /api routes - they should handle their own errors
     if (pathname?.startsWith('/api')) {
       return;
