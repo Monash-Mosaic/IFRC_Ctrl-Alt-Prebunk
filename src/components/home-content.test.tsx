@@ -26,6 +26,11 @@ const mockIsAnswered = jest.fn();
 const mockIsCurrentQuestionAnswered = jest.fn();
 const mockMoveToNextQuestion = jest.fn();
 const mockIsPostDisabled = jest.fn();
+const mockIsGameCompleted = jest.fn();
+const mockGetCorrectAnswers = jest.fn();
+const mockIncrCorrectAnswers = jest.fn();
+const mockGetNumQuestions = jest.fn();
+const mockResetGame = jest.fn();
 
 const mockUseGameStore = jest.fn(() => ({
   getAnswer: mockGetAnswer,
@@ -34,10 +39,17 @@ const mockUseGameStore = jest.fn(() => ({
   isCurrentQuestionAnswered: mockIsCurrentQuestionAnswered,
   moveToNextQuestion: mockMoveToNextQuestion,
   isPostDisabled: mockIsPostDisabled,
+  isGameCompleted: mockIsGameCompleted,
+  getCorrectAnswers: mockGetCorrectAnswers,
+  incrCorrectAnswers: mockIncrCorrectAnswers,
+  getNumQuestions: mockGetNumQuestions,
+  resetGame: mockResetGame,
   currentQuestionIndex: 0,
   questions: ['1', '2'],
   questionStore: {},
   answers: {},
+  gameCompleted: false,
+  correctAnswers: 0
 }));
 
 jest.mock('@/lib/use-game-store', () => ({
@@ -214,6 +226,7 @@ jest.mock('./chat-content', () => {
 });
 
 const mockSetCredibility = jest.fn();
+const mockResetCredibility = jest.fn();
 
 describe('HomeContent', () => {
   beforeEach(() => {
@@ -227,6 +240,7 @@ describe('HomeContent', () => {
     (useCredibilityStore as jest.Mock).mockReturnValue({
       credibility: 80,
       setCredibility: mockSetCredibility,
+      resetCredibility: mockResetCredibility,
     });
   });
 
@@ -364,6 +378,7 @@ describe('HomeContent', () => {
     (useCredibilityStore as jest.Mock).mockReturnValue({
       credibility: 3,
       setCredibility: mockSetCredibility,
+      resetCredibility: mockResetCredibility
     });
 
     const user = userEvent.setup();
