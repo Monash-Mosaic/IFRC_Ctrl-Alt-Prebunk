@@ -1,0 +1,79 @@
+name: Deploy to Cloudflare (Staging)
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write # Required to edit releases
+
+jobs:
+  deploy_staging:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          lfs: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Inject public env for build
+        env:
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_GIT_TAG: ${{ github.event.release.tag_name }}
+          NEXT_PUBLIC_CF_BEACON_TOKEN: ${{ vars.NEXT_PUBLIC_CF_BEACON_TOKEN }}
+        run: npm run inject-env
+
+      - name: Deploy to Cloudflare (staging)
+        id: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_GIT_TAG: ${{ github.event.release.tag_name }}
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_CF_BEACON_TOKEN: ${{ vars.NEXT_PUBLIC_CF_BEACON_TOKEN }}
+        run: |
+          LOG=$(npm run upload -- --preview-alias staging --tag $NEXT_PUBLIC_GIT_TAG 2>&1 | tee /dev/stderr)
+          VERSION_ID=$(echo "$LOG" | grep -oE 'Worker Version ID: [0-9a-f-]+' | awk '{print $4}')
+          PREVIEW_URL=$(echo "$LOG" | grep -oE 'Version Preview URL: https?://[^[:space:]]+' | awk '{print $4}')
+          BRANCH_PREVIEW_URL=$(echo "$LOG" | grep -oE 'Version Preview Alias URL: https?://[^[:space:]]+' | awk '{print $5}')
+          echo "version_id=$VERSION_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo "branch_preview_url=$BRANCH_PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Adding Version ID to Release Notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+          NEW_NOTES: |
+            <!-- preview-url -->
+            | Key | Value |
+            |---|---|
+            | Cloudflare Worker Version ID | ${{ steps.deploy.outputs.version_id }} |
+            | Preview URL | ${{ steps.deploy.outputs.preview_url }} |
+            | Branch Preview URL | ${{ steps.deploy.outputs.branch_preview_url }} |
+        run: |
+          # Get the existing body of the release
+          EXISTING_BODY=$(gh release view "$TAG" --repo="$GITHUB_REPOSITORY" --json body --jq .body)
+          
+          # Combine existing and new notes
+          UPDATED_BODY="$NEW_NOTES"$'\n\n'"$EXISTING_BODY"
+          # Save metadata.json and upload it to the release
+          cat <<'EOF' > metadata.json
+          {"version_id":"${{ steps.deploy.outputs.version_id }}","preview_url":"${{ steps.deploy.outputs.preview_url }}","branch_preview_url":"${{ steps.deploy.outputs.branch_preview_url }}"}
+          EOF
+          gh release upload "$TAG" metadata.json --repo="$GITHUB_REPOSITORY" --clobber
+          # Edit the release with the updated notes
+          gh release edit "$TAG" --repo="$GITHUB_REPOSITORY" --notes "$UPDATED_BODY"
