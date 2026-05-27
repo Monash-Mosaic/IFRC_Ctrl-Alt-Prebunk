@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 export interface PrebunkingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onContinue?: () => void;
   postId: string;
   content: React.ReactNode; // Compiled React content for the modal body
   header: React.ReactNode; // Header content for the modal
@@ -17,18 +18,32 @@ export interface PrebunkingModalProps {
 export default function PrebunkingModal({
   isOpen,
   onClose,
+  onContinue,
   postId,
   content,
   header,
 }: PrebunkingModalProps) {
   const t = useTranslations('prebunking');
 
+  useEffect(() => {
+    // Set app element for react-modal accessibility
+    if (typeof window !== 'undefined') {
+      const rootElement = document.getElementById('root') || document.body;
+      Modal.setAppElement(rootElement);
+    }
+  }, []);
+
+  const handleContinue = () => {
+    onContinue?.();
+    onClose();
+  };
+
   return (
     <Modal
       isOpen={isOpen}
       onRequestClose={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 outline-none"
-      overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 outline-none"
+      overlayClassName="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity"
       contentLabel={t('modalLabel')}
       shouldCloseOnOverlayClick={true}
       shouldCloseOnEsc={true}
@@ -53,7 +68,7 @@ export default function PrebunkingModal({
           {/* Continue Button */}
           <div className="pt-4">
             <button
-              onClick={onClose}
+              onClick={handleContinue}
               className={cn(
                 'w-full rounded-lg bg-[#011E41] text-white font-semibold py-3 px-4',
                 'transition-colors hover:bg-[#002A5A] active:bg-[#001A3F]',
