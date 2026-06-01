@@ -45,7 +45,7 @@ export default function HomeContent() {
 
   useEffect(() => {
   initCredibility(contentList.length);
-}, [contentList.length]);
+}, [contentList.length, initCredibility]);
 
   const handleSkipClick = () => {
     setOnboardingCompleted(true);
@@ -60,7 +60,6 @@ export default function HomeContent() {
       carouselApi?.scrollNext();
     }
   };
-
 
   const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
     // Only allow answer if post is not already answered
