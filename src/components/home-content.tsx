@@ -34,9 +34,6 @@ export default function HomeContent() {
     questionStore: content,
   });
 
-  useEffect(() => {
-  console.log('Content List:', content);
-}, []);
   const { 
     getAnswer, 
     moveToNextQuestion,
