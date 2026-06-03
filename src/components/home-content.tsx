@@ -33,7 +33,7 @@ export default function HomeContent() {
     questions: contentList.map(item => item.id),
     questionStore: content,
   });
-  
+
   const { 
     getAnswer, 
     moveToNextQuestion,
@@ -41,7 +41,11 @@ export default function HomeContent() {
     isAnswered,
     isPostDisabled,
   } = useGameStore();
-  const { credibility, setCredibility } = useCredibilityStore();
+  const { addPoints, decreaseCredibility, initCredibility, updateBadges} = useCredibilityStore();
+
+  useEffect(() => {
+  initCredibility(contentList.length);
+}, [contentList.length, initCredibility]);
 
   const handleSkipClick = () => {
     setOnboardingCompleted(true);
@@ -57,7 +61,6 @@ export default function HomeContent() {
     }
   };
 
-
   const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
     // Only allow answer if post is not already answered
     if (!isAnswered(postId)) {
@@ -70,8 +73,10 @@ export default function HomeContent() {
         
         // Decrease credibility if incorrect
         if (!isCorrect) {
-          const newCredibility = Math.max(0, credibility - 5);
-          setCredibility(newCredibility);
+          decreaseCredibility();
+        } else {
+          addPoints(5)
+          updateBadges(contentList.length)
         }
       }
       

@@ -3,10 +3,10 @@ import PointsCredibilityBar from '@/components/points-credibility-bar';
 
 // Create a shared state object that can be modified
 const createMockState = () => ({
-  point: 0,
-  credibility: 80,
-  setPoint: jest.fn(),
-  setCredibility: jest.fn(),
+  points: 0,
+  credibility: 3,
+  initialCredibility: 5,
+  earnedBadges: [] as number[],
 });
 
 // Store state in a way that's accessible to both mock and tests
@@ -54,7 +54,7 @@ describe('PointsCredibilityBar', () => {
   });
 
   it('displays custom points value', () => {
-    currentMockState.point = 150;
+    currentMockState.points = 150;
     render(<PointsCredibilityBar />);
     expect(screen.getByText(/150/)).toBeInTheDocument();
   });
@@ -65,26 +65,42 @@ describe('PointsCredibilityBar', () => {
   });
 
   it('renders credibility progress bar with default value', () => {
+    // 3 out of 5 = 60%
+    currentMockState.credibility = 3;
+    currentMockState.initialCredibility = 5;
     render(<PointsCredibilityBar />);
     const progressBar = screen.getByText(/credibility/i).nextElementSibling?.querySelector('div');
-    expect(progressBar).toHaveStyle({ width: '80%' });
+    expect(progressBar).toHaveStyle({ width: '60%' });
+  });
+
+  it('handles safety fallback', () => {
+    currentMockState.credibility = 0;
+    currentMockState.initialCredibility = 0;
+    
+    render(<PointsCredibilityBar />);
+    const progressBar = screen.getByText(/credibility/i).nextElementSibling?.querySelector('div');
+    expect(progressBar).toHaveStyle({ width: '0%' });
   });
 
   it('renders credibility progress bar with custom value', () => {
-    currentMockState.credibility = 65;
     render(<PointsCredibilityBar />);
     const progressBar = screen.getByText(/credibility/i).nextElementSibling?.querySelector('div');
-    expect(progressBar).toHaveStyle({ width: '65%' });
+    expect(progressBar).toHaveStyle({ width: '60%' });
   });
 
-  it('renders badge circles', () => {
-    render(<PointsCredibilityBar />);
-    const badges = screen
-      .getByText(/points/i)
-      .closest('div')
-      ?.querySelectorAll('div.h-5.w-5.rounded-full');
-    expect(badges).toHaveLength(3);
-  });
+  it('renders three badge container circles with correct accessibility titles', () => {
+      render(<PointsCredibilityBar />);
+      
+      expect(screen.getByTitle('Misinformation Fighter')).toBeInTheDocument();
+      expect(screen.getByTitle('Prebunking Hero')).toBeInTheDocument();
+      expect(screen.getByTitle('Prebunking Champion')).toBeInTheDocument();
+
+      const badges = screen
+        .getByText(/points/i)
+        .closest('div')
+        ?.querySelectorAll('div.w-5.h-5.rounded-full');
+      expect(badges).toHaveLength(3);
+    });
 
   it('has correct positioning classes', () => {
     render(<PointsCredibilityBar />);
@@ -93,13 +109,14 @@ describe('PointsCredibilityBar', () => {
   });
 
   it('displays points and credibility correctly together', () => {
-    currentMockState.point = 250;
-    currentMockState.credibility = 90;
+    currentMockState.points = 250;
+    currentMockState.credibility = 4;
+    currentMockState.initialCredibility = 5;
     render(<PointsCredibilityBar />);
     expect(screen.getByText(/250/)).toBeInTheDocument();
     expect(screen.getByText(/credibility/i)).toBeInTheDocument();
 
     const progressBar = screen.getByText(/credibility/i).nextElementSibling?.querySelector('div');
-    expect(progressBar).toHaveStyle({ width: '90%' });
+    expect(progressBar).toHaveStyle({ width: '80%' });
   });
 });
