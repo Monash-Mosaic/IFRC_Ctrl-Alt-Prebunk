@@ -1,6 +1,13 @@
 import EchoAvatar from "@/app/[locale]/chat/onboarding/_icons/echo-avatar";
 import PaulaAvatar from "@/app/[locale]/chat/onboarding/_icons/paula-avatar";
 
+// MCQ content imports
+import Mcq1Question from "./post/mcq-1-question.md";
+import Mcq1WhyCorrectTitle from "./post/mcq-1-why-correct-title.md";
+import Mcq1WhyCorrectContent from "./post/mcq-1-why-correct-content.md";
+import Mcq1WhyIncorrectTitle from "./post/mcq-1-why-incorrect-title.md";
+import Mcq1WhyIncorrectContent from "./post/mcq-1-why-incorrect-content.md";
+
 // Post content imports
 import Content1Post from "./post/content-1-post.md";
 import Content2Post from "./post/content-2-post.md";
@@ -59,6 +66,7 @@ export type ContentId = string;
 export enum ContentType {
   LIKE_DISLIKE = 'like_dislike',
   SHARE = 'share',
+  MCQ = 'mcq',
 }
 
 export interface ContentBase {
@@ -70,6 +78,26 @@ export interface LikeDislikeContent extends ContentBase {
   type: ContentType.LIKE_DISLIKE;
   post: Post;
   correctAnswer: 'like' | 'dislike';
+  whyCorrectAnswer: {
+    title: React.ReactNode;
+    content: React.ReactNode;
+  };
+  whyIncorrectAnswer: {
+    title: React.ReactNode;
+    content: React.ReactNode;
+  };
+}
+
+export interface MCQOption {
+  id: string;
+  label: string;
+}
+
+export interface MCQContent extends ContentBase {
+  type: ContentType.MCQ;
+  post: Post;
+  options: MCQOption[];
+  correctOptionId: string;
   whyCorrectAnswer: {
     title: React.ReactNode;
     content: React.ReactNode;
@@ -95,7 +123,7 @@ export interface ShareContent extends ContentBase {
 
 export type UserId = string;
 
-export type Content = LikeDislikeContent | ShareContent;
+export type Content = LikeDislikeContent | ShareContent | MCQContent;
 
 export const users: Record<UserId, User> = {
   'paula': {
@@ -221,6 +249,30 @@ export const content: Record<ContentId, Content> = {
     whyIncorrectAnswer: {
       title: <Content5WhyIncorrectTitle />,
       content: <Content5WhyIncorrectContent />,
+    },
+  },
+  'mcq-1': {
+    id: 'mcq-1',
+    type: ContentType.MCQ,
+    post: {
+      id: 'mcq-1',
+      user: users['echo'],
+      content: <Mcq1Question />,
+    },
+    options: [
+      { id: 'a', label: "That's huge if true! Yes, let's share it, so people know!" },
+      { id: 'b', label: 'Wait! Something seems off!' },
+      { id: 'c', label: 'Wait! Something seems off about this post' },
+      { id: 'd', label: 'Wait! I should fact-check this before sharing' },
+    ],
+    correctOptionId: 'b',
+    whyCorrectAnswer: {
+      title: <Mcq1WhyCorrectTitle />,
+      content: <Mcq1WhyCorrectContent />,
+    },
+    whyIncorrectAnswer: {
+      title: <Mcq1WhyIncorrectTitle />,
+      content: <Mcq1WhyIncorrectContent />,
     },
   },
 }
