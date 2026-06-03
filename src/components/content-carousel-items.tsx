@@ -3,12 +3,13 @@
 import { CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 import { LikeDislikeContent } from '@/contents/en';
+import { GameAnswer } from '@/lib/use-game-store';
 
 interface ContentCarouselItemsProps {
   contentList: LikeDislikeContent[];
-  getAnswer: (postId: string) => 'like' | 'dislike' | null | undefined;
+  getAnswer: (postId: string) => GameAnswer | null | undefined;
   isPostDisabled: (postId: string) => boolean;
-  onAnswer: (postId: string, answer: 'like' | 'dislike') => void;
+  onAnswer: (postId: string, answer: GameAnswer) => void;
 }
 
 export default function ContentCarouselItems({
@@ -36,6 +37,7 @@ export default function ContentCarouselItems({
               correctAnswer={likeDislikeContent.correctAnswer} 
               onLike={(postId) => onAnswer(postId, 'like')} 
               onDislike={(postId) => onAnswer(postId, 'dislike')}
+              onShare={(postId) => onAnswer(postId, 'share')}
               isDisabled={isDisabled}
             />
           </CarouselItem>

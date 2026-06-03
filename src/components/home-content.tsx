@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ChatContent from '@/components/chat-content';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
@@ -9,7 +9,7 @@ import { useLocalStorage } from '@/lib/use-local-storage';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
 import { ContentType, LikeDislikeContent } from '@/contents/en';
-import { createGameStore } from '@/lib/use-game-store';
+import { createGameStore, GameAnswer } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import ContentCarouselItems from '@/components/content-carousel-items';
 
@@ -27,12 +27,15 @@ export default function HomeContent() {
   const { content, contentList } = CONTENTS[locale as keyof typeof CONTENTS];
   const [modalPostId, setModalPostId] = useState<string | null>(null);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const useGameStore = createGameStore({
-    answers: {},
-    currentQuestionIndex: 0,
-    questions: contentList.map(item => item.id),
-    questionStore: content,
-  });
+  const useGameStore = useMemo(
+    () => createGameStore({
+      answers: {},
+      currentQuestionIndex: 0,
+      questions: contentList.map(item => item.id),
+      questionStore: content,
+    }),
+    [content, contentList]
+  );
   
   const { 
     getAnswer, 
@@ -58,7 +61,15 @@ export default function HomeContent() {
   };
 
 
-  const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
+  const isCorrectAnswer = (answer: GameAnswer, contentItem: LikeDislikeContent) => {
+    if (answer === 'share') {
+      return contentItem.correctAnswer === 'like';
+    }
+
+    return answer === contentItem.correctAnswer;
+  };
+
+  const handleOnAnswer = (postId: string, answer: GameAnswer) => {
     // Only allow answer if post is not already answered
     if (!isAnswered(postId)) {
       setAnswer(postId, answer);
@@ -66,7 +77,7 @@ export default function HomeContent() {
       // Find the content item to check correctness
       const contentItem = contentList.find(item => item.id === postId) as LikeDislikeContent | undefined;
       if (contentItem && contentItem.type === ContentType.LIKE_DISLIKE) {
-        const isCorrect = answer === contentItem.correctAnswer;
+        const isCorrect = isCorrectAnswer(answer, contentItem);
         
         // Decrease credibility if incorrect
         if (!isCorrect) {
@@ -118,7 +129,7 @@ export default function HomeContent() {
         const modalAnswer = getAnswer(modalPostId);
         if (!modalAnswer) return null;
         
-        const isCorrect = modalAnswer === contentItem.correctAnswer;
+        const isCorrect = isCorrectAnswer(modalAnswer, contentItem);
         const reasonContent = isCorrect 
           ? contentItem.whyCorrectAnswer.content 
           : contentItem.whyIncorrectAnswer.content;

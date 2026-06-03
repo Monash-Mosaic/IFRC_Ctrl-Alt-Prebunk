@@ -172,6 +172,7 @@ jest.mock('./newfeeds/like-dislike-post-message', () => {
     correctAnswer,
     onLike,
     onDislike,
+    onShare,
   }: any) {
     return (
       <div data-testid={`post-${postId}`}>
@@ -182,6 +183,9 @@ jest.mock('./newfeeds/like-dislike-post-message', () => {
         </button>
         <button data-testid={`dislike-${postId}`} onClick={() => onDislike?.(postId)}>
           Dislike
+        </button>
+        <button data-testid={`share-${postId}`} onClick={() => onShare?.(postId)}>
+          Share
         </button>
       </div>
     );
@@ -211,6 +215,39 @@ jest.mock('./chat-content', () => {
   return function MockChatContent() {
     return <div data-testid="chat-content">Chat Content</div>;
   };
+});
+
+Object.defineProperty(global, 'ResizeObserver', {
+  writable: true,
+  value: jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+  })),
+});
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
+Object.defineProperty(global, 'IntersectionObserver', {
+  writable: true,
+  value: jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+    takeRecords: jest.fn(() => []),
+  })),
 });
 
 const mockSetCredibility = jest.fn();
@@ -281,6 +318,28 @@ describe('HomeContent', () => {
     await user.click(likeButton);
 
     expect(mockSetAnswer).toHaveBeenCalledWith('1', 'like');
+    expect(mockSetCredibility).not.toHaveBeenCalled();
+  });
+
+  it('decreases credibility when sharing a misleading post', async () => {
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    const shareButton = screen.getByTestId('share-2');
+    await user.click(shareButton);
+
+    expect(mockSetAnswer).toHaveBeenCalledWith('2', 'share');
+    expect(mockSetCredibility).toHaveBeenCalledWith(75);
+  });
+
+  it('maintains credibility when sharing a trustworthy post', async () => {
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    const shareButton = screen.getByTestId('share-1');
+    await user.click(shareButton);
+
+    expect(mockSetAnswer).toHaveBeenCalledWith('1', 'share');
     expect(mockSetCredibility).not.toHaveBeenCalled();
   });
 
