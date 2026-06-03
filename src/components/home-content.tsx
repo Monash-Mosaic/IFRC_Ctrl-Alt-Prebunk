@@ -136,7 +136,7 @@ export default function HomeContent() {
         return (
           <PrebunkingModal
             isOpen={true}
-            onClose={() => handleOnCloseLikeDislikeModal(modalPostId)}
+            onClose={() => handleOnCloseModal(modalPostId)}
             postId={modalPostId}
             content={reasonContent}
             header={reasonHeader}
