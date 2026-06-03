@@ -48,7 +48,7 @@ export const useCredibilityStore = create<CredibilityStore>()(
 
         if (progress >= 0.33 && !newBadges.includes(0)) { newBadges.push(0); updated = true; }
         if (progress >= 0.66 && !newBadges.includes(1)) { newBadges.push(1); updated = true; }
-        if (progress === 1.0 && !newBadges.includes(2)) { newBadges.push(2); updated = true; }
+        if (progress >= 1.0 && !newBadges.includes(2)) { newBadges.push(2); updated = true; }
 
         if (updated) {
           set({ earnedBadges: newBadges.sort() });
@@ -59,6 +59,7 @@ export const useCredibilityStore = create<CredibilityStore>()(
         const { clickedLinks } = get();
         if (clickedLinks.includes(href)) return false;
         set({ clickedLinks: [...clickedLinks, href] });
+        set((state) => ({ points: state.points + 2 }));
         return true;
       },
 

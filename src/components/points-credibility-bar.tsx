@@ -11,7 +11,7 @@ export default function PointsCredibilityBar() {
   const { points, credibility, initialCredibility, earnedBadges } = useCredibilityStore((state) => state);
 
   const credibilityPercentage = (credibility / Math.max(initialCredibility, 1)) * 100;
-  
+
   return (
     <div className="flex justify-between fixed top-14 left-0 right-0 z-40 flex h-10 items-center gap-4 border-t border-white/50 bg-[#E8E9ED] px-4 md:px-6">
       {/* Points */}
@@ -24,12 +24,12 @@ export default function PointsCredibilityBar() {
           {BADGE_NAMES.map((name, index) => {
             const isEarned = earnedBadges.includes(index);
             return (
-              <div 
-                key={index} 
-                title={name} 
-                className={`relative w-5 h-5 rounded-full flex items-center justify-center text-xs transition-all duration-300 ${
-                  isEarned ? 'bg-amber-400 scale-110 animate-bounce' : 'bg-gray-300'
-                }`}
+              <div
+                key={index}
+                title={name}
+                className={`relative w-5 h-5 rounded-full flex items-center justify-center text-xs transition-all duration-300 ${isEarned ? 'bg-amber-400 scale-110' : 'bg-gray-300'
+                  }`}
+                style={isEarned ? { animation: 'badge-earn 1.6s ease-in-out' } : undefined}
               >
                 {isEarned ? (
                   <Image src="/images/trophy.png" alt={name} width={16} height={16} className="object-contain" />

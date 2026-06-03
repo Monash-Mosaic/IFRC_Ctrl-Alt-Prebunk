@@ -278,9 +278,18 @@ describe('HomeContent', () => {
     expect(mockAddPoints).not.toHaveBeenCalled();
   });
 
-  it('maintains credibility on correct answer', async () => {
-    const mockSetCredibility = jest.fn();
+  it('awards points and does not decrease credibility on correct answer', async () => {
+    const user = userEvent.setup();
+    render(<HomeContent />);
 
+    // Post 1 correct answer is 'like'
+    const likeButton = screen.getByTestId('like-1');
+    await user.click(likeButton);
+
+    expect(mockSetAnswer).toHaveBeenCalledWith('1', 'like');
+    expect(mockAddPoints).toHaveBeenCalledWith(5);
+    expect(mockUpdateBadges).toHaveBeenCalled();
+    expect(mockDecreaseCredibility).not.toHaveBeenCalled();
   });
 
   it('does not allow changing answer for previously answered questions', async () => {
