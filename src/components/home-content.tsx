@@ -78,6 +78,10 @@ export default function HomeContent() {
 
   const handleOnCloseModal = (postId: string) => {
     setModalPostId(null);
+    // Advance game state so the next post is unlocked even when the feedback
+    // modal is dismissed via ESC instead of the "Continue" button.
+    // moveToNextQuestion is a no-op if the current question isn't answered yet.
+    moveToNextQuestion();
   };
 
   const handleOnContinueModal = (postId: string) => {
