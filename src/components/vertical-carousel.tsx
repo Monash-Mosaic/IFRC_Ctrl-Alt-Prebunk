@@ -1,10 +1,6 @@
 import React, { useEffect } from 'react'
 import { EmblaCarouselType, EmblaOptionsType } from 'embla-carousel'
-import {
-  PrevButton,
-  NextButton,
-  usePrevNextButtons
-} from '@/components/vertical-carousel-button'
+import { usePrevNextButtons } from '@/components/vertical-carousel-button'
 import useEmblaCarousel from 'embla-carousel-react'
 
 type PropType = {
