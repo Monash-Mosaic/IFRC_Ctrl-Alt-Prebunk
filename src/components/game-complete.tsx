@@ -15,7 +15,7 @@ export default function GameComplete({ correctAnswers, totalQuestions, restartGa
             <div className="w-full max-w-sm rounded-3xl bg-[#E4EAF3] px-6 py-8 text-center shadow-sm">
                 <p className="mx-auto max-w-xs text-[15px] leading-7 text-slate-700">
                     You are ready to help stop disinformation in the real world.
-                    Check out this article on misinformation on the Solferino
+                    Check out this article on misinformation on the IFRC Solferino
                     Academy website.
                 </p>
 
