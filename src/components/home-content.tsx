@@ -41,7 +41,7 @@ export default function HomeContent() {
     isAnswered,
     isPostDisabled,
   } = useGameStore();
-  const { addPoints, decreaseCredibility, initCredibility, updateBadges} = useCredibilityStore();
+  const { addPoints, increaseCredibility, decreaseCredibility, initCredibility, updateBadges} = useCredibilityStore();
 
   useEffect(() => {
   initCredibility(contentList.length);
@@ -71,12 +71,12 @@ export default function HomeContent() {
       if (contentItem && contentItem.type === ContentType.LIKE_DISLIKE) {
         const isCorrect = answer === contentItem.correctAnswer;
         
-        // Decrease credibility if incorrect
-        if (!isCorrect) {
-          decreaseCredibility();
+        if (isCorrect) {
+          increaseCredibility();
+          addPoints(5);
+          updateBadges(contentList.length);
         } else {
-          addPoints(5)
-          updateBadges(contentList.length)
+          decreaseCredibility();
         }
       }
       
