@@ -48,11 +48,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
     }
   }, [emblaApi, lockNext])
 
-  const {
-    nextBtnDisabled,
-    onPrevButtonClick,
-    onNextButtonClick
-  } = usePrevNextButtons(emblaApi)
+  usePrevNextButtons(emblaApi)
 
   return (
     <section 
