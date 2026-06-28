@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { useTranslations } from 'next-intl';
 import { CornerUpLeft } from 'lucide-react';
@@ -23,9 +23,18 @@ export default function PrebunkingModal({
 }: PrebunkingModalProps) {
   const t = useTranslations('prebunking');
 
+  // Delay isOpen by one effect cycle so react-modal's class component only receives
+  // isOpen=true after React StrictMode's double-invoke cycle completes. Without this,
+  // the async setState inside open() means componentWillUnmount sees state.isOpen=false
+  // and skips deregister(), causing the "already open" warning on remount.
+  const [isActuallyOpen, setIsActuallyOpen] = useState(false);
+  useEffect(() => {
+    setIsActuallyOpen(isOpen);
+  }, [isOpen]);
+
   return (
     <Modal
-      isOpen={isOpen}
+      isOpen={isActuallyOpen}
       onRequestClose={onClose}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 outline-none"
       overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"

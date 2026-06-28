@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ChatContent from '@/components/chat-content';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
@@ -27,6 +27,11 @@ export default function HomeContent() {
   const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED, false);
   const { content, contentList } = CONTENTS[locale as keyof typeof CONTENTS];
   const [modalPostId, setModalPostId] = useState<string | null>(null);
+  const modalDataRef = useRef<{
+    postId: string;
+    content: React.ReactNode;
+    header: React.ReactNode;
+  } | null>(null);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const useGameStore = createGameStore({
     answers: {},
@@ -140,27 +145,30 @@ export default function HomeContent() {
           />
         </Carousel>
       
-      {/* Modal - shown when a post is answered */}
-      {modalPostId && (() => {
-        const contentItem = contentList.find(item => item.id === modalPostId) as LikeDislikeContent | undefined as LikeDislikeContent;
-        const modalAnswer = getAnswer(modalPostId);
-        if (!modalAnswer) return null;
-        
-        const isCorrect = modalAnswer === contentItem.correctAnswer;
-        const reasonContent = isCorrect 
-          ? contentItem.whyCorrectAnswer.content 
-          : contentItem.whyIncorrectAnswer.content;
-        const reasonHeader = isCorrect 
-          ? contentItem.whyCorrectAnswer.title 
-          : contentItem.whyIncorrectAnswer.title;
-        
+      {/* Modal - shown when a post is answered. Always rendered (never remounts) so
+          react-modal doesn't warn about double-registration in StrictMode. */}
+      {(() => {
+        if (modalPostId) {
+          const contentItem = contentList.find(item => item.id === modalPostId) as LikeDislikeContent | undefined;
+          const modalAnswer = getAnswer(modalPostId);
+          if (contentItem && modalAnswer) {
+            const isCorrect = modalAnswer === contentItem.correctAnswer;
+            modalDataRef.current = {
+              postId: modalPostId,
+              content: isCorrect ? contentItem.whyCorrectAnswer.content : contentItem.whyIncorrectAnswer.content,
+              header: isCorrect ? contentItem.whyCorrectAnswer.title : contentItem.whyIncorrectAnswer.title,
+            };
+          }
+        }
+        if (!modalDataRef.current) return null;
+        const { postId, content, header } = modalDataRef.current;
         return (
           <PrebunkingModal
-            isOpen={true}
-            onClose={() => handleOnCloseModal(modalPostId)}
-            postId={modalPostId}
-            content={reasonContent}
-            header={reasonHeader}
+            isOpen={modalPostId !== null}
+            onClose={() => handleOnCloseModal(postId)}
+            postId={postId}
+            content={content}
+            header={header}
           />
         );
       })()}
