@@ -1,14 +1,10 @@
+'use client';
 import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import MCQPostMessage from './mcq-post-message';
 
-jest.mock('next-intl', () => ({
-  useTranslations: jest.fn(() => (key: string) => key),
-}));
-
 jest.mock('lucide-react', () => ({
-  CornerUpLeft: () => <svg data-testid="corner-up-left" />,
   ThumbsUp: () => <svg />,
   ThumbsDown: () => <svg />,
   MessageCircle: () => <svg />,
@@ -32,16 +28,7 @@ const defaultProps = {
   ],
   correctOptionId: 'a',
   answer: null as string | null,
-  whyCorrectAnswer: {
-    title: <div>Correct!</div>,
-    content: <div>Because A is right</div>,
-  },
-  whyIncorrectAnswer: {
-    title: <div>Wrong!</div>,
-    content: <div>Because A was right</div>,
-  },
   onAnswer: jest.fn(),
-  onContinue: jest.fn(),
 };
 
 beforeEach(() => {
@@ -74,12 +61,6 @@ describe('MCQPostMessage', () => {
       expect(screen.getByRole('button', { name: 'Dislike' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Comment' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Share' })).toBeDisabled();
-    });
-
-    it('does not show overlay when not answered', () => {
-      render(<MCQPostMessage {...defaultProps} answer={null} />);
-      expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
-      expect(screen.queryByText('Wrong!')).not.toBeInTheDocument();
     });
   });
 
@@ -120,41 +101,6 @@ describe('MCQPostMessage', () => {
       await user.click(screen.getByRole('button', { name: 'Option A' }));
 
       expect(mockOnAnswer).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('overlay after answering', () => {
-    it('shows correct overlay when answer is correct', () => {
-      render(<MCQPostMessage {...defaultProps} answer="a" correctOptionId="a" />);
-      expect(screen.getByText('Correct!')).toBeInTheDocument();
-      expect(screen.getByText('Because A is right')).toBeInTheDocument();
-    });
-
-    it('shows incorrect overlay when answer is wrong', () => {
-      render(<MCQPostMessage {...defaultProps} answer="b" correctOptionId="a" />);
-      expect(screen.getByText('Wrong!')).toBeInTheDocument();
-      expect(screen.getByText('Because A was right')).toBeInTheDocument();
-    });
-
-    it('shows continue button in overlay', () => {
-      render(<MCQPostMessage {...defaultProps} answer="a" />);
-      expect(screen.getByRole('button', { name: 'continueButton' })).toBeInTheDocument();
-    });
-
-    it('dismisses overlay and calls onContinue when continue is clicked', async () => {
-      const mockOnContinue = jest.fn();
-      const user = userEvent.setup();
-      render(<MCQPostMessage {...defaultProps} answer="a" onContinue={mockOnContinue} />);
-
-      await user.click(screen.getByRole('button', { name: 'continueButton' }));
-
-      expect(mockOnContinue).toHaveBeenCalledWith('mcq-1');
-      expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
-    });
-
-    it('does not show overlay when answer is null', () => {
-      render(<MCQPostMessage {...defaultProps} answer={null} />);
-      expect(screen.queryByRole('button', { name: 'continueButton' })).not.toBeInTheDocument();
     });
   });
 });

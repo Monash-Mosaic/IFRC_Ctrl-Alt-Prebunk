@@ -31,8 +31,9 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
       isPostDisabled: (postId: string) => {
         const state = get();
         if (!!state.answers[postId]) return false;
-        const currentQuestion = state.questions[state.currentQuestionIndex];
-        return currentQuestion !== postId;
+        const postIndex = state.questions.indexOf(postId);
+        if (postIndex === -1) return true;
+        return state.questions.slice(0, postIndex).some(id => !state.answers[id]);
       },
       setAnswer: (postId: string, answer: string) => {
         const state = get();
@@ -84,6 +85,10 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
     {
       name: STORAGE_KEYS.GAME_STATE,
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        answers: state.answers,
+        currentQuestionIndex: state.currentQuestionIndex,
+      }),
     }
   )
 );

@@ -22,13 +22,12 @@ jest.mock('@/components/newfeeds/like-dislike-post-message', () => {
 });
 
 jest.mock('@/components/newfeeds/mcq-post-message', () => {
-  return function MockMCQPostMessage({ postId, answer, correctOptionId, onAnswer, onContinue }: any) {
+  return function MockMCQPostMessage({ postId, answer, correctOptionId, onAnswer }: any) {
     return (
       <div data-testid={`mcq-post-${postId}`}>
         <span data-testid={`mcq-answer-${postId}`}>{answer ?? 'null'}</span>
         <span data-testid={`mcq-correct-${postId}`}>{correctOptionId}</span>
         <button data-testid={`mcq-answer-btn-${postId}`} onClick={() => onAnswer?.(postId, 'opt-a')}>Answer</button>
-        <button data-testid={`mcq-continue-${postId}`} onClick={() => onContinue?.(postId)}>Continue</button>
       </div>
     );
   };
@@ -65,7 +64,6 @@ const defaultProps = {
   getAnswer: jest.fn(() => null),
   isPostDisabled: jest.fn(() => false),
   onAnswer: jest.fn(),
-  onContinue: jest.fn(),
 };
 
 beforeEach(() => jest.clearAllMocks());
@@ -115,15 +113,6 @@ describe('ContentCarouselItems', () => {
     );
     getByTestId('mcq-answer-btn-mcq-1').click();
     expect(mockOnAnswer).toHaveBeenCalledWith('mcq-1', 'opt-a');
-  });
-
-  it('passes onContinue to MCQ post', async () => {
-    const mockOnContinue = jest.fn();
-    const { getByTestId } = render(
-      <ContentCarouselItems {...defaultProps} contentList={[mcqItem]} onContinue={mockOnContinue} />
-    );
-    getByTestId('mcq-continue-mcq-1').click();
-    expect(mockOnContinue).toHaveBeenCalledWith('mcq-1');
   });
 
   it('renders nothing when contentList is empty', () => {

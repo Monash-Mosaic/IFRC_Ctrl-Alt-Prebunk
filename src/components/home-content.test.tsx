@@ -195,16 +195,12 @@ jest.mock('./newfeeds/mcq-post-message', () => {
     postId,
     answer,
     onAnswer,
-    onContinue,
   }: any) {
     return (
       <div data-testid={`mcq-post-${postId}`}>
         <div data-testid={`mcq-answer-${postId}`}>{answer || 'null'}</div>
         <button data-testid={`mcq-option-${postId}`} onClick={() => onAnswer?.(postId, 'opt-a')}>
           Answer Option A
-        </button>
-        <button data-testid={`mcq-continue-${postId}`} onClick={() => onContinue?.(postId)}>
-          Continue
         </button>
       </div>
     );
@@ -448,26 +444,27 @@ describe('HomeContent', () => {
       expect(mockSetAnswer).toHaveBeenCalledWith('mcq-1', 'opt-a');
     });
 
-    it('does not open a modal for MCQ answers', async () => {
+    it('opens modal for MCQ answers', async () => {
+      mockGetAnswer.mockImplementation((postId: string) => postId === 'mcq-1' ? 'opt-a' : null);
       const user = userEvent.setup();
       render(<HomeContent />);
 
-      const optionBtn = screen.getByTestId('mcq-option-mcq-1');
-      await user.click(optionBtn);
+      await user.click(screen.getByTestId('mcq-option-mcq-1'));
 
-      expect(screen.queryByTestId('prebunking-modal-mcq-1')).not.toBeInTheDocument();
+      expect(await screen.findByTestId('prebunking-modal-mcq-1')).toBeInTheDocument();
     });
 
-    it('moves to next question when MCQ continue is clicked and post is answered', async () => {
+    it('moves to next question when MCQ modal is closed and post is answered', async () => {
       let answerSet = false;
       mockSetAnswer.mockImplementation(() => { answerSet = true; });
       mockIsAnswered.mockImplementation((postId: string) => postId === 'mcq-1' && answerSet);
+      mockGetAnswer.mockImplementation((postId: string) => postId === 'mcq-1' && answerSet ? 'opt-a' : null);
 
       const user = userEvent.setup();
       render(<HomeContent />);
 
       await user.click(screen.getByTestId('mcq-option-mcq-1'));
-      await user.click(screen.getByTestId('mcq-continue-mcq-1'));
+      await user.click(await screen.findByTestId('close-modal-mcq-1'));
 
       expect(mockMoveToNextQuestion).toHaveBeenCalled();
     });

@@ -10,7 +10,6 @@ interface ContentCarouselItemsProps {
   getAnswer: (postId: string) => string | null | undefined;
   isPostDisabled: (postId: string) => boolean;
   onAnswer: (postId: string, answer: string) => void;
-  onContinue: (postId: string) => void;
 }
 
 export default function ContentCarouselItems({
@@ -18,7 +17,6 @@ export default function ContentCarouselItems({
   getAnswer,
   isPostDisabled,
   onAnswer,
-  onContinue,
 }: ContentCarouselItemsProps) {
   return (
     <CarouselContent className="w-full p-2">
@@ -37,11 +35,8 @@ export default function ContentCarouselItems({
                 options={mcq.options}
                 correctOptionId={mcq.correctOptionId}
                 answer={answer}
-                whyCorrectAnswer={mcq.whyCorrectAnswer}
-                whyIncorrectAnswer={mcq.whyIncorrectAnswer}
                 isDisabled={isDisabled}
                 onAnswer={onAnswer}
-                onContinue={onContinue}
               />
             </CarouselItem>
           );

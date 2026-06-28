@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { CornerUpLeft, ThumbsUp, ThumbsDown, MessageCircle, Send } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { ThumbsUp, ThumbsDown, MessageCircle, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { MCQOption, User } from '@/contents/en';
 
@@ -13,11 +11,8 @@ export interface MCQPostMessageProps {
   options: MCQOption[];
   correctOptionId: string;
   answer: string | null | undefined;
-  whyCorrectAnswer: { title: React.ReactNode; content: React.ReactNode };
-  whyIncorrectAnswer: { title: React.ReactNode; content: React.ReactNode };
   isDisabled?: boolean;
   onAnswer: (postId: string, optionId: string) => void;
-  onContinue: (postId: string) => void;
 }
 
 export default function MCQPostMessage({
@@ -27,23 +22,11 @@ export default function MCQPostMessage({
   options,
   correctOptionId,
   answer,
-  whyCorrectAnswer,
-  whyIncorrectAnswer,
   isDisabled = false,
   onAnswer,
-  onContinue,
 }: MCQPostMessageProps) {
-  const t = useTranslations('prebunking');
-  const [overlayDismissed, setOverlayDismissed] = useState(false);
-
   const hasAnswered = answer != null;
   const isCorrect = hasAnswered && answer === correctOptionId;
-  const showOverlay = hasAnswered && !overlayDismissed;
-
-  const handleContinue = () => {
-    setOverlayDismissed(true);
-    onContinue(postId);
-  };
 
   const getOptionClass = (optionId: string) => {
     if (!hasAnswered) {
@@ -67,7 +50,7 @@ export default function MCQPostMessage({
   return (
     <article
       className={cn(
-        'w-full rounded-lg border border-[#E8E9ED] bg-white p-4 shadow-sm relative overflow-hidden',
+        'w-full rounded-lg border border-[#E8E9ED] bg-white p-4 shadow-sm',
         isDisabled ? 'opacity-50 cursor-not-allowed' : ''
       )}
     >
@@ -124,48 +107,6 @@ export default function MCQPostMessage({
         </div>
       </div>
 
-      {/* Inline overlay - shown after answering, dismissed on Continue */}
-      {showOverlay && (
-        <div className="absolute inset-0 z-10 flex flex-col bg-white rounded-lg overflow-auto">
-          {/* Coloured header */}
-          <div
-            className={cn(
-              'px-6 py-4 flex items-center gap-3 shrink-0',
-              isCorrect ? 'bg-[#00FF9C]' : 'bg-[#FF1E56]'
-            )}
-          >
-            <div className="shrink-0" aria-hidden="true">
-              <CornerUpLeft
-                className={isCorrect ? 'text-[#011E41]' : 'text-white'}
-                size={24}
-                strokeWidth={2.5}
-              />
-            </div>
-            <div className={cn('text-sm font-semibold', isCorrect ? 'text-[#011E41]' : 'text-white')}>
-              {isCorrect ? whyCorrectAnswer.title : whyIncorrectAnswer.title}
-            </div>
-          </div>
-
-          {/* Explanation body */}
-          <div className="flex-1 px-6 py-5 space-y-3 overflow-auto text-sm text-[#0D1B3E]">
-            {isCorrect ? whyCorrectAnswer.content : whyIncorrectAnswer.content}
-          </div>
-
-          {/* Continue button */}
-          <div className="px-6 pb-5 shrink-0">
-            <button
-              onClick={handleContinue}
-              className={cn(
-                'w-full rounded-lg bg-[#011E41] text-white font-semibold py-3 px-4',
-                'transition-colors hover:bg-[#002A5A] active:bg-[#001A3F]',
-                'focus:outline-none focus:ring-2 focus:ring-[#011E41] focus:ring-offset-2'
-              )}
-            >
-              {t('continueButton')}
-            </button>
-          </div>
-        </div>
-      )}
     </article>
   );
 }

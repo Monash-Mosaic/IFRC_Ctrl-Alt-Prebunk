@@ -55,13 +55,6 @@ export default function HomeContent() {
     }
   };
 
-  const handleOnMCQContinue = (postId: string) => {
-    if (isAnswered(postId)) {
-      moveToNextQuestion();
-      carouselApi?.scrollNext();
-    }
-  };
-
   const handleOnAnswer = (postId: string, answer: string) => {
     if (!isAnswered(postId)) {
       setAnswer(postId, answer);
@@ -70,20 +63,14 @@ export default function HomeContent() {
       if (!contentItem) return;
 
       if (contentItem.type === ContentType.LIKE_DISLIKE) {
-        const ldContent = contentItem as LikeDislikeContent;
-        const isCorrect = answer === ldContent.correctAnswer;
-        if (!isCorrect) {
-          setCredibility(Math.max(0, credibility - 5));
-        }
-        setModalPostId(postId);
+        const isCorrect = answer === (contentItem as LikeDislikeContent).correctAnswer;
+        if (!isCorrect) setCredibility(Math.max(0, credibility - 5));
       } else if (contentItem.type === ContentType.MCQ) {
-        const mcqContent = contentItem as MCQContent;
-        const isCorrect = answer === mcqContent.correctOptionId;
-        if (!isCorrect) {
-          setCredibility(Math.max(0, credibility - 5));
-        }
-        // Overlay is handled inside MCQPostMessage; no modal needed here
+        const isCorrect = answer === (contentItem as MCQContent).correctOptionId;
+        if (!isCorrect) setCredibility(Math.max(0, credibility - 5));
       }
+
+      setModalPostId(postId);
     }
   };
 
@@ -114,18 +101,19 @@ export default function HomeContent() {
             getAnswer={getAnswer}
             isPostDisabled={isPostDisabled}
             onAnswer={handleOnAnswer}
-            onContinue={handleOnMCQContinue}
           />
         </Carousel>
 
-      {/* Like/Dislike modal */}
       {modalPostId && (() => {
-        const contentItem = contentList.find(item => item.id === modalPostId) as LikeDislikeContent | undefined;
+        const contentItem = contentList.find(item => item.id === modalPostId);
         if (!contentItem) return null;
         const modalAnswer = getAnswer(modalPostId);
         if (!modalAnswer) return null;
 
-        const isCorrect = modalAnswer === contentItem.correctAnswer;
+        const isCorrect = contentItem.type === ContentType.MCQ
+          ? modalAnswer === (contentItem as MCQContent).correctOptionId
+          : modalAnswer === (contentItem as LikeDislikeContent).correctAnswer;
+
         const reasonContent = isCorrect
           ? contentItem.whyCorrectAnswer.content
           : contentItem.whyIncorrectAnswer.content;
