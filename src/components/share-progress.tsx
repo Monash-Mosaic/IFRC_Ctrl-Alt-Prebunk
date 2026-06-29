@@ -23,8 +23,8 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
                 link.href = dataUrl;
                 link.click();
             })
-            .catch((err) => {
-                console.error(err);
+            .catch(() => {
+                console.error("Error generating image");
             });
     }, []);
 
