@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import PrebunkingModal from './prebunking-modal';
+import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 
 // Mock react-modal
 jest.mock('react-modal', () => {
