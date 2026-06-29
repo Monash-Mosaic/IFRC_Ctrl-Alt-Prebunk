@@ -58,6 +58,23 @@ jest.mock('@/lib/use-game-store', () => ({
 
 jest.mock('@/lib/use-credibility-store');
 
+const mockToPng = jest.fn();
+
+jest.mock('html-to-image', () => ({
+  toPng: (...args: any[]) => mockToPng(...args),
+}));
+
+jest.mock('react-modal', () => {
+  const React = require('react');
+  const Modal = ({ isOpen, children }: { isOpen: boolean; children: React.ReactNode }) =>
+    isOpen ? <div data-testid="react-modal">{children}</div> : null;
+  Modal.setAppElement = jest.fn();
+  return {
+    __esModule: true,
+    default: Modal,
+  };
+});
+
 jest.mock('@/contents', () => ({
   __esModule: true,
   default: {
@@ -236,6 +253,7 @@ describe('HomeContent', () => {
     mockIsAnswered.mockReturnValue(false);
     mockIsCurrentQuestionAnswered.mockReturnValue(false);
     mockIsPostDisabled.mockReturnValue(false);
+    mockToPng.mockResolvedValue('data:image/png;base64,123');
 
     (useCredibilityStore as jest.Mock).mockReturnValue({
       credibility: 80,
@@ -397,5 +415,59 @@ describe('HomeContent', () => {
     
     expect(screen.getByTestId('correct-1')).toHaveTextContent('like');
     expect(screen.getByTestId('correct-2')).toHaveTextContent('dislike');
+  });
+
+  it('renders GameComplete once all questions are answered', () => {
+    mockIsGameCompleted.mockReturnValue(true);
+    mockGetCorrectAnswers.mockReturnValue(2);
+    mockGetNumQuestions.mockReturnValue(2);
+
+    render(<HomeContent />);
+
+    expect(screen.getByText('Simulation complete!')).toBeInTheDocument();
+    expect(screen.getByText('2/2')).toBeInTheDocument();
+  });
+
+  it('restarts simulation when Restart Simulation is clicked', async () => {
+    mockIsGameCompleted.mockReturnValue(true);
+    mockGetCorrectAnswers.mockReturnValue(2);
+    mockGetNumQuestions.mockReturnValue(2);
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByRole('button', { name: /restart simulation/i }));
+
+    expect(mockResetGame).toHaveBeenCalled();
+    expect(mockResetCredibility).toHaveBeenCalled();
+    expect(mockSetOnboardingCompleted).toHaveBeenCalledWith(false);
+  });
+
+  it('opens and renders ShareProgressModal when Share Progress is clicked', async () => {
+    mockIsGameCompleted.mockReturnValue(true);
+    mockGetCorrectAnswers.mockReturnValue(2);
+    mockGetNumQuestions.mockReturnValue(2);
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByRole('button', { name: /share my progress/i }));
+
+    expect(await screen.findByText('Share your progress')).toBeInTheDocument();
+    expect(screen.getByText(/Download a snapshot of your results to share/i)).toBeInTheDocument();
+  });
+
+  it('downloads image when Download Image is clicked', async () => {
+    mockIsGameCompleted.mockReturnValue(true);
+    mockGetCorrectAnswers.mockReturnValue(2);
+    mockGetNumQuestions.mockReturnValue(2);
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByRole('button', { name: /share my progress/i }));
+    await user.click(await screen.findByRole('button', { name: /download image/i }));
+
+    expect(mockToPng).toHaveBeenCalled();
   });
 });
