@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useRef } from 'react';
-import { toPng } from 'html-to-image';
 
 import Title from '@/components/title';
 
@@ -13,10 +12,11 @@ interface ShareProgressProps {
 export default function ShareProgress({ correctAnswers, totalQuestions }: ShareProgressProps) {
     const ref = useRef<HTMLDivElement>(null);
 
-    const handleDownload = useCallback(() => {
+    const handleDownload = useCallback(async () => {
         if (ref.current === null) return;
 
-        toPng(ref.current, { cacheBust: true, pixelRatio: 2 })
+        const { toPng } = await import('html-to-image');
+        await toPng(ref.current, { cacheBust: true, pixelRatio: 2 })
             .then((dataUrl) => {
                 const link = document.createElement('a');
                 link.download = 'prebunk-results.png';
