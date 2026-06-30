@@ -148,8 +148,16 @@ describe('HomeContent navigation', () => {
     mockSelectedScrollSnap.mockReturnValue(0);
 
     (useCredibilityStore as jest.Mock).mockReturnValue({
-      credibility: 80,
-      setCredibility: jest.fn(),
+      points: 0,
+      credibility: 1,
+      initialCredibility: 1,
+      earnedBadges: [],
+      addPoints: jest.fn(),
+      increaseCredibility: jest.fn(),
+      decreaseCredibility: jest.fn(),
+      initCredibility: jest.fn(),
+      updateBadges: jest.fn(),
+      recordLinkClick: jest.fn(),
       resetCredibility: jest.fn(),
     });
   });

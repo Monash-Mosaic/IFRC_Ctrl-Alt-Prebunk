@@ -55,7 +55,11 @@ export default function HomeContent() {
     getNumQuestions,
     resetGame
   } = useGameStore();
-  const { credibility, setCredibility, resetCredibility } = useCredibilityStore();
+  const { addPoints, increaseCredibility, decreaseCredibility, initCredibility, updateBadges, resetCredibility } = useCredibilityStore();
+
+  useEffect(() => {
+    initCredibility(contentList.length);
+  }, [contentList.length, initCredibility]);
 
   const handleSkipClick = () => {
     setOnboardingCompleted(true);
@@ -94,12 +98,12 @@ export default function HomeContent() {
   };
 
   const handleOnContinueModal = (postId: string) => {
-    // Check if this specific question is answered
     if (isAnswered(postId)) {
       moveToNextQuestion();
       emblaApi?.scrollNext();
     }
   };
+
 
   const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
     // Only allow answer if post is not already answered and is not disabled
@@ -111,12 +115,13 @@ export default function HomeContent() {
       if (contentItem && contentItem.type === ContentType.LIKE_DISLIKE) {
         const isCorrect = answer === contentItem.correctAnswer;
 
-        // Decrease credibility if incorrect
-        if (!isCorrect) {
-          const newCredibility = Math.max(0, credibility - 5);
-          setCredibility(newCredibility);
-        } else {
+        if (isCorrect) {
+          increaseCredibility();
+          addPoints(5);
+          updateBadges(contentList.length);
           incrCorrectAnswers();
+        } else {
+          decreaseCredibility();
         }
       }
 
@@ -127,7 +132,7 @@ export default function HomeContent() {
 
   const handleRestartSimulation = () => {
     resetGame();
-    resetCredibility();
+    resetCredibility(contentList.length);
     setOnboardingCompleted(false);
   }
 
