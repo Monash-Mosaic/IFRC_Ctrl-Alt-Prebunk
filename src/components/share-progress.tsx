@@ -24,9 +24,48 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
                 link.click();
             })
             .catch(() => {
-                console.error("Error generating image");
+                console.error('Error generating image');
             });
     }, []);
+
+    const handleShare = useCallback(async () => {
+        if (ref.current === null) return;
+
+        const { toPng } = await import('html-to-image');
+
+        try {
+            const dataUrl = await toPng(ref.current, { cacheBust: true, pixelRatio: 2 });
+            const match = dataUrl.match(/^data:(.+);base64,(.*)$/);
+            const mimeType = match?.[1] ?? 'image/png';
+            const base64Data = match?.[2] ?? '';
+
+            const binaryString = atob(base64Data);
+            const bytes = Uint8Array.from(binaryString, (char) => char.charCodeAt(0));
+            const blob = new Blob([bytes], { type: mimeType });
+            const file = new File([blob], 'prebunk-results.png', { type: mimeType });
+
+            if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+                const shareData = {
+                    title: 'Prebunking Champion',
+                    text: `I scored ${correctAnswers}/${totalQuestions} in the IFRC prebunking challenge.`,
+                    files: [file],
+                };
+
+                if (typeof navigator.canShare === 'function' && !navigator.canShare(shareData)) {
+                    await handleDownload();
+                    return;
+                }
+
+                await navigator.share(shareData);
+                return;
+            }
+
+            await handleDownload();
+        } catch (error) {
+            console.error('Error sharing image', error);
+            await handleDownload();
+        }
+    }, [correctAnswers, handleDownload, totalQuestions]);
 
     return (
         <div className="flex w-full max-w-[420px] flex-col items-center gap-4">
@@ -36,7 +75,7 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
                 style={{ minHeight: '240px' }}
             >
                 <div className="mx-auto flex max-w-[320px] flex-col items-center justify-center">
-                    <Title width={'115%'} height={'115%'}/>
+                    <Title width={'100%'} height={'100%'}/>
                     <p className="mt-3 text-[15px] leading-7 text-slate-700">
                         You are ready to help stop disinformation in the real world. Dive deeper into the data that matters.
                     </p>
@@ -53,13 +92,22 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
                 </div>
             </div>
 
-            <button
-                type="button"
-                onClick={handleDownload}
-                className="w-full max-w-[280px] rounded-full bg-[#011E41] px-6 py-3 text-base font-semibold text-white transition hover:bg-[#002552]"
-            >
-                Download Image
-            </button>
+            <div className="flex w-full max-w-[280px] flex-col gap-3 sm:flex-row">
+                <button
+                    type="button"
+                    onClick={handleShare}
+                    className="flex-1 rounded-full border border-[#011E41] px-6 py-3 text-base font-semibold text-[#011E41] transition hover:bg-slate-100"
+                >
+                    Share
+                </button>
+                <button
+                    type="button"
+                    onClick={handleDownload}
+                    className="flex-1 rounded-full bg-[#011E41] px-6 py-3 text-base font-semibold text-white transition hover:bg-[#002552]"
+                >
+                    Download
+                </button>
+            </div>
         </div>
     );
 }

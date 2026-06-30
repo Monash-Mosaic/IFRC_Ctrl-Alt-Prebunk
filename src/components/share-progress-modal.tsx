@@ -30,7 +30,7 @@ export default function ShareProgressModal({
                 <div className="flex flex-col gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
                     <div className="flex-1">
                         <h2 className="text-xl font-semibold text-slate-900">Share your progress</h2>
-                        <p className="mt-1 text-sm text-slate-600">Download a snapshot of your results to share.</p>
+                        <p className="mt-1 text-sm text-slate-600">Share or download a snapshot of your results.</p>
                     </div>
                     <button
                         type="button"
