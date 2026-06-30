@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { useOnboardingMachine, type OnboardingOptionEvent } from './onboarding-machine';
+import { useOnboardingMachine, type OnboardingOptionEvent } from '@/app/[locale]/chat/onboarding/_machines/onboarding-machine';
 
 const FIXED_DATE = new Date('2020-08-20T00:12:00.000Z').getTime();
 

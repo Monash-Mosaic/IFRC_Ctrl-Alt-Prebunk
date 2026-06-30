@@ -10,6 +10,7 @@ export interface LikeDislikePostMessageProps extends Omit<PostMessageProps, 'lik
   user: User;
   onLike?: (postId: string) => void;
   onDislike?: (postId: string) => void;
+  isDisabled?: boolean;
 }
 
 const colors = {
@@ -27,6 +28,7 @@ export default function LikeDislikePostMessage({
   mediaUrl,
   mediaType,
   content,
+  isDisabled,
   ...postMessageProps
 }: LikeDislikePostMessageProps) {
   // Use answer from props (passed from parent)
@@ -35,13 +37,13 @@ export default function LikeDislikePostMessage({
   const isCorrect = currentAnswer === correctAnswer;
 
   const handleLike = () => {
-    if (!hasAnswered) {
+    if (!hasAnswered && !isDisabled) {
       onLike?.(postId);
     }
   };
 
   const handleDislike = () => {
-    if (!hasAnswered) {
+    if (!hasAnswered && !isDisabled) {
       onDislike?.(postId);
     }
   };
@@ -62,8 +64,8 @@ export default function LikeDislikePostMessage({
       onDislike={handleDislike}
       likeClassName={likeClassName}
       dislikeClassName={dislikeClassName}
-      likeDisabled={hasAnswered}
-      dislikeDisabled={hasAnswered}
+      likeDisabled={hasAnswered || isDisabled}
+      dislikeDisabled={hasAnswered || isDisabled}
       commentDisabled={true}
       shareDisabled={true}
       mediaUrl={mediaUrl}

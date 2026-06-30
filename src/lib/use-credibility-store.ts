@@ -13,6 +13,7 @@ interface CredibilityStore {
   initCredibility: (totalQuestions: number) => void;
   updateBadges: (totalQuestions: number) => void;
   recordLinkClick: (href: string) => boolean;
+  resetCredibility: (totalQuestions: number) => void;
 }
 
 export const useCredibilityStore = create<CredibilityStore>()(
@@ -65,6 +66,17 @@ export const useCredibilityStore = create<CredibilityStore>()(
         set({ clickedLinks: [...clickedLinks, href] });
         set((state) => ({ points: state.points + 2 }));
         return true;
+      },
+
+      resetCredibility: (totalQuestions) => {
+        const initial = Math.floor(totalQuestions / 2);
+        set({
+          points: 0,
+          credibility: initial,
+          initialCredibility: initial,
+          earnedBadges: [],
+          clickedLinks: [],
+        });
       },
 
     }),

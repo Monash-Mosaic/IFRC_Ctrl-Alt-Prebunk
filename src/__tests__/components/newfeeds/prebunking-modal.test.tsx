@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import PrebunkingModal from './prebunking-modal';
+import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 
 // Mock react-modal
 jest.mock('react-modal', () => {
@@ -143,5 +143,25 @@ describe('PrebunkingModal', () => {
 
     // Modal should still render correctly
     expect(screen.getByTestId('modal-content')).toBeInTheDocument();
+  });
+
+  it('uses #root element when available for setAppElement', () => {
+    const root = document.createElement('div');
+    root.id = 'root';
+    document.body.appendChild(root);
+
+    const Modal = require('react-modal');
+    render(<PrebunkingModal {...defaultProps} />);
+
+    expect(Modal.setAppElement).toHaveBeenCalledWith(root);
+
+    document.body.removeChild(root);
+  });
+
+  it('falls back to document.body for setAppElement when #root is absent', () => {
+    const Modal = require('react-modal');
+    render(<PrebunkingModal {...defaultProps} />);
+
+    expect(Modal.setAppElement).toHaveBeenCalledWith(document.body);
   });
 });

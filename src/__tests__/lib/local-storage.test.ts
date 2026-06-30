@@ -1,4 +1,4 @@
-import { storage, STORAGE_KEYS } from './local-storage';
+import { storage, STORAGE_KEYS } from '@/lib/local-storage';
 
 // Mock localStorage
 const localStorageMock = (() => {
