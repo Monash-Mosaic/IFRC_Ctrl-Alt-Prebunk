@@ -36,6 +36,12 @@
       "alex": "Alex",
       "newMessage": "New message"
     },
+    "alex": {
+      "greeting": "Hey, want to try one quick fact-checking question?",
+      "chooseAnswer": "Choose one reply:",
+      "correctReply": "Nice catch. You earned {points} points.",
+      "incorrectReply": "Not quite. No points this time, but here is why."
+    },
     "onboarding": {
       "step1": {
         "greeting": "Hey! Welcome to the feed. I'm Paula, and I'll help you navigate this wild world of online information. 👋",
