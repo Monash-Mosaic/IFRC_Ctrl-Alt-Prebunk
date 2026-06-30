@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Modal from 'react-modal';
 import { useTranslations } from 'next-intl';
 import { CornerUpLeft } from 'lucide-react';
