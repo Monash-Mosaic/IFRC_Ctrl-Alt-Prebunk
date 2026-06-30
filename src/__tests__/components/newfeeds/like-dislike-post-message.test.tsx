@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, act } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import LikeDislikePostMessage from './like-dislike-post-message';
+import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 
 // Mock PostMessage component
 jest.mock('@/app/[locale]/chat/onboarding/_components/post-message', () => {
@@ -62,7 +62,7 @@ jest.mock('@/app/[locale]/chat/onboarding/_components/post-message', () => {
 
 // Mock PrebunkingModal component
 const mockOnClose = jest.fn();
-jest.mock('./prebunking-modal', () => {
+jest.mock('@/components/newfeeds/prebunking-modal', () => {
   return function MockPrebunkingModal({
     isOpen,
     onClose,
@@ -237,6 +237,36 @@ describe('LikeDislikePostMessage', () => {
     expect(dislikeButton).not.toBeDisabled();
     expect(likeButton).not.toHaveClass('fill-(--color-dunder-green)');
     expect(dislikeButton).not.toHaveClass('fill-(--color-dunder-red)');
+  });
+
+  it('does not call onDislike if post is already answered', async () => {
+    const mockOnDislike = jest.fn();
+    const user = userEvent.setup();
+    render(
+      <LikeDislikePostMessage
+        {...defaultProps}
+        answer="dislike"
+        onDislike={mockOnDislike}
+      />,
+    );
+
+    await user.click(screen.getByTestId('dislike-button'));
+    expect(mockOnDislike).not.toHaveBeenCalled();
+  });
+
+  it('safely handles missing callbacks when unanswered', async () => {
+    const user = userEvent.setup();
+    render(<LikeDislikePostMessage {...defaultProps} answer={null} />);
+
+    await expect(user.click(screen.getByTestId('like-button'))).resolves.not.toThrow();
+    await expect(user.click(screen.getByTestId('dislike-button'))).resolves.not.toThrow();
+  });
+
+  it('treats undefined answer the same as unanswered', () => {
+    render(<LikeDislikePostMessage {...defaultProps} answer={undefined} />);
+
+    expect(screen.getByTestId('like-button')).not.toBeDisabled();
+    expect(screen.getByTestId('dislike-button')).not.toBeDisabled();
   });
 
 });
