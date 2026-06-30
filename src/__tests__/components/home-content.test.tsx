@@ -267,6 +267,7 @@ jest.mock('@/components/game-complete', () => {
 });
 
 const mockAddPoints = jest.fn();
+const mockIncreaseCredibility = jest.fn();
 const mockDecreaseCredibility = jest.fn();
 const mockInitCredibility = jest.fn();
 const mockUpdateBadges = jest.fn();
@@ -284,11 +285,13 @@ describe('HomeContent', () => {
 
     jest.mocked(useCredibilityStore).mockReturnValue({
       addPoints: mockAddPoints,
+      increaseCredibility: mockIncreaseCredibility,
       decreaseCredibility: mockDecreaseCredibility,
       initCredibility: mockInitCredibility,
       updateBadges: mockUpdateBadges,
       resetCredibility: mockResetCredibility,
     });
+  });
 
   it('renders chat content when onboarding is not completed', () => {
     // Reset mock to return false for this test
@@ -426,6 +429,7 @@ describe('HomeContent', () => {
   it('prevents credibility from going below 0', async () => {
     jest.mocked(useCredibilityStore).mockReturnValue({
       addPoints: mockAddPoints,
+      increaseCredibility: mockIncreaseCredibility,
       decreaseCredibility: mockDecreaseCredibility,
       initCredibility: mockInitCredibility,
       updateBadges: mockUpdateBadges,
