@@ -205,6 +205,7 @@ jest.mock('@/components/newfeeds/prebunking-modal', () => {
   return function MockPrebunkingModal({
     isOpen,
     onClose,
+    onContinue,
     postId,
     header,
     content,
@@ -216,6 +217,9 @@ jest.mock('@/components/newfeeds/prebunking-modal', () => {
         <div data-testid={`modal-content-${postId}`}>{content}</div>
         <button data-testid={`close-modal-${postId}`} onClick={onClose}>
           Close Modal
+        </button>
+        <button data-testid={`continue-modal-${postId}`} onClick={onContinue}>
+          Continue
         </button>
       </div>
     );
@@ -529,5 +533,41 @@ describe('HomeContent', () => {
 
     expect(setAppElementSpy).toHaveBeenCalled();
     setAppElementSpy.mockRestore();
+  });
+
+  it('calls moveToNextQuestion when continue is clicked on an answered question', async () => {
+    let answerSet = false;
+    mockSetAnswer.mockImplementation(() => { answerSet = true; });
+    mockIsAnswered.mockImplementation((postId: string) => postId === '1' && answerSet);
+    mockGetAnswer.mockImplementation((postId: string) => (postId === '1' && answerSet ? 'like' : null));
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('like-1'));
+
+    const modal = await screen.findByTestId('prebunking-modal-1');
+    expect(modal).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('continue-modal-1'));
+
+    expect(mockMoveToNextQuestion).toHaveBeenCalled();
+  });
+
+  it('does not call moveToNextQuestion when continue is clicked on an unanswered question', async () => {
+    mockIsAnswered.mockReturnValue(false);
+    mockGetAnswer.mockImplementation((postId: string) => (postId === '1' ? 'like' : null));
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('like-1'));
+
+    const modal = await screen.findByTestId('prebunking-modal-1');
+    expect(modal).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('continue-modal-1'));
+
+    expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
   });
 });
