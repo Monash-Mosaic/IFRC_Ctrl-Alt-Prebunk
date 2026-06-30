@@ -38,14 +38,6 @@ export const routing = defineRouting({
       zh: '/聊天/上手',
       ar: '/دردشة/تعريف',
     },
-    '/chat/alex': {
-      en: '/chat/alex',
-      es: '/chat/alex',
-      fr: '/discussion/alex',
-      ru: '/чат/alex',
-      zh: '/聊天/alex',
-      ar: '/دردشة/alex',
-    },
     '/analytics': {
       en: '/analytics',
       es: '/analitica',
