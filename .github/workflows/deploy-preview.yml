@@ -1,0 +1,194 @@
+name: Deploy to Cloudflare (PR Preview)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  checks: write
+  statuses: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  security_gates:
+    if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }}
+    runs-on: ubuntu-latest
+    permissions:
+        checks: write
+        pull-requests: write
+        contents: write
+        issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          lfs: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test with coverage
+        if: ${{ !cancelled() }}
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        id: coverage
+        with:
+          test-script: npm run test:coverage
+          skip-step: install
+          annotations: none
+          output: report-markdown
+
+      - name: Post coverage comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.coverage.outputs.report != '' }}
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          header: jest-coverage
+          message: ${{ steps.coverage.outputs.report }}
+
+      - name: Build
+        run: npm run ci:build
+
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
+  deploy_preview:
+    if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }}
+    runs-on: ubuntu-latest
+    needs: security_gates
+    environment: preview
+
+    steps:
+      - name: Compute preview name and route
+        id: preview
+        run: |
+          RAW_BRANCH="${{ github.head_ref || github.ref_name }}"
+          BRANCH_SLUG=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z]+/-/g' | sed -E 's/^-+|-+$//g' | cut -c1-40)
+          if [ -z "$BRANCH_SLUG" ]; then
+            BRANCH_SLUG="${{ github.event.pull_request.number && format('pr-{0}', github.event.pull_request.number) || 'main' }}"
+          fi
+          echo "branch_slug=$BRANCH_SLUG" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          lfs: true
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Inject public env for build
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_SITE_URL: ${{ format('https://{0}-{1}.{2}.workers.dev', steps.preview.outputs.branch_slug, vars.CLOUDFLARE_WORKER_NAME, vars.CLOUDFLARE_WORKERS_SUBDOMAIN) }}
+          NEXT_PUBLIC_GIT_TAG: ${{ steps.preview.outputs.branch_slug }}
+        run: npm run inject-env
+
+      - name: Deploy to Cloudflare (branch preview)
+        id: deploy
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_GIT_TAG: ${{ steps.preview.outputs.branch_slug }}
+          NEXT_PUBLIC_SITE_URL: ${{ format('https://{0}-{1}.{2}.workers.dev', steps.preview.outputs.branch_slug, vars.CLOUDFLARE_WORKER_NAME, vars.CLOUDFLARE_WORKERS_SUBDOMAIN) }}
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+        run: |
+          LOG=$(npm run upload -- --preview-alias ${{ steps.preview.outputs.branch_slug }} --tag $NEXT_PUBLIC_GIT_TAG 2>&1 | tee /dev/stderr)
+          VERSION_ID=$(echo "$LOG" | grep -oE 'Worker Version ID: [0-9a-f-]+' | awk '{print $4}')
+          PREVIEW_URL=$(echo "$LOG" | grep -oE 'Version Preview URL: https?://[^[:space:]]+' | awk '{print $4}')
+          BRANCH_PREVIEW_URL=$(echo "$LOG" | grep -oE 'Version Preview Alias URL: https?://[^[:space:]]+' | awk '{print $5}')
+          echo "version_id=$VERSION_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo "branch_preview_url=$BRANCH_PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Inject public env for main deploy
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        env:
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_PREVIEW_SITE_URL }}
+          NEXT_PUBLIC_GIT_TAG: ${{ steps.preview.outputs.branch_slug }}
+        run: npm run inject-env
+
+      - name: Deploy to Cloudflare (main branch only)
+        id: deploy_preview_main
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_PREVIEW_SITE_URL }}
+          NEXT_PUBLIC_GIT_TAG: ${{ steps.preview.outputs.branch_slug }}
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+        run: |
+          LOG=$(npm run upload -- --tag main 2>&1 | tee /dev/stderr)
+          VERSION_ID=$(echo "$LOG" | grep -oE 'Worker Version ID: [0-9a-f-]+' | awk '{print $4}')
+          npx --yes wrangler@4 versions deploy -y "$VERSION_ID"
+
+      - name: Comment preview URL on PR
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const versionId = `${{ steps.deploy.outputs.version_id }}`;
+            const branchPreviewUrl = `${{ steps.deploy.outputs.branch_preview_url }}`;
+            const previewUrl = `${{ steps.deploy.outputs.preview_url }}`;
+            const marker = '<!-- preview-url -->';
+            const body = `${marker}\n| Key | Value |\n|---|---|\n| Branch | ${{ steps.preview.outputs.branch_slug }} |\n| Cloudflare Worker Version ID | ${versionId} |\n| Branch Preview URL | ${branchPreviewUrl} |\n| Version Preview URL | ${previewUrl} |`;
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: prNumber,
+              body,
+            });
+
+
+      - name: Update deployment status
+        if: ${{ always() }}
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = context.eventName === 'pull_request'
+              ? context.payload.pull_request.head.sha
+              : context.sha;
+            const state = '${{ job.status }}' === 'success' ? 'success' : 'failure';
+            const branchPreviewUrl = `${{ steps.deploy.outputs.branch_preview_url }}`;
+            const previewUrl = `${{ steps.deploy.outputs.preview_url }}`;
+
+            await github.rest.repos.createCommitStatus({
+              owner,
+              repo,
+              sha,
+              state,
+              context: 'deploy/preview',
+              description: state === 'success' ? 'Preview deployed' : 'Preview deploy failed',
+              target_url: branchPreviewUrl || previewUrl || undefined,
+            });

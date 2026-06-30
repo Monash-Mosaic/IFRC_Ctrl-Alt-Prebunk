@@ -8,6 +8,8 @@ interface GameState {
   currentQuestionIndex: number;
   questions: Array<ContentId>;
   questionStore: Record<ContentId, ContentBase>;
+  gameCompleted: boolean;
+  correctAnswers: number;
 }
 
 interface GameStore extends GameState {
@@ -17,14 +19,24 @@ interface GameStore extends GameState {
   isCurrentQuestionAnswered: (contentList: Array<{ id: string }>) => boolean;
   isPostDisabled: (postId: string) => boolean;
   moveToNextQuestion: () => void;
-  // resetGame: () => void;
+  isGameCompleted: () => boolean;
+  getCorrectAnswers: () => number;
+  incrCorrectAnswers: () => void;
+  getNumQuestions: () => number;
+  resetGame: () => void;
+}
+
+const initialGameState = {
+  answers: {},
+  currentQuestionIndex: 0,
+  gameCompleted: false,
+  correctAnswers: 0
 }
 
 export const createGameStore = (initialState?: Partial<GameState>) => create<GameStore>()(
   persist(
     (set, get) => ({
-      answers: {},
-      currentQuestionIndex: 0,
+      ...initialGameState,
       questions: [],
       questionStore: {},
       ...initialState,
@@ -73,13 +85,34 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
             set({
               currentQuestionIndex: nextIndex,
             });
+          } else {
+            set({
+              gameCompleted: true,
+            });
           }
         }
       },
-      // resetGame: () => {
-      //   // Clear persisted storage
-
-      // },
+      isGameCompleted: () => {
+        const state = get();
+        return state.gameCompleted;
+      },
+      getCorrectAnswers: () => {
+        const state = get();
+        return state.correctAnswers;
+      },
+      incrCorrectAnswers: () => {
+        const state = get();
+        set({
+          correctAnswers: state.correctAnswers + 1,
+        });
+      },
+      getNumQuestions: () => {
+        const state = get();
+        return state.questions.length;
+      },
+      resetGame: () => {
+        set(initialGameState);
+      },
     }),
     {
       name: STORAGE_KEYS.GAME_STATE,

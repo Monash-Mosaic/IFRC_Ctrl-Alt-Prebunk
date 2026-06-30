@@ -5,11 +5,17 @@ interface CredibilityStore {
   credibility: number;
   setPoint: (point: number) => void;
   setCredibility: (credibility: number) => void;
+  resetCredibility: () => void;
+}
+
+const initialCredibilityState = {
+  point: 0,
+  credibility: 80
 }
 
 export const useCredibilityStore = create<CredibilityStore>((set) => ({
-  point: 0,
-  credibility: 80,
+  ...initialCredibilityState,
   setPoint: (point) => set({ point }),
   setCredibility: (credibility) => set({ credibility }),
+  resetCredibility: () => set(initialCredibilityState)
 }));

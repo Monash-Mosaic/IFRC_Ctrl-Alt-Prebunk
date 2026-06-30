@@ -11,6 +11,9 @@ import CONTENTS from '@/contents';
 import { ContentType, LikeDislikeContent } from '@/contents/en';
 import { createGameStore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
+import ContentCarouselItems from '@/components/content-carousel-items';
+import GameComplete from '@/components/game-complete';
+
 import Modal from 'react-modal';
 import type { EmblaCarouselType } from 'embla-carousel';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -36,6 +39,8 @@ export default function HomeContent() {
     currentQuestionIndex: 0,
     questions: contentList.map(item => item.id),
     questionStore: content,
+    gameCompleted: false,
+    correctAnswers: 0
   });
 
   const {
@@ -44,8 +49,13 @@ export default function HomeContent() {
     setAnswer,
     isAnswered,
     isPostDisabled,
+    isGameCompleted,
+    getCorrectAnswers,
+    incrCorrectAnswers,
+    getNumQuestions,
+    resetGame
   } = useGameStore();
-  const { credibility, setCredibility } = useCredibilityStore();
+  const { credibility, setCredibility, resetCredibility } = useCredibilityStore();
 
   const handleSkipClick = () => {
     setOnboardingCompleted(true);
@@ -93,8 +103,8 @@ export default function HomeContent() {
   };
 
   const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
-    // Only allow answer if post is not already answered
-    if (!isAnswered(postId)) {
+    // Only allow answer if post is not already answered and is not disabled
+    if (!isAnswered(postId) && !isPostDisabled(postId)) {
       setAnswer(postId, answer);
 
       // Find the content item to check correctness
@@ -106,6 +116,8 @@ export default function HomeContent() {
         if (!isCorrect) {
           const newCredibility = Math.max(0, credibility - 5);
           setCredibility(newCredibility);
+        } else {
+          incrCorrectAnswers();
         }
       }
 
@@ -113,6 +125,13 @@ export default function HomeContent() {
       setModalPostId(postId);
     }
   };
+
+  const handleRestartSimulation = () => {
+    resetGame();
+    resetCredibility();
+    setOnboardingCompleted(false);
+  }
+
 
   useEffect(() => {
     // Set app element for react-modal accessibility
@@ -159,6 +178,19 @@ export default function HomeContent() {
   if (!onboardingCompleted) {
     return <ChatContent startOnboardingText={t('startOnboarding')} skipText={t('skip')} onSkipClick={handleSkipClick} />;
   }
+
+  if(isGameCompleted()) {
+    return (
+      <div className="flex min-h-[calc(100vh-6rem)] flex-col py-4 items-center justify-center">
+        <GameComplete
+          correctAnswers={getCorrectAnswers()}
+          totalQuestions={getNumQuestions()}
+          restartGame={handleRestartSimulation}
+        />
+      </div>
+    );
+  }
+
 
   return (
     <div

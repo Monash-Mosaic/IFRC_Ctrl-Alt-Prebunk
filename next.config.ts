@@ -22,8 +22,15 @@ const withBundleAnalyzer = createBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+
   transpilePackages: ['geist'],
   reactStrictMode: true,
+  
+  output: 'standalone',
+
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default compose(withBundleAnalyzer, withNextIntl, withMDX)(nextConfig);

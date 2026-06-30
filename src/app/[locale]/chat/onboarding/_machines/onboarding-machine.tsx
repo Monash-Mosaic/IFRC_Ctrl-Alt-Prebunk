@@ -61,8 +61,10 @@ export interface OnboardingOption {
   translationKey: string;
 }
 
+const generateMessageId = () => `msg-${Date.now()}-${crypto.randomUUID()}`;
+
 const createTypingMessage = (sender: MessageSender): TypingMessage => ({
-  id: `msg-${Date.now()}`,
+  id: generateMessageId(),
   sender,
   type: 'typing',
   typing: true,
@@ -70,7 +72,7 @@ const createTypingMessage = (sender: MessageSender): TypingMessage => ({
 });
 
 const createMessage = (sender: MessageSender, text: string): TextMessage => ({
-  id: `msg-${Date.now()}`,
+  id: generateMessageId(),
   sender,
   type: 'text',
   text,
@@ -81,7 +83,7 @@ export const createPostMessage = (
   sender: MessageSender,
   post: PostMessage['post']
 ): PostMessage => ({
-  id: `msg-${Date.now()}`,
+  id: generateMessageId(),
   sender,
   type: 'post',
   post,

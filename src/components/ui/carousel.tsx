@@ -95,12 +95,13 @@ function Carousel({
 
   React.useEffect(() => {
     if (!api) return
-    onSelect(api)
+    queueMicrotask(() => onSelect(api))
     api.on("reInit", onSelect)
     api.on("select", onSelect)
 
     return () => {
-      api?.off("select", onSelect)
+      api.off("reInit", onSelect)
+      api.off("select", onSelect)
     }
   }, [api, onSelect])
 
@@ -178,11 +179,7 @@ function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       ref={(node) => {
-        if (typeof carouselRef === 'function') {
-          carouselRef(node)
-        } else if (carouselRef) {
-          (carouselRef as React.MutableRefObject<HTMLDivElement | null>).current = node
-        }
+        carouselRef(node)
         contentRef.current = node
       }}
       className={cn("overflow-hidden", orientation === "vertical" ? "flex-1 min-h-0" : "")}

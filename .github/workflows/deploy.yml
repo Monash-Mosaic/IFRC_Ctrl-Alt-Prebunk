@@ -1,0 +1,100 @@
+name: Deploy to Cloudflare (Production)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Optional release tag to deploy (e.g., v1.2.3). If empty, deploy latest stable (non-prerelease) release.'
+        required: false
+        type: string
+
+jobs:
+  deploy_production:
+    runs-on: ubuntu-latest
+    environment: production
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Resolve version id from metadata.json asset
+        id: version
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const requestedTag = `${{ inputs.tag }}`.trim();
+            const { owner, repo } = context.repo;
+            let release;
+
+            if (requestedTag) {
+              const byTag = await github.rest.repos.getReleaseByTag({
+                owner,
+                repo,
+                tag: requestedTag,
+              });
+              release = byTag.data;
+            } else {
+              const { data: releases } = await github.rest.repos.listReleases({
+                owner,
+                repo,
+                per_page: 100,
+              });
+              release = releases.find((r) => !r.draft && !r.prerelease);
+              if (!release) {
+                core.setFailed('No stable (non-prerelease) release found.');
+                return;
+              }
+            }
+
+            const resolvedTag = release.tag_name;
+            core.info(`Deploying release tag: ${resolvedTag}`);
+            core.setOutput('tag', resolvedTag);
+            const assets = await github.rest.repos.listReleaseAssets({
+              owner,
+              repo,
+              release_id: release.id,
+            });
+
+            const asset = assets.data.find(a => a.name === 'metadata.json');
+            if (!asset) {
+              core.setFailed('metadata.json not found in release assets.');
+              return;
+            }
+
+            const response = await github.request(asset.url, {
+              headers: { Accept: 'application/octet-stream' },
+            });
+
+            const metadata = JSON.parse(Buffer.from(response.data).toString('utf8'));
+            const versionId = metadata.version_id || metadata.versionId;
+
+            if (!versionId) {
+              core.setFailed('version_id not found in metadata.json.');
+              return;
+            }
+
+            core.setOutput('version_id', versionId);
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.version.outputs.tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Deploy to Cloudflare (production)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          VERSION_ID: ${{ steps.version.outputs.version_id }}
+        run: npx --yes wrangler@4 versions deploy -y "$VERSION_ID"
+
+      - name: Purge Cloudflare CDN cache
+        if: ${{ vars.CLOUDFLARE_ZONE_ID != '' }}
+        uses: nathanvaughn/actions-cloudflare-purge@v4.0.0
+        with:
+          cf_zone: ${{ vars.CLOUDFLARE_ZONE_ID }}
+          cf_auth: ${{ secrets.CLOUDFLARE_API_TOKEN }}

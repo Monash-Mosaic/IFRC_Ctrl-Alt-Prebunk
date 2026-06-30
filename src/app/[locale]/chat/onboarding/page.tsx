@@ -8,13 +8,17 @@ import { CHAT_USERS } from '../_constants/users';
 
 export const dynamic = 'force-dynamic';
 
-export default function OnboardingPage() {
+function OnboardingLoadingFallback() {
   const t = useTranslations('common');
-  const OnboardingFlow = loadDynamicComponent(() => import('./_components/onboarding-flow'), {
-    ssr: false,
-    loading: () => <Loading displayText={t('loading')} />,
-  });
+  return <Loading displayText={t('loading')} />;
+}
 
+const OnboardingFlow = loadDynamicComponent(() => import('./_components/onboarding-flow'), {
+  ssr: false,
+  loading: OnboardingLoadingFallback,
+});
+
+export default function OnboardingPage() {
   return (
     <div className="mx-auto flex flex-col md:px-4 md:pt-6">
       {/* Headline */}

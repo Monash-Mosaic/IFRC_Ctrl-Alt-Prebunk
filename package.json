@@ -3,15 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "analyze": "ANALYZE=true next build --webpack",
     "lint": "eslint",
     "format": "prettier -w .",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "inject-env": "node scripts/inject-public-env.mjs",
+    "preview": "node scripts/inject-public-env.mjs && opennextjs-cloudflare build && wrangler dev",
+    "upload": "node scripts/inject-public-env.mjs && opennextjs-cloudflare build && wrangler versions upload",
+    "ci:build": "next build",
+    "ci:test": "jest",
+    "ci:lint": "eslint",
+    "ci:format": "prettier -w .",
+    "ci:test:coverage": "jest --ci --coverage"
   },
   "dependencies": {
     "@cassiozen/usestatemachine": "^1.0.0",
@@ -32,7 +40,8 @@
     "react-dom": "19.2.0",
     "react-modal": "^3.16.3",
     "tailwind-merge": "^3.4.0",
-    "zustand": "^5.0.9"
+    "zustand": "^5.0.9",
+    "@opennextjs/cloudflare": "^1.19.8"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.0.8",
@@ -56,7 +65,12 @@
     "jest-environment-jsdom": "^30.2.0",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.4.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.90.0"
+  },
+  "overrides": {
+    "js-yaml": "^4.3.0",
+    "postcss": "^8.5.10"
   },
   "browserslist": [
     "cover 95%",
