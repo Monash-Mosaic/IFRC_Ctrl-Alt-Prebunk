@@ -69,6 +69,7 @@ describe('PrebunkingModal', () => {
     postId: 'post-123',
     content: <div>Test content</div>,
     header: defaultHeader,
+    isCorrect: true,
   };
 
   beforeEach(() => {
@@ -163,5 +164,17 @@ describe('PrebunkingModal', () => {
     render(<PrebunkingModal {...defaultProps} />);
 
     expect(Modal.setAppElement).toHaveBeenCalledWith(document.body);
+  });
+
+  it('uses correct header styling when isCorrect is true', () => {
+    render(<PrebunkingModal {...defaultProps} isCorrect />);
+
+    expect(screen.getByTestId('modal-content').querySelector('[data-result="correct"]')).toBeInTheDocument();
+  });
+
+  it('uses incorrect header styling when isCorrect is false', () => {
+    render(<PrebunkingModal {...defaultProps} isCorrect={false} />);
+
+    expect(screen.getByTestId('modal-content').querySelector('[data-result="incorrect"]')).toBeInTheDocument();
   });
 });
