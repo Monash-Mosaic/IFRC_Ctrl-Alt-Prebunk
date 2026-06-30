@@ -1,5 +1,5 @@
 import { render, screen } from '@/test-utils/test-utils';
-import TypingMessage from './typing-message';
+import TypingMessage from '@/app/[locale]/chat/onboarding/_components/typing-message';
 
 describe('TypingMessage', () => {
   it('matches snapshot with default props', () => {

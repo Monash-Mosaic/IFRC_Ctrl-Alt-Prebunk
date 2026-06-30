@@ -1,5 +1,5 @@
 import { render } from '@/test-utils/test-utils';
-import BotTextMessage from './bot-text-message';
+import BotTextMessage from '@/app/[locale]/chat/onboarding/_components/bot-text-message';
 
 describe('BotTextMessage', () => {
   const defaultProps = {

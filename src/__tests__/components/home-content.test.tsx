@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import HomeContent from './home-content';
+import HomeContent from '@/components/home-content';
 import { createGameStore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import { STORAGE_KEYS } from '@/lib/local-storage';
@@ -177,7 +177,7 @@ jest.mock('@/contents', () => ({
 
 
 // Mock LikeDislikePostMessage
-jest.mock('./newfeeds/like-dislike-post-message', () => {
+jest.mock('@/components/newfeeds/like-dislike-post-message', () => {
   return function MockLikeDislikePostMessage({
     postId,
     answer,
@@ -201,15 +201,19 @@ jest.mock('./newfeeds/like-dislike-post-message', () => {
 });
 
 // Mock PrebunkingModal
-jest.mock('./newfeeds/prebunking-modal', () => {
+jest.mock('@/components/newfeeds/prebunking-modal', () => {
   return function MockPrebunkingModal({
     isOpen,
     onClose,
     postId,
+    header,
+    content,
   }: any) {
     if (!isOpen) return null;
     return (
       <div data-testid={`prebunking-modal-${postId}`}>
+        <div data-testid={`modal-header-${postId}`}>{header}</div>
+        <div data-testid={`modal-content-${postId}`}>{content}</div>
         <button data-testid={`close-modal-${postId}`} onClick={onClose}>
           Close Modal
         </button>
@@ -219,9 +223,42 @@ jest.mock('./newfeeds/prebunking-modal', () => {
 });
 
 // Mock ChatContent
-jest.mock('./chat-content', () => {
-  return function MockChatContent() {
-    return <div data-testid="chat-content">Chat Content</div>;
+jest.mock('@/components/chat-content', () => {
+  return function MockChatContent({
+    onSkipClick,
+  }: {
+    onSkipClick?: () => void;
+  }) {
+    return (
+      <div data-testid="chat-content">
+        <button type="button" data-testid="skip-onboarding" onClick={onSkipClick}>
+          Skip onboarding
+        </button>
+      </div>
+    );
+  };
+});
+
+jest.mock('@/components/game-complete', () => {
+  return function MockGameComplete({
+    correctAnswers,
+    totalQuestions,
+    restartGame,
+  }: {
+    correctAnswers: number;
+    totalQuestions: number;
+    restartGame: () => void;
+  }) {
+    return (
+      <div data-testid="game-complete">
+        <span data-testid="game-score">
+          {correctAnswers}/{totalQuestions}
+        </span>
+        <button type="button" data-testid="restart-game" onClick={restartGame}>
+          Restart
+        </button>
+      </div>
+    );
   };
 });
 
@@ -236,6 +273,8 @@ describe('HomeContent', () => {
     mockIsAnswered.mockReturnValue(false);
     mockIsCurrentQuestionAnswered.mockReturnValue(false);
     mockIsPostDisabled.mockReturnValue(false);
+    mockIsGameCompleted.mockReturnValue(false);
+    mockUseLocalStorage.mockReturnValue([true, mockSetOnboardingCompleted]);
 
     (useCredibilityStore as jest.Mock).mockReturnValue({
       credibility: 80,
@@ -397,5 +436,98 @@ describe('HomeContent', () => {
     
     expect(screen.getByTestId('correct-1')).toHaveTextContent('like');
     expect(screen.getByTestId('correct-2')).toHaveTextContent('dislike');
+  });
+
+  it('marks onboarding complete when skip is clicked', async () => {
+    mockUseLocalStorage.mockReturnValue([false, mockSetOnboardingCompleted]);
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('skip-onboarding'));
+    expect(mockSetOnboardingCompleted).toHaveBeenCalledWith(true);
+
+    mockUseLocalStorage.mockReturnValue([true, mockSetOnboardingCompleted]);
+  });
+
+  it('increments correct answers on a correct response', async () => {
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('like-1'));
+    expect(mockIncrCorrectAnswers).toHaveBeenCalled();
+  });
+
+  it('does not answer when the post is disabled', async () => {
+    mockIsPostDisabled.mockReturnValue(true);
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('like-1'));
+    expect(mockSetAnswer).not.toHaveBeenCalled();
+  });
+
+  it('renders game complete screen when the game is finished', () => {
+    mockIsGameCompleted.mockReturnValue(true);
+    mockGetCorrectAnswers.mockReturnValue(2);
+    mockGetNumQuestions.mockReturnValue(2);
+
+    render(<HomeContent />);
+
+    expect(screen.getByTestId('game-complete')).toBeInTheDocument();
+    expect(screen.getByTestId('game-score')).toHaveTextContent('2/2');
+  });
+
+  it('resets game state when restart is clicked', async () => {
+    mockIsGameCompleted.mockReturnValue(true);
+    const user = userEvent.setup();
+
+    render(<HomeContent />);
+    await user.click(screen.getByTestId('restart-game'));
+
+    expect(mockResetGame).toHaveBeenCalled();
+    expect(mockResetCredibility).toHaveBeenCalled();
+    expect(mockSetOnboardingCompleted).toHaveBeenCalledWith(false);
+  });
+
+  it('shows incorrect answer feedback in the modal', async () => {
+    mockSetAnswer.mockImplementation((postId: string, answer: string) => {
+      mockGetAnswer.mockImplementation((id: string) => (id === postId ? answer : null));
+    });
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('dislike-1'));
+
+    const modal = await screen.findByTestId('prebunking-modal-1');
+    expect(modal).toBeInTheDocument();
+    expect(screen.getByTestId('modal-header-1')).toHaveTextContent('Incorrect Title 1');
+    expect(screen.getByTestId('modal-content-1')).toHaveTextContent('Incorrect Content 1');
+  });
+
+  it('shows correct answer feedback in the modal', async () => {
+    mockSetAnswer.mockImplementation((postId: string, answer: string) => {
+      mockGetAnswer.mockImplementation((id: string) => (id === postId ? answer : null));
+    });
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('like-1'));
+
+    const modal = await screen.findByTestId('prebunking-modal-1');
+    expect(modal).toBeInTheDocument();
+    expect(screen.getByTestId('modal-header-1')).toHaveTextContent('Correct Title 1');
+    expect(screen.getByTestId('modal-content-1')).toHaveTextContent('Correct Content 1');
+  });
+
+  it('sets modal app element on mount', () => {
+    const setAppElementSpy = jest.spyOn(require('react-modal'), 'setAppElement');
+
+    render(<HomeContent />);
+
+    expect(setAppElementSpy).toHaveBeenCalled();
+    setAppElementSpy.mockRestore();
   });
 });

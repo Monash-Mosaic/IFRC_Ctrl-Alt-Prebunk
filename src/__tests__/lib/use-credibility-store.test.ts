@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useCredibilityStore } from './use-credibility-store';
+import { useCredibilityStore } from '@/lib/use-credibility-store';
 
 describe('useCredibilityStore', () => {
   beforeEach(() => {
