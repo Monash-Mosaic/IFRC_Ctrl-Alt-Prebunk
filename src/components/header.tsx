@@ -19,6 +19,7 @@ export default async function Header() {
                 height={61.35}
                 width={223.67}
                 className="h-8 w-auto"
+                priority
               />
             </Link>
           </div>
@@ -43,6 +44,7 @@ export default async function Header() {
               height={2747}
               width={655}
               className="h-8 w-auto"
+              priority
             />
           </Link>
         </div>
