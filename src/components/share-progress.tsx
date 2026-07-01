@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useRef } from 'react';
+import { toPng, toBlob } from 'html-to-image';
 
 import Title from '@/components/title';
 
@@ -15,7 +16,6 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
     const handleDownload = useCallback(async () => {
         if (ref.current === null) return;
 
-        const { toPng } = await import('html-to-image');
         await toPng(ref.current, { cacheBust: true, pixelRatio: 2 })
             .then((dataUrl) => {
                 const link = document.createElement('a');
@@ -30,8 +30,6 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
 
     const handleShare = useCallback(async () => {
         if (ref.current === null) return;
-
-        const { toBlob } = await import('html-to-image');
 
         try {
             const blob = await toBlob(ref.current, { cacheBust: true, pixelRatio: 2 });
@@ -60,8 +58,8 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
             }
 
             await handleDownload();
-        } catch (error) {
-            console.error('Error sharing image', error);
+        } catch {
+            console.error('Error sharing image');
             await handleDownload();
         }
     }, [correctAnswers, handleDownload, totalQuestions]);
