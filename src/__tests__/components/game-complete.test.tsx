@@ -4,9 +4,11 @@ import userEvent from '@testing-library/user-event';
 import GameComplete from '@/components/game-complete';
 
 const mockToPng = jest.fn();
+const mockToBlob = jest.fn();
 
 jest.mock('html-to-image', () => ({
   toPng: (...args: any[]) => mockToPng(...args),
+  toBlob: (...args: any[]) => mockToBlob(...args),
 }));
 
 jest.mock('react-modal', () => {
@@ -65,18 +67,40 @@ describe('GameComplete', () => {
     await user.click(screen.getByRole('button', { name: /share my progress/i }));
 
     expect(await screen.findByText('Share your progress')).toBeInTheDocument();
-    expect(screen.getByText(/Download a snapshot of your results to share/i)).toBeInTheDocument();
+    expect(screen.getByText(/Share or download a snapshot of your results/i)).toBeInTheDocument();
   });
 
-  it('downloads image when Download Image is clicked', async () => {
+  it('downloads image when Download is clicked', async () => {
     mockToPng.mockResolvedValue('data:image/png;base64,123');
 
     const user = userEvent.setup();
     render(<GameComplete correctAnswers={2} totalQuestions={2} restartGame={jest.fn()} />);
 
     await user.click(screen.getByRole('button', { name: /share my progress/i }));
-    await user.click(await screen.findByRole('button', { name: /download image/i }));
+    await user.click(await screen.findByRole('button', { name: /download/i }));
 
     expect(mockToPng).toHaveBeenCalled();
+  });
+
+  it('shares image when Share is clicked', async () => {
+    const shareMock = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: shareMock,
+    });
+    Object.defineProperty(navigator, 'canShare', {
+      configurable: true,
+      value: jest.fn(() => true),
+    });
+    mockToBlob.mockResolvedValue(new Blob(['image'], { type: 'image/png' }));
+
+    const user = userEvent.setup();
+    render(<GameComplete correctAnswers={2} totalQuestions={2} restartGame={jest.fn()} />);
+
+    await user.click(screen.getByRole('button', { name: /share my progress/i }));
+    await user.click(await screen.findByRole('button', { name: /^share$/i }));
+
+    expect(mockToBlob).toHaveBeenCalled();
+    expect(shareMock).toHaveBeenCalled();
   });
 });

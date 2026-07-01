@@ -31,18 +31,17 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
     const handleShare = useCallback(async () => {
         if (ref.current === null) return;
 
-        const { toPng } = await import('html-to-image');
+        const { toBlob } = await import('html-to-image');
 
         try {
-            const dataUrl = await toPng(ref.current, { cacheBust: true, pixelRatio: 2 });
-            const match = dataUrl.match(/^data:(.+);base64,(.*)$/);
-            const mimeType = match?.[1] ?? 'image/png';
-            const base64Data = match?.[2] ?? '';
+            const blob = await toBlob(ref.current, { cacheBust: true, pixelRatio: 2 });
 
-            const binaryString = atob(base64Data);
-            const bytes = Uint8Array.from(binaryString, (char) => char.charCodeAt(0));
-            const blob = new Blob([bytes], { type: mimeType });
-            const file = new File([blob], 'prebunk-results.png', { type: mimeType });
+            if (!blob) {
+                console.error("Failed to generate image blob");
+                return;
+            }
+            
+            const file = new File([blob], 'prebunk-results.png', { type: 'image/png' });
 
             if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
                 const shareData = {
