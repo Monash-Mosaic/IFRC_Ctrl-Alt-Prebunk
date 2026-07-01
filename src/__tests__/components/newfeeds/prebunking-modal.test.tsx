@@ -69,6 +69,7 @@ describe('PrebunkingModal', () => {
     postId: 'post-123',
     content: <div>Test content</div>,
     header: defaultHeader,
+    isCorrect: true,
   };
 
   beforeEach(() => {
@@ -143,5 +144,37 @@ describe('PrebunkingModal', () => {
 
     // Modal should still render correctly
     expect(screen.getByTestId('modal-content')).toBeInTheDocument();
+  });
+
+  it('uses #root element when available for setAppElement', () => {
+    const root = document.createElement('div');
+    root.id = 'root';
+    document.body.appendChild(root);
+
+    const Modal = require('react-modal');
+    render(<PrebunkingModal {...defaultProps} />);
+
+    expect(Modal.setAppElement).toHaveBeenCalledWith(root);
+
+    document.body.removeChild(root);
+  });
+
+  it('falls back to document.body for setAppElement when #root is absent', () => {
+    const Modal = require('react-modal');
+    render(<PrebunkingModal {...defaultProps} />);
+
+    expect(Modal.setAppElement).toHaveBeenCalledWith(document.body);
+  });
+
+  it('uses correct header styling when isCorrect is true', () => {
+    render(<PrebunkingModal {...defaultProps} isCorrect />);
+
+    expect(screen.getByTestId('modal-content').querySelector('[data-result="correct"]')).toBeInTheDocument();
+  });
+
+  it('uses incorrect header styling when isCorrect is false', () => {
+    render(<PrebunkingModal {...defaultProps} isCorrect={false} />);
+
+    expect(screen.getByTestId('modal-content').querySelector('[data-result="incorrect"]')).toBeInTheDocument();
   });
 });

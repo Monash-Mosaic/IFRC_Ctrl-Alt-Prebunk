@@ -11,7 +11,9 @@
   --color-ifrc-blue: #011E41;
   --color-ifrc-red: #EE2435;
   --color-dunder-green: #00FF9C;
+  --color-dunder-red: #FF1E56;
   --color-dunder-lightgrey: #E4EAF3;
+  --light-black: #000;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.13 0.028 261.692);
@@ -203,6 +205,15 @@ body {
   --sidebar-accent-foreground: oklch(0.985 0.002 247.839);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@keyframes badge-earn {
+  0%   { translate: 0 0; }
+  25%  { translate: 0 -5px; }
+  50%  { translate: 0 0; }
+  70%  { translate: 0 -3px; }
+  85%  { translate: 0 1px; }
+  100% { translate: 0 0; }
 }
 
 @layer base {

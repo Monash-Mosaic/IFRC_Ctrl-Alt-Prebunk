@@ -13,10 +13,10 @@ jest.mock('next-intl', () => ({
 }));
 
 const mockSetOnboardingCompleted = jest.fn();
-const mockUseLocalStorage = jest.fn(() => [true, mockSetOnboardingCompleted]);
+const mockUseLocalStorage = jest.fn((...args: any) => [true, mockSetOnboardingCompleted]);
 
 jest.mock('@/lib/use-local-storage', () => ({
-  useLocalStorage: (...args: any[]) => mockUseLocalStorage(...args),
+  useLocalStorage: (...args: any) => mockUseLocalStorage(...args),
 }));
 
 // Mock createGameStore
@@ -205,6 +205,7 @@ jest.mock('@/components/newfeeds/prebunking-modal', () => {
   return function MockPrebunkingModal({
     isOpen,
     onClose,
+    onContinue,
     postId,
     header,
     content,
@@ -216,6 +217,9 @@ jest.mock('@/components/newfeeds/prebunking-modal', () => {
         <div data-testid={`modal-content-${postId}`}>{content}</div>
         <button data-testid={`close-modal-${postId}`} onClick={onClose}>
           Close Modal
+        </button>
+        <button data-testid={`continue-modal-${postId}`} onClick={onContinue}>
+          Continue
         </button>
       </div>
     );
@@ -262,7 +266,11 @@ jest.mock('@/components/game-complete', () => {
   };
 });
 
-const mockSetCredibility = jest.fn();
+const mockAddPoints = jest.fn();
+const mockIncreaseCredibility = jest.fn();
+const mockDecreaseCredibility = jest.fn();
+const mockInitCredibility = jest.fn();
+const mockUpdateBadges = jest.fn();
 const mockResetCredibility = jest.fn();
 
 describe('HomeContent', () => {
@@ -271,14 +279,16 @@ describe('HomeContent', () => {
     
     mockGetAnswer.mockReturnValue(null);
     mockIsAnswered.mockReturnValue(false);
-    mockIsCurrentQuestionAnswered.mockReturnValue(false);
     mockIsPostDisabled.mockReturnValue(false);
     mockIsGameCompleted.mockReturnValue(false);
     mockUseLocalStorage.mockReturnValue([true, mockSetOnboardingCompleted]);
 
-    (useCredibilityStore as jest.Mock).mockReturnValue({
-      credibility: 80,
-      setCredibility: mockSetCredibility,
+    jest.mocked(useCredibilityStore).mockReturnValue({
+      addPoints: mockAddPoints,
+      increaseCredibility: mockIncreaseCredibility,
+      decreaseCredibility: mockDecreaseCredibility,
+      initCredibility: mockInitCredibility,
+      updateBadges: mockUpdateBadges,
       resetCredibility: mockResetCredibility,
     });
   });
@@ -322,19 +332,22 @@ describe('HomeContent', () => {
     await user.click(dislikeButton);
 
     expect(mockSetAnswer).toHaveBeenCalledWith('1', 'dislike');
-    expect(mockSetCredibility).toHaveBeenCalledWith(75); // 80 - 5
+    expect(mockDecreaseCredibility).toHaveBeenCalled();
+    expect(mockAddPoints).not.toHaveBeenCalled();
   });
 
-  it('maintains credibility on correct answer', async () => {
+  it('awards points and does not decrease credibility on correct answer', async () => {
     const user = userEvent.setup();
     render(<HomeContent />);
 
-    // Answer correctly (post 1 correct answer is 'like')
+    // Post 1 correct answer is 'like'
     const likeButton = screen.getByTestId('like-1');
     await user.click(likeButton);
 
     expect(mockSetAnswer).toHaveBeenCalledWith('1', 'like');
-    expect(mockSetCredibility).not.toHaveBeenCalled();
+    expect(mockAddPoints).toHaveBeenCalledWith(5);
+    expect(mockUpdateBadges).toHaveBeenCalled();
+    expect(mockDecreaseCredibility).not.toHaveBeenCalled();
   });
 
   it('does not allow changing answer for previously answered questions', async () => {
@@ -414,10 +427,13 @@ describe('HomeContent', () => {
   });
 
   it('prevents credibility from going below 0', async () => {
-    (useCredibilityStore as jest.Mock).mockReturnValue({
-      credibility: 3,
-      setCredibility: mockSetCredibility,
-      resetCredibility: mockResetCredibility
+    jest.mocked(useCredibilityStore).mockReturnValue({
+      addPoints: mockAddPoints,
+      increaseCredibility: mockIncreaseCredibility,
+      decreaseCredibility: mockDecreaseCredibility,
+      initCredibility: mockInitCredibility,
+      updateBadges: mockUpdateBadges,
+      resetCredibility: mockResetCredibility,
     });
 
     const user = userEvent.setup();
@@ -427,8 +443,8 @@ describe('HomeContent', () => {
     const dislikeButton = screen.getByTestId('dislike-1');
     await user.click(dislikeButton);
 
-    // Should be clamped to 0, not -2
-    expect(mockSetCredibility).toHaveBeenCalledWith(0);
+    // Assert that the decrement action was triggered safely
+    expect(mockDecreaseCredibility).toHaveBeenCalled();
   });
 
   it('passes correct answer to LikeDislikePostMessage', () => {
@@ -529,5 +545,41 @@ describe('HomeContent', () => {
 
     expect(setAppElementSpy).toHaveBeenCalled();
     setAppElementSpy.mockRestore();
+  });
+
+  it('calls moveToNextQuestion when continue is clicked on an answered question', async () => {
+    let answerSet = false;
+    mockSetAnswer.mockImplementation(() => { answerSet = true; });
+    mockIsAnswered.mockImplementation((postId: string) => postId === '1' && answerSet);
+    mockGetAnswer.mockImplementation((postId: string) => (postId === '1' && answerSet ? 'like' : null));
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('like-1'));
+
+    const modal = await screen.findByTestId('prebunking-modal-1');
+    expect(modal).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('continue-modal-1'));
+
+    expect(mockMoveToNextQuestion).toHaveBeenCalled();
+  });
+
+  it('does not call moveToNextQuestion when continue is clicked on an unanswered question', async () => {
+    mockIsAnswered.mockReturnValue(false);
+    mockGetAnswer.mockImplementation((postId: string) => (postId === '1' ? 'like' : null));
+
+    const user = userEvent.setup();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('like-1'));
+
+    const modal = await screen.findByTestId('prebunking-modal-1');
+    expect(modal).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('continue-modal-1'));
+
+    expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
   });
 });

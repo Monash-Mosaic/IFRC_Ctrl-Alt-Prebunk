@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
+import userEvent from '@testing-library/user-event';
 import ContentCarouselItems from '@/components/content-carousel-items';
 import { Carousel } from '@/components/ui/carousel';
 
@@ -105,5 +106,43 @@ describe('ContentCarouselItems', () => {
 
     expect(screen.getByTestId('carousel-answer-post-1')).toHaveTextContent('like');
     expect(screen.getByTestId('carousel-post-post-2')).toHaveAttribute('data-disabled', 'true');
+  });
+
+  it('calls onAnswer with like when like button is clicked', async () => {
+    const onAnswer = jest.fn();
+    const user = userEvent.setup();
+
+    render(
+      <Carousel>
+        <ContentCarouselItems
+          contentList={contentList}
+          getAnswer={() => null}
+          isPostDisabled={() => false}
+          onAnswer={onAnswer}
+        />
+      </Carousel>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Like post-1' }));
+    expect(onAnswer).toHaveBeenCalledWith('post-1', 'like');
+  });
+
+  it('calls onAnswer with dislike when dislike button is clicked', async () => {
+    const onAnswer = jest.fn();
+    const user = userEvent.setup();
+
+    render(
+      <Carousel>
+        <ContentCarouselItems
+          contentList={contentList}
+          getAnswer={() => null}
+          isPostDisabled={() => false}
+          onAnswer={onAnswer}
+        />
+      </Carousel>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Dislike post-2' }));
+    expect(onAnswer).toHaveBeenCalledWith('post-2', 'dislike');
   });
 });
