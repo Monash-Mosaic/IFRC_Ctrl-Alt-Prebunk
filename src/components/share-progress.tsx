@@ -65,42 +65,42 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
     }, [correctAnswers, handleDownload, totalQuestions]);
 
     return (
-        <div className="flex w-full max-w-[420px] flex-col items-center gap-4">
+        <div className="flex w-full max-w-[420px] flex-col items-center gap-3 sm:gap-4">
             <div
                 ref={ref}
-                className="w-full rounded-[1.75rem] border border-slate-200 bg-[#E4EAF3] px-4 py-6 text-center shadow-sm sm:px-6 sm:py-8"
-                style={{ minHeight: '240px' }}
+                className="w-full rounded-[1.5rem] border border-slate-200 bg-[#E4EAF3] px-3 py-5 text-center shadow-sm sm:rounded-[1.75rem] sm:px-6 sm:py-8"
+                style={{ minHeight: '220px' }}
             >
                 <div className="mx-auto flex max-w-[320px] flex-col items-center justify-center">
                     <Title width={'100%'} height={'100%'}/>
-                    <p className="mt-3 text-[15px] leading-7 text-slate-700">
+                    <p className="mt-2 text-sm leading-6 text-slate-700 sm:mt-3 sm:text-[15px] sm:leading-7">
                         You are ready to help stop disinformation in the real world. Dive deeper into the data that matters.
                     </p>
 
-                    <div className="mt-6">
-                        <p className="text-5xl font-black tracking-[0.2em] text-[#2979FF]">
+                    <div className="mt-4 sm:mt-6">
+                        <p className="text-4xl font-black tracking-[0.2em] text-[#2979FF] sm:text-5xl">
                             {correctAnswers}/{totalQuestions}
                         </p>
 
-                        <p className="mt-3 text-2xl font-black uppercase leading-tight tracking-[0.2em] text-[#2979FF] sm:text-3xl">
+                        <p className="mt-2 text-xl font-black uppercase leading-tight tracking-[0.2em] text-[#2979FF] sm:mt-3 sm:text-2xl sm:text-3xl">
                             Prebunking Champion
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div className="flex w-full max-w-[280px] flex-col gap-3 sm:flex-row">
+            <div className="flex w-full max-w-[280px] flex-col gap-2 sm:flex-row sm:gap-3">
                 <button
                     type="button"
                     onClick={handleShare}
-                    className="flex-1 rounded-full border border-[#011E41] px-6 py-3 text-base font-semibold text-[#011E41] transition hover:bg-slate-100"
+                    className="flex-1 rounded-full border border-[#011E41] px-4 py-2.5 text-base font-semibold text-[#011E41] transition hover:bg-slate-100 sm:px-6 sm:py-3"
                 >
                     Share
                 </button>
                 <button
                     type="button"
                     onClick={handleDownload}
-                    className="flex-1 rounded-full bg-[#011E41] px-6 py-3 text-base font-semibold text-white transition hover:bg-[#002552]"
+                    className="flex-1 rounded-full bg-[#011E41] px-4 py-2.5 text-base font-semibold text-white transition hover:bg-[#002552] sm:px-6 sm:py-3"
                 >
                     Download
                 </button>
