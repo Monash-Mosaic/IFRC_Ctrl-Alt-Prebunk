@@ -1,0 +1,110 @@
+'use client';
+
+import React, { useCallback, useRef } from 'react';
+import { toPng, toBlob } from 'html-to-image';
+
+import Title from '@/components/title';
+
+interface ShareProgressProps {
+    correctAnswers: number;
+    totalQuestions: number;
+}
+
+export default function ShareProgress({ correctAnswers, totalQuestions }: ShareProgressProps) {
+    const ref = useRef<HTMLDivElement>(null);
+
+    const handleDownload = useCallback(async () => {
+        if (ref.current === null) return;
+
+        await toPng(ref.current, { cacheBust: true, pixelRatio: 2 })
+            .then((dataUrl) => {
+                const link = document.createElement('a');
+                link.download = 'prebunk-results.png';
+                link.href = dataUrl;
+                link.click();
+            })
+            .catch(() => {
+                console.error('Error generating image');
+            });
+    }, []);
+
+    const handleShare = useCallback(async () => {
+        if (ref.current === null) return;
+
+        try {
+            const blob = await toBlob(ref.current, { cacheBust: true, pixelRatio: 2 });
+
+            if (!blob) {
+                console.error("Failed to generate image blob");
+                return;
+            }
+            
+            const file = new File([blob], 'prebunk-results.png', { type: 'image/png' });
+
+            if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+                const shareData = {
+                    title: 'Prebunking Champion',
+                    text: `I scored ${correctAnswers}/${totalQuestions} in the IFRC prebunking challenge.`,
+                    files: [file],
+                };
+
+                if (typeof navigator.canShare === 'function' && !navigator.canShare(shareData)) {
+                    await handleDownload();
+                    return;
+                }
+
+                await navigator.share(shareData);
+                return;
+            }
+
+            await handleDownload();
+        } catch {
+            console.error('Error sharing image');
+            await handleDownload();
+        }
+    }, [correctAnswers, handleDownload, totalQuestions]);
+
+    return (
+        <div className="flex w-full max-w-[420px] flex-col items-center gap-3 sm:gap-4">
+            <div
+                ref={ref}
+                className="w-full rounded-[1.5rem] border border-slate-200 bg-[#E4EAF3] px-3 py-5 text-center shadow-sm sm:rounded-[1.75rem] sm:px-6 sm:py-8"
+                style={{ minHeight: '220px' }}
+            >
+                <div className="mx-auto flex max-w-[320px] flex-col items-center justify-center">
+                    <Title width={'100%'} height={'100%'}/>
+                    <p className="mt-2 text-sm leading-6 text-slate-700 sm:mt-3 sm:text-[15px] sm:leading-7">
+                        You are ready to help stop disinformation in the real world. Dive deeper into the data that matters.
+                    </p>
+
+                    <div className="mt-4 sm:mt-6">
+                        <p className="text-4xl font-black tracking-[0.2em] text-[#2979FF] sm:text-5xl">
+                            {correctAnswers}/{totalQuestions}
+                        </p>
+
+                        <p className="mt-2 text-xl font-black uppercase leading-tight tracking-[0.2em] text-[#2979FF] sm:mt-3 sm:text-2xl sm:text-3xl">
+                            Prebunking Champion
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex w-full max-w-[280px] flex-col gap-2 sm:flex-row sm:gap-3">
+                <button
+                    type="button"
+                    onClick={handleShare}
+                    className="flex-1 rounded-full border border-[#011E41] px-4 py-2.5 text-base font-semibold text-[#011E41] transition hover:bg-slate-100 sm:px-6 sm:py-3"
+                >
+                    Share
+                </button>
+                <button
+                    type="button"
+                    onClick={handleDownload}
+                    className="flex-1 rounded-full bg-[#011E41] px-4 py-2.5 text-base font-semibold text-white transition hover:bg-[#002552] sm:px-6 sm:py-3"
+                >
+                    Download
+                </button>
+            </div>
+        </div>
+    );
+}
