@@ -8,10 +8,9 @@ import { STORAGE_KEYS } from '@/lib/local-storage';
 import { useLocalStorage } from '@/lib/use-local-storage';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
-import { ContentType, LikeDislikeContent } from '@/contents/en';
+import { Content, ContentType, LikeDislikeContent, MCQContent } from '@/contents/en';
 import { createGameStore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
-import ContentCarouselItems from '@/components/content-carousel-items';
 import GameComplete from '@/components/game-complete';
 
 import Modal from 'react-modal';
@@ -19,6 +18,7 @@ import type { EmblaCarouselType } from 'embla-carousel';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import VerticalCarousel from '@/components/vertical-carousel';
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
+import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
 import { cn } from '@/lib/utils';
 import Toast from '@/components/toast';
 
@@ -34,14 +34,17 @@ export default function HomeContent() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
-  const useGameStore = createGameStore({
+  // Lazily created once: createGameStore() builds a brand-new Zustand store each call,
+  // and gameCompleted/correctAnswers aren't persisted, so recreating it on every render
+  // (e.g. from the state updates below) would silently reset them.
+  const [useGameStore] = useState(() => createGameStore({
     answers: {},
     currentQuestionIndex: 0,
     questions: contentList.map(item => item.id),
     questionStore: content,
     gameCompleted: false,
     correctAnswers: 0
-  });
+  }));
 
   const {
     getAnswer,
@@ -104,25 +107,26 @@ export default function HomeContent() {
     }
   };
 
-
-  const handleOnAnswer = (postId: string, answer: 'like' | 'dislike') => {
+  const handleOnAnswer = (postId: string, answer: string) => {
     // Only allow answer if post is not already answered and is not disabled
     if (!isAnswered(postId) && !isPostDisabled(postId)) {
       setAnswer(postId, answer);
 
       // Find the content item to check correctness
-      const contentItem = contentList.find(item => item.id === postId) as LikeDislikeContent | undefined;
-      if (contentItem && contentItem.type === ContentType.LIKE_DISLIKE) {
-        const isCorrect = answer === contentItem.correctAnswer;
+      const contentItem = contentList.find(item => item.id === postId) as Content | undefined;
+      if (!contentItem) return;
 
-        if (isCorrect) {
-          increaseCredibility();
-          addPoints(5);
-          updateBadges(contentList.length);
-          incrCorrectAnswers();
-        } else {
-          decreaseCredibility();
-        }
+      const isCorrect = contentItem.type === ContentType.MCQ
+        ? answer === (contentItem as MCQContent).correctOptionId
+        : answer === (contentItem as LikeDislikeContent).correctAnswer;
+
+      if (isCorrect) {
+        increaseCredibility();
+        addPoints(5);
+        updateBadges(contentList.length);
+        incrCorrectAnswers();
+      } else {
+        decreaseCredibility();
       }
 
       // Show modal after answer is set
@@ -136,9 +140,7 @@ export default function HomeContent() {
     setOnboardingCompleted(false);
   }
 
-
   useEffect(() => {
-    // Set app element for react-modal accessibility
     if (typeof window !== 'undefined') {
       const rootElement = document.getElementById('root') || document.body;
       Modal.setAppElement(rootElement);
@@ -147,7 +149,7 @@ export default function HomeContent() {
 
   const handleNext = () => {
     if (!emblaApi) return;
-    
+
     // Check if we're at the last post
     const isLastPost = selectedIndex === contentList.length - 1;
     if (isLastPost || !canGoNext) {
@@ -155,19 +157,19 @@ export default function HomeContent() {
       setShowToast(true);
       return;
     }
-    
+
     if (!nextEnabled) {
       setToastMessage('Please engage with this post before moving to the next one');
       setShowToast(true);
       return;
     }
-    
+
     emblaApi.scrollNext();
   };
 
   const handlePrevious = () => {
     if (!emblaApi) return;
-    
+
     // Check if we're at the first post
     const isFirstPost = selectedIndex === 0;
     if (isFirstPost || !canGoPrev) {
@@ -175,7 +177,7 @@ export default function HomeContent() {
       setShowToast(true);
       return;
     }
-    
+
     emblaApi.scrollPrev();
   };
 
@@ -194,7 +196,6 @@ export default function HomeContent() {
       </div>
     );
   }
-
 
   return (
     <div
@@ -236,10 +237,9 @@ export default function HomeContent() {
             >
               {(api) => {
                 return contentList.map((contentItem, index) => {
-                  const likeDislikeContent = contentItem as LikeDislikeContent;
                   const isActive = api?.selectedScrollSnap() === index;
-                  const answer = getAnswer(likeDislikeContent.id);
-                  const isDisabled = isPostDisabled(likeDislikeContent.id);
+                  const answer = getAnswer(contentItem.id);
+                  const isDisabled = isPostDisabled(contentItem.id);
 
                   return (
                     <div
@@ -251,21 +251,34 @@ export default function HomeContent() {
                         height: '100%',
                         minHeight: '100%',
                       }}
-                      key={likeDislikeContent.id}
+                      key={contentItem.id}
                     >
                       <div className="flex h-full items-center justify-center overflow-y-auto">
-                        <LikeDislikePostMessage
-                          postId={likeDislikeContent.id}
-                          user={likeDislikeContent.post.user}
-                          content={likeDislikeContent.post.content}
-                          mediaUrl={likeDislikeContent.post.mediaUrl}
-                          mediaType={likeDislikeContent.post.mediaType}
-                          answer={answer}
-                          correctAnswer={likeDislikeContent.correctAnswer}
-                          onLike={(postId) => handleOnAnswer(postId, 'like')}
-                          onDislike={(postId) => handleOnAnswer(postId, 'dislike')}
-                          isDisabled={isDisabled}
-                        />
+                        {contentItem.type === ContentType.MCQ ? (
+                          <MCQPostMessage
+                            postId={contentItem.id}
+                            user={(contentItem as MCQContent).post.user}
+                            content={(contentItem as MCQContent).post.content}
+                            options={(contentItem as MCQContent).options}
+                            correctOptionId={(contentItem as MCQContent).correctOptionId}
+                            answer={answer}
+                            isDisabled={isDisabled}
+                            onAnswer={handleOnAnswer}
+                          />
+                        ) : (
+                          <LikeDislikePostMessage
+                            postId={contentItem.id}
+                            user={(contentItem as LikeDislikeContent).post.user}
+                            content={(contentItem as LikeDislikeContent).post.content}
+                            mediaUrl={(contentItem as LikeDislikeContent).post.mediaUrl}
+                            mediaType={(contentItem as LikeDislikeContent).post.mediaType}
+                            answer={answer as 'like' | 'dislike' | null | undefined}
+                            correctAnswer={(contentItem as LikeDislikeContent).correctAnswer}
+                            onLike={(postId) => handleOnAnswer(postId, 'like')}
+                            onDislike={(postId) => handleOnAnswer(postId, 'dislike')}
+                            isDisabled={isDisabled}
+                          />
+                        )}
                       </div>
                     </div>
                   );
@@ -315,13 +328,15 @@ export default function HomeContent() {
 
       {/* Modal - shown when a post is answered */}
       {modalPostId && (() => {
-        const contentItem = contentList.find(item => item.id === modalPostId) as LikeDislikeContent | undefined;
+        const contentItem = contentList.find(item => item.id === modalPostId) as Content | undefined;
         if (!contentItem) return null;
 
         const modalAnswer = getAnswer(modalPostId);
         if (!modalAnswer) return null;
 
-        const isCorrect = modalAnswer === contentItem.correctAnswer;
+        const isCorrect = contentItem.type === ContentType.MCQ
+          ? modalAnswer === (contentItem as MCQContent).correctOptionId
+          : modalAnswer === (contentItem as LikeDislikeContent).correctAnswer;
         const reasonContent = isCorrect
           ? contentItem.whyCorrectAnswer.content
           : contentItem.whyIncorrectAnswer.content;

@@ -118,6 +118,31 @@ jest.mock('@/contents', () => ({
       },
       contentList: [
         {
+          id: 'mcq-1',
+          type: 'mcq',
+          post: {
+            id: 'mcq-1',
+            user: {
+              id: 'echo',
+              name: 'Echo',
+              handle: '@echo',
+              avatar: null,
+              isUser: false,
+            },
+            content: <div>MCQ question</div>,
+          },
+          options: [{ id: 'opt-a', label: 'Option A' }, { id: 'opt-b', label: 'Option B' }],
+          correctOptionId: 'opt-a',
+          whyCorrectAnswer: {
+            title: <div>MCQ Correct Title</div>,
+            content: <div>MCQ Correct Content</div>,
+          },
+          whyIncorrectAnswer: {
+            title: <div>MCQ Incorrect Title</div>,
+            content: <div>MCQ Incorrect Content</div>,
+          },
+        },
+        {
           id: '1',
           type: 'like_dislike',
           post: {
@@ -175,6 +200,27 @@ jest.mock('@/contents', () => ({
 }));
 
 
+
+// Mock MCQPostMessage
+jest.mock('@/components/newfeeds/mcq-post-message', () => {
+  return function MockMCQPostMessage({
+    postId,
+    answer,
+    onAnswer,
+  }: any) {
+    return (
+      <div data-testid={`mcq-post-${postId}`}>
+        <div data-testid={`mcq-answer-${postId}`}>{answer || 'null'}</div>
+        <button data-testid={`mcq-option-${postId}`} onClick={() => onAnswer?.(postId, 'opt-a')}>
+          Answer Option A
+        </button>
+        <button data-testid={`mcq-option-incorrect-${postId}`} onClick={() => onAnswer?.(postId, 'opt-b')}>
+          Answer Option B
+        </button>
+      </div>
+    );
+  };
+});
 
 // Mock LikeDislikePostMessage
 jest.mock('@/components/newfeeds/like-dislike-post-message', () => {
@@ -449,9 +495,138 @@ describe('HomeContent', () => {
 
   it('passes correct answer to LikeDislikePostMessage', () => {
     render(<HomeContent />);
-    
+
     expect(screen.getByTestId('correct-1')).toHaveTextContent('like');
     expect(screen.getByTestId('correct-2')).toHaveTextContent('dislike');
+  });
+
+  describe('MCQ content', () => {
+    it('renders MCQ post', () => {
+      render(<HomeContent />);
+      expect(screen.getByTestId('mcq-post-mcq-1')).toBeInTheDocument();
+    });
+
+    it('awards points and does not decrease credibility on correct MCQ answer', async () => {
+      const user = userEvent.setup();
+      render(<HomeContent />);
+
+      // opt-a is correct (correctOptionId is opt-a)
+      await user.click(screen.getByTestId('mcq-option-mcq-1'));
+
+      expect(mockSetAnswer).toHaveBeenCalledWith('mcq-1', 'opt-a');
+      expect(mockAddPoints).toHaveBeenCalledWith(5);
+      expect(mockUpdateBadges).toHaveBeenCalled();
+      expect(mockIncreaseCredibility).toHaveBeenCalled();
+      expect(mockDecreaseCredibility).not.toHaveBeenCalled();
+    });
+
+    it('decreases credibility on incorrect MCQ answer', async () => {
+      const user = userEvent.setup();
+      render(<HomeContent />);
+
+      // opt-b is incorrect (correctOptionId is opt-a)
+      await user.click(screen.getByTestId('mcq-option-incorrect-mcq-1'));
+
+      expect(mockSetAnswer).toHaveBeenCalledWith('mcq-1', 'opt-b');
+      expect(mockDecreaseCredibility).toHaveBeenCalled();
+      expect(mockAddPoints).not.toHaveBeenCalled();
+    });
+
+    it('does not allow changing answer for a previously answered MCQ question', async () => {
+      mockIsAnswered.mockReturnValue(true);
+      const user = userEvent.setup();
+      render(<HomeContent />);
+
+      await user.click(screen.getByTestId('mcq-option-mcq-1'));
+
+      expect(mockSetAnswer).not.toHaveBeenCalled();
+    });
+
+    it('does not answer MCQ when the post is disabled', async () => {
+      mockIsPostDisabled.mockReturnValue(true);
+      const user = userEvent.setup();
+      render(<HomeContent />);
+
+      await user.click(screen.getByTestId('mcq-option-mcq-1'));
+
+      expect(mockSetAnswer).not.toHaveBeenCalled();
+    });
+
+    it('opens modal for MCQ answers', async () => {
+      mockGetAnswer.mockImplementation((postId: string) => postId === 'mcq-1' ? 'opt-a' : null);
+      const user = userEvent.setup();
+      render(<HomeContent />);
+
+      await user.click(screen.getByTestId('mcq-option-mcq-1'));
+
+      expect(await screen.findByTestId('prebunking-modal-mcq-1')).toBeInTheDocument();
+    });
+
+    it('shows correct answer feedback in the modal for MCQ', async () => {
+      mockSetAnswer.mockImplementation((postId: string, answer: string) => {
+        mockGetAnswer.mockImplementation((id: string) => (id === postId ? answer : null));
+      });
+
+      const user = userEvent.setup();
+      render(<HomeContent />);
+
+      await user.click(screen.getByTestId('mcq-option-mcq-1'));
+
+      const modal = await screen.findByTestId('prebunking-modal-mcq-1');
+      expect(modal).toBeInTheDocument();
+      expect(screen.getByTestId('modal-header-mcq-1')).toHaveTextContent('MCQ Correct Title');
+      expect(screen.getByTestId('modal-content-mcq-1')).toHaveTextContent('MCQ Correct Content');
+    });
+
+    it('shows incorrect answer feedback in the modal for MCQ', async () => {
+      mockSetAnswer.mockImplementation((postId: string, answer: string) => {
+        mockGetAnswer.mockImplementation((id: string) => (id === postId ? answer : null));
+      });
+
+      const user = userEvent.setup();
+      render(<HomeContent />);
+
+      await user.click(screen.getByTestId('mcq-option-incorrect-mcq-1'));
+
+      const modal = await screen.findByTestId('prebunking-modal-mcq-1');
+      expect(modal).toBeInTheDocument();
+      expect(screen.getByTestId('modal-header-mcq-1')).toHaveTextContent('MCQ Incorrect Title');
+      expect(screen.getByTestId('modal-content-mcq-1')).toHaveTextContent('MCQ Incorrect Content');
+    });
+
+    it('moves to next question when MCQ modal is closed and post is answered', async () => {
+      let answerSet = false;
+      mockSetAnswer.mockImplementation(() => { answerSet = true; });
+      mockIsAnswered.mockImplementation((postId: string) => postId === 'mcq-1' && answerSet);
+      mockGetAnswer.mockImplementation((postId: string) => postId === 'mcq-1' && answerSet ? 'opt-a' : null);
+
+      const user = userEvent.setup();
+      render(<HomeContent />);
+
+      await user.click(screen.getByTestId('mcq-option-mcq-1'));
+      await user.click(await screen.findByTestId('close-modal-mcq-1'));
+
+      expect(mockMoveToNextQuestion).toHaveBeenCalled();
+    });
+
+    it('calls moveToNextQuestion when continue is clicked on an answered MCQ question', async () => {
+      let answerSet = false;
+      mockSetAnswer.mockImplementation(() => { answerSet = true; });
+      mockIsAnswered.mockImplementation((postId: string) => postId === 'mcq-1' && answerSet);
+      mockGetAnswer.mockImplementation((postId: string) => (postId === 'mcq-1' && answerSet ? 'opt-a' : null));
+
+      const user = userEvent.setup();
+      render(<HomeContent />);
+
+      await user.click(screen.getByTestId('mcq-option-mcq-1'));
+
+      const modal = await screen.findByTestId('prebunking-modal-mcq-1');
+      expect(modal).toBeInTheDocument();
+
+      await user.click(screen.getByTestId('continue-modal-mcq-1'));
+
+      expect(mockMoveToNextQuestion).toHaveBeenCalled();
+    });
   });
 
   it('marks onboarding complete when skip is clicked', async () => {
