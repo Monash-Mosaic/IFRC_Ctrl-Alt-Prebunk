@@ -34,14 +34,17 @@ export default function HomeContent() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
-  const useGameStore = createGameStore({
+  // Lazily created once: createGameStore() builds a brand-new Zustand store each call,
+  // and gameCompleted/correctAnswers aren't persisted, so recreating it on every render
+  // (e.g. from the state updates below) would silently reset them.
+  const [useGameStore] = useState(() => createGameStore({
     answers: {},
     currentQuestionIndex: 0,
     questions: contentList.map(item => item.id),
     questionStore: content,
     gameCompleted: false,
     correctAnswers: 0
-  });
+  }));
 
   const {
     getAnswer,
