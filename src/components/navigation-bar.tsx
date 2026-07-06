@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link, routing, usePathname } from '@/i18n/routing';
-import { Home, MessageSquare, PieChart, Upload, User } from 'lucide-react';
+import { Home, MessageSquare } from 'lucide-react';
 
 interface NavItem {
   href: keyof typeof routing.pathnames;
@@ -27,24 +27,6 @@ export default function Navigation() {
       labelKey: 'chat',
       icon: <MessageSquare size={24} strokeWidth={2} />,
       activeIcon: <MessageSquare size={24} fill="currentColor" strokeWidth={1} />,
-    },
-    {
-      href: '/analytics',
-      labelKey: 'analytics',
-      icon: <PieChart size={24} strokeWidth={2} />,
-      activeIcon: <PieChart size={24} fill="currentColor" strokeWidth={1} />,
-    },
-    {
-      href: '/share',
-      labelKey: 'share',
-      icon: <Upload size={24} strokeWidth={2} />,
-      activeIcon: <Upload size={24} fill="currentColor" strokeWidth={1} />,
-    },
-    {
-      href: '/profile',
-      labelKey: 'profile',
-      icon: <User size={24} strokeWidth={2} />,
-      activeIcon: <User size={24} fill="currentColor" strokeWidth={1} />,
     },
   ];
 
