@@ -1,9 +1,9 @@
 import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import PostMessage from './post-message';
+import PostMessage from '@/app/[locale]/chat/onboarding/_components/post-message';
 
 // Mock EchoAvatar
-jest.mock('../_icons/echo-avatar', () => {
+jest.mock('@/app/[locale]/chat/onboarding/_icons/echo-avatar', () => {
   return function MockEchoAvatar() {
     return <div data-testid="echo-avatar">Echo Avatar</div>;
   };

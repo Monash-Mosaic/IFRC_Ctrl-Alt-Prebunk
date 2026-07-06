@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
-import ContentCarouselItems from './content-carousel-items';
-import { ContentType } from '@/contents/en';
+import ContentCarouselItems from '@/components/content-carousel-items';
+import { Content, ContentType } from '@/contents/en';
 
 jest.mock('@/components/ui/carousel', () => ({
   CarouselContent: ({ children }: any) => <div data-testid="carousel-content">{children}</div>,
@@ -41,16 +41,16 @@ const mockUser = {
   isUser: false,
 };
 
-const likeDislikeItem = {
+const likeDislikeItem: Content = {
   id: 'ld-1',
   type: ContentType.LIKE_DISLIKE,
   post: { id: 'ld-1', user: mockUser, content: <div>Post content</div> },
-  correctAnswer: 'like' as const,
+  correctAnswer: 'like',
   whyCorrectAnswer: { title: <div>T</div>, content: <div>C</div> },
   whyIncorrectAnswer: { title: <div>T</div>, content: <div>C</div> },
 };
 
-const mcqItem = {
+const mcqItem: Content = {
   id: 'mcq-1',
   type: ContentType.MCQ,
   post: { id: 'mcq-1', user: mockUser, content: <div>MCQ content</div> },
@@ -61,7 +61,7 @@ const mcqItem = {
 };
 
 const defaultProps = {
-  getAnswer: jest.fn(() => null),
+  getAnswer: jest.fn((_id: string): string | null => null),
   isPostDisabled: jest.fn(() => false),
   onAnswer: jest.fn(),
 };

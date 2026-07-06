@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import MCQPostMessage from './mcq-post-message';
+import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
 
 jest.mock('lucide-react', () => ({
   ThumbsUp: () => <svg />,

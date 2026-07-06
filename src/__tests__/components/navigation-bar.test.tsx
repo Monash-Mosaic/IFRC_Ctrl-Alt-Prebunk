@@ -24,13 +24,11 @@ describe('Navigation', () => {
 
     it('renders all navigation items', () => {
       render(<Navigation />);
-      // Translation mock returns keys, so we check for lowercase
-      // Use getAllByText since items appear in both desktop and mobile
       expect(screen.getAllByText(/home/i).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/chat/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/analytics/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/share/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/profile/i).length).toBeGreaterThan(0);
+      expect(screen.queryAllByText(/analytics/i).length).toBe(0);
+      expect(screen.queryAllByText(/share/i).length).toBe(0);
+      expect(screen.queryAllByText(/profile/i).length).toBe(0);
     });
 
     it('highlights active navigation item', () => {
@@ -85,14 +83,9 @@ describe('Navigation', () => {
       const chatLinks = screen.getAllByRole('link', { name: /chat/i });
       expect(chatLinks[0]).toHaveAttribute('href', '/chat');
 
-      const analyticsLinks = screen.getAllByRole('link', { name: /analytics/i });
-      expect(analyticsLinks[0]).toHaveAttribute('href', '/analytics');
-
-      const shareLinks = screen.getAllByRole('link', { name: /share/i });
-      expect(shareLinks[0]).toHaveAttribute('href', '/share');
-
-      const profileLinks = screen.getAllByRole('link', { name: /profile/i });
-      expect(profileLinks[0]).toHaveAttribute('href', '/profile');
+      expect(screen.queryAllByRole('link', { name: /analytics/i }).length).toBe(0);
+      expect(screen.queryAllByRole('link', { name: /share/i }).length).toBe(0);
+      expect(screen.queryAllByRole('link', { name: /profile/i }).length).toBe(0);
     });
 
     it('renders icons for each navigation item', () => {
@@ -119,9 +112,9 @@ describe('Navigation', () => {
       render(<Navigation />);
       expect(screen.getAllByText(/home/i).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/chat/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/analytics/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/share/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/profile/i).length).toBeGreaterThan(0);
+      expect(screen.queryAllByText(/analytics/i).length).toBe(0);
+      expect(screen.queryAllByText(/share/i).length).toBe(0);
+      expect(screen.queryAllByText(/profile/i).length).toBe(0);
     });
 
     it('has correct mobile navigation positioning', () => {
@@ -132,11 +125,11 @@ describe('Navigation', () => {
     });
 
     it('highlights active item in mobile view', () => {
-      mockUsePathname.mockReturnValue('/analytics');
+      mockUsePathname.mockReturnValue('/chat');
       render(<Navigation />);
 
-      const analyticsLinks = screen.getAllByText(/analytics/i);
-      const activeLink = analyticsLinks.find((link) =>
+      const chatLinks = screen.getAllByText(/chat/i);
+      const activeLink = chatLinks.find((link) =>
         link.closest('a')?.classList.contains('text-(--color-ifrc-red)')
       );
       expect(activeLink).toBeDefined();

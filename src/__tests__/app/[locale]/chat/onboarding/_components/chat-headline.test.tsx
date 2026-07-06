@@ -1,5 +1,5 @@
 import { render } from '@/test-utils/test-utils';
-import ChatHeadline from './chat-headline';
+import ChatHeadline from '@/app/[locale]/chat/onboarding/_components/chat-headline';
 
 describe('ChatHeadline', () => {
   it('matches snapshot with default props', () => {

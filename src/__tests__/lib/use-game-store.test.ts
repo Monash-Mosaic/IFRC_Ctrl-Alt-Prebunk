@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
-import { createGameStore } from './use-game-store';
-import { storage, STORAGE_KEYS } from './local-storage';
+import { createGameStore } from '@/lib/use-game-store';
+import { storage, STORAGE_KEYS } from '@/lib/local-storage';
 
 // Mock localStorage
 const localStorageMock = (() => {

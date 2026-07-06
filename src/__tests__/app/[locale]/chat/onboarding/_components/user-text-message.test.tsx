@@ -1,5 +1,5 @@
 import { render, screen } from '@/test-utils/test-utils';
-import UserTextMessage from './user-text-message';
+import UserTextMessage from '@/app/[locale]/chat/onboarding/_components/user-text-message';
 
 describe('UserTextMessage', () => {
   it('matches snapshot with default message', () => {

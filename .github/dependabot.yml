@@ -1,0 +1,73 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+
+    open-pull-requests-limit: 10
+
+    commit-message:
+      prefix: "deps"
+
+    labels:
+      - dependencies
+      - security
+
+    versioning-strategy: increase
+
+    allow:
+      - dependency-type: "all"
+
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "/scripts/build-search-index"
+    schedule:
+      interval: "daily"
+
+    open-pull-requests-limit: 10
+
+    commit-message:
+      prefix: "deps"
+
+    labels:
+      - dependencies
+      - security
+
+    versioning-strategy: increase
+
+    allow:
+      - dependency-type: "all"
+
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "/scripts/wdr25"
+    schedule:
+      interval: "daily"
+
+    open-pull-requests-limit: 10
+
+    commit-message:
+      prefix: "deps"
+
+    labels:
+      - dependencies
+      - security
+
+    versioning-strategy: increase
+
+    allow:
+      - dependency-type: "all"
+
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"

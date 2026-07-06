@@ -42,16 +42,17 @@ jobs:
         run: npm run lint
 
       - name: Test with coverage
+        if: ${{ !cancelled() }}
         uses: ArtiomTr/jest-coverage-report-action@v2
         id: coverage
         with:
           test-script: npm run test:coverage
           skip-step: install
           annotations: none
-          output: comment, report-markdown
+          output: report-markdown
 
       - name: Post coverage comment
-        if: github.event_name == 'pull_request'
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.coverage.outputs.report != '' }}
         uses: marocchino/sticky-pull-request-comment@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
