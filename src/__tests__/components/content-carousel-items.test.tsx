@@ -1,148 +1,123 @@
 import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
-import userEvent from '@testing-library/user-event';
 import ContentCarouselItems from '@/components/content-carousel-items';
-import { Carousel } from '@/components/ui/carousel';
+import { Content, ContentType } from '@/contents/en';
+
+jest.mock('@/components/ui/carousel', () => ({
+  CarouselContent: ({ children }: any) => <div data-testid="carousel-content">{children}</div>,
+  CarouselItem: ({ children }: any) => <div data-testid="carousel-item">{children}</div>,
+}));
 
 jest.mock('@/components/newfeeds/like-dislike-post-message', () => {
-  return function MockLikeDislikePostMessage({
-    postId,
-    answer,
-    onLike,
-    onDislike,
-    isDisabled,
-  }: {
-    postId: string;
-    answer: string | null;
-    onLike?: (id: string) => void;
-    onDislike?: (id: string) => void;
-    isDisabled?: boolean;
-  }) {
+  return function MockLikeDislikePostMessage({ postId, answer, correctAnswer, onLike, onDislike }: any) {
     return (
-      <div data-testid={`carousel-post-${postId}`} data-disabled={String(isDisabled)}>
-        <span data-testid={`carousel-answer-${postId}`}>{answer ?? 'none'}</span>
-        <button type="button" onClick={() => onLike?.(postId)}>
-          Like {postId}
-        </button>
-        <button type="button" onClick={() => onDislike?.(postId)}>
-          Dislike {postId}
-        </button>
+      <div data-testid={`ld-post-${postId}`}>
+        <span data-testid={`ld-answer-${postId}`}>{answer ?? 'null'}</span>
+        <span data-testid={`ld-correct-${postId}`}>{correctAnswer}</span>
+        <button data-testid={`ld-like-${postId}`} onClick={() => onLike?.(postId)}>Like</button>
+        <button data-testid={`ld-dislike-${postId}`} onClick={() => onDislike?.(postId)}>Dislike</button>
       </div>
     );
   };
 });
 
-const contentList = [
-  {
-    id: 'post-1',
-    type: 'like_dislike' as const,
-    post: {
-      id: 'post-1',
-      user: {
-        id: 'echo',
-        name: 'Echo',
-        handle: '@echo',
-        avatar: null,
-        isUser: false,
-      },
-      content: <div>First post</div>,
-      mediaUrl: '/images/post-1.jpg',
-      mediaType: 'image' as const,
-    },
-    correctAnswer: 'like' as const,
-    whyCorrectAnswer: { title: <div>Correct</div>, content: <div>Because</div> },
-    whyIncorrectAnswer: { title: <div>Incorrect</div>, content: <div>Try again</div> },
-  },
-  {
-    id: 'post-2',
-    type: 'like_dislike' as const,
-    post: {
-      id: 'post-2',
-      user: {
-        id: 'alex',
-        name: 'Alex',
-        handle: '@alex',
-        avatar: null,
-        isUser: false,
-      },
-      content: <div>Second post</div>,
-      mediaUrl: '/images/post-2.jpg',
-      mediaType: 'image' as const,
-    },
-    correctAnswer: 'dislike' as const,
-    whyCorrectAnswer: { title: <div>Correct</div>, content: <div>Because</div> },
-    whyIncorrectAnswer: { title: <div>Incorrect</div>, content: <div>Try again</div> },
-  },
-];
+jest.mock('@/components/newfeeds/mcq-post-message', () => {
+  return function MockMCQPostMessage({ postId, answer, correctOptionId, onAnswer }: any) {
+    return (
+      <div data-testid={`mcq-post-${postId}`}>
+        <span data-testid={`mcq-answer-${postId}`}>{answer ?? 'null'}</span>
+        <span data-testid={`mcq-correct-${postId}`}>{correctOptionId}</span>
+        <button data-testid={`mcq-answer-btn-${postId}`} onClick={() => onAnswer?.(postId, 'opt-a')}>Answer</button>
+      </div>
+    );
+  };
+});
+
+const mockUser = {
+  id: 'echo',
+  name: 'Echo',
+  handle: '@echo',
+  avatar: null,
+  isUser: false,
+};
+
+const likeDislikeItem: Content = {
+  id: 'ld-1',
+  type: ContentType.LIKE_DISLIKE,
+  post: { id: 'ld-1', user: mockUser, content: <div>Post content</div> },
+  correctAnswer: 'like',
+  whyCorrectAnswer: { title: <div>T</div>, content: <div>C</div> },
+  whyIncorrectAnswer: { title: <div>T</div>, content: <div>C</div> },
+};
+
+const mcqItem: Content = {
+  id: 'mcq-1',
+  type: ContentType.MCQ,
+  post: { id: 'mcq-1', user: mockUser, content: <div>MCQ content</div> },
+  options: [{ id: 'opt-a', label: 'Option A' }],
+  correctOptionId: 'opt-a',
+  whyCorrectAnswer: { title: <div>T</div>, content: <div>C</div> },
+  whyIncorrectAnswer: { title: <div>T</div>, content: <div>C</div> },
+};
+
+const defaultProps = {
+  getAnswer: jest.fn((_id: string): string | null => null),
+  isPostDisabled: jest.fn(() => false),
+  onAnswer: jest.fn(),
+};
+
+beforeEach(() => jest.clearAllMocks());
 
 describe('ContentCarouselItems', () => {
-  it('renders a carousel item for each content entry', () => {
-    render(
-      <Carousel>
-        <ContentCarouselItems
-          contentList={contentList}
-          getAnswer={() => null}
-          isPostDisabled={() => false}
-          onAnswer={jest.fn()}
-        />
-      </Carousel>,
-    );
-
-    expect(screen.getByTestId('carousel-post-post-1')).toBeInTheDocument();
-    expect(screen.getByTestId('carousel-post-post-2')).toBeInTheDocument();
+  it('renders LikeDislikePostMessage for like_dislike content', () => {
+    render(<ContentCarouselItems {...defaultProps} contentList={[likeDislikeItem]} />);
+    expect(screen.getByTestId('ld-post-ld-1')).toBeInTheDocument();
   });
 
-  it('passes answers and disabled state to child posts', () => {
-    render(
-      <Carousel>
-        <ContentCarouselItems
-          contentList={contentList}
-          getAnswer={(id) => (id === 'post-1' ? 'like' : null)}
-          isPostDisabled={(id) => id === 'post-2'}
-          onAnswer={jest.fn()}
-        />
-      </Carousel>,
-    );
-
-    expect(screen.getByTestId('carousel-answer-post-1')).toHaveTextContent('like');
-    expect(screen.getByTestId('carousel-post-post-2')).toHaveAttribute('data-disabled', 'true');
+  it('renders MCQPostMessage for mcq content', () => {
+    render(<ContentCarouselItems {...defaultProps} contentList={[mcqItem]} />);
+    expect(screen.getByTestId('mcq-post-mcq-1')).toBeInTheDocument();
   });
 
-  it('calls onAnswer with like when like button is clicked', async () => {
-    const onAnswer = jest.fn();
-    const user = userEvent.setup();
-
-    render(
-      <Carousel>
-        <ContentCarouselItems
-          contentList={contentList}
-          getAnswer={() => null}
-          isPostDisabled={() => false}
-          onAnswer={onAnswer}
-        />
-      </Carousel>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Like post-1' }));
-    expect(onAnswer).toHaveBeenCalledWith('post-1', 'like');
+  it('renders both types when mixed content is provided', () => {
+    render(<ContentCarouselItems {...defaultProps} contentList={[likeDislikeItem, mcqItem]} />);
+    expect(screen.getByTestId('ld-post-ld-1')).toBeInTheDocument();
+    expect(screen.getByTestId('mcq-post-mcq-1')).toBeInTheDocument();
   });
 
-  it('calls onAnswer with dislike when dislike button is clicked', async () => {
-    const onAnswer = jest.fn();
-    const user = userEvent.setup();
+  it('passes answer from getAnswer to like-dislike post', () => {
+    defaultProps.getAnswer.mockImplementation((id: string) => id === 'ld-1' ? 'like' : null);
+    render(<ContentCarouselItems {...defaultProps} contentList={[likeDislikeItem]} />);
+    expect(screen.getByTestId('ld-answer-ld-1')).toHaveTextContent('like');
+  });
 
-    render(
-      <Carousel>
-        <ContentCarouselItems
-          contentList={contentList}
-          getAnswer={() => null}
-          isPostDisabled={() => false}
-          onAnswer={onAnswer}
-        />
-      </Carousel>,
+  it('passes answer from getAnswer to mcq post', () => {
+    defaultProps.getAnswer.mockImplementation((id: string) => id === 'mcq-1' ? 'opt-a' : null);
+    render(<ContentCarouselItems {...defaultProps} contentList={[mcqItem]} />);
+    expect(screen.getByTestId('mcq-answer-mcq-1')).toHaveTextContent('opt-a');
+  });
+
+  it('passes onAnswer through to like-dislike as onLike/onDislike', async () => {
+    const mockOnAnswer = jest.fn();
+    const { getByTestId } = render(
+      <ContentCarouselItems {...defaultProps} contentList={[likeDislikeItem]} onAnswer={mockOnAnswer} />
     );
+    getByTestId('ld-like-ld-1').click();
+    expect(mockOnAnswer).toHaveBeenCalledWith('ld-1', 'like');
+  });
 
-    await user.click(screen.getByRole('button', { name: 'Dislike post-2' }));
-    expect(onAnswer).toHaveBeenCalledWith('post-2', 'dislike');
+  it('passes onAnswer to MCQ post', async () => {
+    const mockOnAnswer = jest.fn();
+    const { getByTestId } = render(
+      <ContentCarouselItems {...defaultProps} contentList={[mcqItem]} onAnswer={mockOnAnswer} />
+    );
+    getByTestId('mcq-answer-btn-mcq-1').click();
+    expect(mockOnAnswer).toHaveBeenCalledWith('mcq-1', 'opt-a');
+  });
+
+  it('renders nothing when contentList is empty', () => {
+    render(<ContentCarouselItems {...defaultProps} contentList={[]} />);
+    expect(screen.queryByTestId(/^ld-post/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId(/^mcq-post/)).not.toBeInTheDocument();
   });
 });

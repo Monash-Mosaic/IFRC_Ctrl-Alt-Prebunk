@@ -11,7 +11,7 @@ interface ChatListItemProps {
   hasNewMessage?: boolean;
 }
 
-function ChatListItem({ name, avatar, newMessageText, hasNewMessage = false }: ChatListItemProps) {  
+function ChatListItem({ name, avatar, newMessageText, hasNewMessage = false }: ChatListItemProps) {
   return (
     <div className="flex items-center justify-between w-full rounded-3xl border-1 border-dashed border-[#011E41] bg-[#E4EAF3] px-6 py-4 min-h-[60px]">
       <div className="flex items-center gap-3">
