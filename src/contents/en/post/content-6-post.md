@@ -1,0 +1,1 @@
+Some scientists say climate change is real, others say it’s fake. The truth is somewhere in the middle.

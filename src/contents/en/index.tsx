@@ -8,12 +8,27 @@ import Mcq1WhyCorrectContent from "./post/mcq-1-why-correct-content.md";
 import Mcq1WhyIncorrectTitle from "./post/mcq-1-why-incorrect-title.md";
 import Mcq1WhyIncorrectContent from "./post/mcq-1-why-incorrect-content.md";
 
+import Mcq2Question from "./post/mcq-2-question.md";
+import Mcq2WhyCorrectTitle from "./post/mcq-2-why-correct-title.md";
+import Mcq2WhyCorrectContent from "./post/mcq-2-why-correct-content.md";
+import Mcq2WhyIncorrectTitle from "./post/mcq-2-why-incorrect-title.md";
+import Mcq2WhyIncorrectContent from "./post/mcq-2-why-incorrect-content.md";
+
+import Mcq3Question from "./post/mcq-3-question.md";
+import Mcq3WhyCorrectTitle from "./post/mcq-3-why-correct-title.md";
+import Mcq3WhyCorrectContent from "./post/mcq-3-why-correct-content.md";
+import Mcq3WhyIncorrectTitle from "./post/mcq-3-why-incorrect-title.md";
+import Mcq3WhyIncorrectContent from "./post/mcq-3-why-incorrect-content.md";
+
 // Post content imports
 import Content1Post from "./post/content-1-post.md";
 import Content2Post from "./post/content-2-post.md";
 import Content3Post from "./post/content-3-post.md";
 import Content4Post from "./post/content-4-post.md";
 import Content5Post from "./post/content-5-post.md";
+import Content6Post from "./post/content-6-post.md";
+import Content7Post from "./post/content-7-post.md";
+import Content8Post from "./post/content-8-post.md";
 
 // Explanation imports for content 1
 import Content1WhyCorrectTitle from "./post/content-1-why-correct-title.md";
@@ -44,6 +59,24 @@ import Content5WhyCorrectTitle from "./post/content-5-why-correct-title.md";
 import Content5WhyCorrectContent from "./post/content-5-why-correct-content.md";
 import Content5WhyIncorrectTitle from "./post/content-5-why-incorrect-title.md";
 import Content5WhyIncorrectContent from "./post/content-5-why-incorrect-content.md";
+
+// Explanation imports for content 6
+import Content6WhyCorrectTitle from "./post/content-6-why-correct-title.md";
+import Content6WhyCorrectContent from "./post/content-6-why-correct-content.md";
+import Content6WhyIncorrectTitle from "./post/content-6-why-incorrect-title.md";
+import Content6WhyIncorrectContent from "./post/content-6-why-incorrect-content.md";
+
+// Explanation imports for content 7
+import Content7WhyCorrectTitle from "./post/content-7-why-correct-title.md";
+import Content7WhyCorrectContent from "./post/content-7-why-correct-content.md";
+import Content7WhyIncorrectTitle from "./post/content-7-why-incorrect-title.md";
+import Content7WhyIncorrectContent from "./post/content-7-why-incorrect-content.md";
+
+// Explanation imports for content 8
+import Content8WhyCorrectTitle from "./post/content-8-why-correct-title.md";
+import Content8WhyCorrectContent from "./post/content-8-why-correct-content.md";
+import Content8WhyIncorrectTitle from "./post/content-8-why-incorrect-title.md";
+import Content8WhyIncorrectContent from "./post/content-8-why-incorrect-content.md";
 
 export type User = {
   id: string;
@@ -151,11 +184,11 @@ export const users: Record<UserId, User> = {
 
 
 export const content: Record<ContentId, Content> = {
-  '1': {
-    id: '1',
+  'like-dislike-1': {
+    id: 'like-dislike-1',
     type: ContentType.LIKE_DISLIKE,
     post: {
-      id: '1',
+      id: 'like-dislike-1',
       user: users['echo'],
       content: <Content1Post />,
       mediaUrl: '/images/posts/post-1.jpg',
@@ -171,11 +204,11 @@ export const content: Record<ContentId, Content> = {
       content: <Content1WhyIncorrectContent />,
     },
   },
-  '2': {
-    id: '2',
+  'like-dislike-2': {
+    id: 'like-dislike-2',
     type: ContentType.LIKE_DISLIKE,
     post: {
-      id: '2',
+      id: 'like-dislike-2',
       user: users['echo'],
       content: <Content2Post />,
       mediaUrl: '/images/posts/post-2.jpg',
@@ -191,11 +224,11 @@ export const content: Record<ContentId, Content> = {
       content: <Content2WhyIncorrectContent />,
     },
   },
-  '3': {
-    id: '3',
+  'like-dislike-3': {
+    id: 'like-dislike-3',
     type: ContentType.LIKE_DISLIKE,
     post: {
-      id: '3',
+      id: 'like-dislike-3',
       user: users['echo'],
       content: <Content3Post />,
       mediaUrl: '/images/posts/post-3.jpg',
@@ -211,11 +244,11 @@ export const content: Record<ContentId, Content> = {
       content: <Content3WhyIncorrectContent />,
     },
   },
-  '4': {
-    id: '4',
+  'like-dislike-4': {
+    id: 'like-dislike-4',
     type: ContentType.LIKE_DISLIKE,
     post: {
-      id: '4',
+      id: 'like-dislike-4',
       user: users['echo'],
       content: <Content4Post />,
       mediaUrl: '/images/posts/post-4.jpg',
@@ -231,11 +264,11 @@ export const content: Record<ContentId, Content> = {
       content: <Content4WhyIncorrectContent />,
     },
   },
-  '5': {
-    id: '5',
+  'like-dislike-5': {
+    id: 'like-dislike-5',
     type: ContentType.LIKE_DISLIKE,
     post: {
-      id: '5',
+      id: 'like-dislike-5',
       user: users['echo'],
       content: <Content5Post />,
       mediaUrl: '/images/posts/post-5.jpg',
@@ -273,6 +306,114 @@ export const content: Record<ContentId, Content> = {
     whyIncorrectAnswer: {
       title: <Mcq1WhyIncorrectTitle />,
       content: <Mcq1WhyIncorrectContent />,
+    },
+  },
+  'mcq-2': {
+    id: 'mcq-2',
+    type: ContentType.MCQ,
+    post: {
+      id: 'mcq-2',
+      user: users['echo'],
+      content: <Mcq2Question />,
+    },
+    options: [
+      { id: 'a', label: "Because climate change is fake" },
+      { id: 'b', label: 'Because all science is political' },
+      { id: 'c', label: 'Because debate exists within a broad scientific consensus' },
+      { id: 'd', label: 'Because no data exists' },
+    ],
+    correctOptionId: 'c',
+    whyCorrectAnswer: {
+      title: <Mcq2WhyCorrectTitle />,
+      content: <Mcq2WhyCorrectContent />,
+    },
+    whyIncorrectAnswer: {
+      title: <Mcq2WhyIncorrectTitle />,
+      content: <Mcq2WhyIncorrectContent />,
+    },
+  },
+  'like-dislike-6': {
+    id: 'like-dislike-6',
+    type: ContentType.LIKE_DISLIKE,
+    post: {
+      id: 'like-dislike-6',
+      user: users['echo'],
+      content: <Content6Post />,
+      mediaUrl: '/images/posts/post-1.jpg',
+      mediaType: 'image',
+    },
+    correctAnswer: 'dislike',
+    whyCorrectAnswer: {
+      title: <Content6WhyCorrectTitle />,
+      content: <Content6WhyCorrectContent />,
+    },
+    whyIncorrectAnswer: {
+      title: <Content6WhyIncorrectTitle />,
+      content: <Content6WhyIncorrectContent />,
+    },
+  },
+  'like-dislike-7': {
+    id: 'like-dislike-7',
+    type: ContentType.LIKE_DISLIKE,
+    post: {
+      id: 'like-dislike-7',
+      user: users['echo'],
+      content: <Content7Post />,
+      mediaUrl: '/images/posts/post-2.jpg',
+      mediaType: 'image',
+    },
+    correctAnswer: 'dislike',
+    whyCorrectAnswer: {
+      title: <Content7WhyCorrectTitle />,
+      content: <Content7WhyCorrectContent />,
+    },
+    whyIncorrectAnswer: {
+      title: <Content7WhyIncorrectTitle />,
+      content: <Content7WhyIncorrectContent />,
+    },
+  },
+  'mcq-3': {
+    id: 'mcq-3',
+    type: ContentType.MCQ,
+    post: {
+      id: 'mcq-3',
+      user: users['echo'],
+      content: <Mcq3Question />,
+    },
+    options: [
+      { id: 'a', label: "Share it because NASA is a trusted source" },
+      { id: 'b', label: 'Check whether NASA actually published this figure and in what context' },
+      { id: 'c', label: 'Reject it because sea level rise is exaggerated' },
+      { id: 'd', label: 'Assume it applies equally to all coastal regions' },
+    ],
+    correctOptionId: 'b',
+    whyCorrectAnswer: {
+      title: <Mcq3WhyCorrectTitle />,
+      content: <Mcq3WhyCorrectContent />,
+    },
+    whyIncorrectAnswer: {
+      title: <Mcq3WhyIncorrectTitle />,
+      content: <Mcq3WhyIncorrectContent />,
+    },
+  },
+  'like-dislike-8': {
+    id: 'like-dislike-8',
+    type: ContentType.LIKE_DISLIKE,
+    post: {
+      id: 'like-dislike-8',
+      user: users['echo'],
+      content: <Content8Post />,
+      mediaUrl: '/images/posts/post-3.jpg',
+      mediaType: 'image',
+    },
+    correctAnswer: 'like',
+    whyCorrectAnswer: {
+      title: <Content8WhyCorrectTitle />,
+      content: <Content8WhyCorrectContent />,
+    },
+    whyIncorrectAnswer: {
+      title: <Content8WhyIncorrectTitle />,
+      content: <Content8WhyIncorrectContent />,
     },
   },
 }

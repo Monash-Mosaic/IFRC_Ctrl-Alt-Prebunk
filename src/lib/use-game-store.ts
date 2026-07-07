@@ -121,6 +121,8 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
       partialize: (state) => ({
         answers: state.answers,
         currentQuestionIndex: state.currentQuestionIndex,
+        gameCompleted: state.gameCompleted,
+        correctAnswers: state.correctAnswers,
       }),
     }
   )
