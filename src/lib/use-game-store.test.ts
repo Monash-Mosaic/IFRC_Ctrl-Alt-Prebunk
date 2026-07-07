@@ -211,10 +211,30 @@ describe('useGameStore', () => {
     expect(result.current.currentQuestionIndex).toBe(1);
   });
 
-  // Note: resetGame is commented out in the store, so we skip this test
-  // it('should reset game state using resetGame', () => {
-  //   ...
-  // });
+  it('should reset game state using resetGame', () => {
+    useGameStore = createGameStore({
+      answers: {},
+      currentQuestionIndex: 0,
+      questions: ['post-1', 'post-2'],
+      questionStore: {},
+    });
+    const { result } = renderHook(() => useGameStore());
+
+    act(() => {
+      result.current.setAnswer('post-1', 'like');
+      result.current.moveToNextQuestion();
+    });
+
+    expect(result.current.answers['post-1']).toBe('like');
+    expect(result.current.currentQuestionIndex).toBe(1);
+
+    act(() => {
+      result.current.resetGame();
+    });
+
+    expect(result.current.answers).toEqual({});
+    expect(result.current.currentQuestionIndex).toBe(0);
+  });
 
   it('should persist state to localStorage', () => {
     const { result } = renderHook(() => useGameStore());

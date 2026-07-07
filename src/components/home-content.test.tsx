@@ -26,6 +26,8 @@ const mockIsAnswered = jest.fn();
 const mockIsCurrentQuestionAnswered = jest.fn();
 const mockMoveToNextQuestion = jest.fn();
 const mockIsPostDisabled = jest.fn();
+const mockResetGame = jest.fn();
+let mockAnswers: Record<string, 'like' | 'dislike' | 'share'> = {};
 
 const mockUseGameStore = jest.fn(() => ({
   getAnswer: mockGetAnswer,
@@ -34,10 +36,11 @@ const mockUseGameStore = jest.fn(() => ({
   isCurrentQuestionAnswered: mockIsCurrentQuestionAnswered,
   moveToNextQuestion: mockMoveToNextQuestion,
   isPostDisabled: mockIsPostDisabled,
+  resetGame: mockResetGame,
   currentQuestionIndex: 0,
   questions: ['1', '2'],
   questionStore: {},
-  answers: {},
+  answers: mockAnswers,
 }));
 
 jest.mock('@/lib/use-game-store', () => ({
@@ -251,10 +254,12 @@ Object.defineProperty(global, 'IntersectionObserver', {
 });
 
 const mockSetCredibility = jest.fn();
+const mockSetPoint = jest.fn();
 
 describe('HomeContent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAnswers = {};
     
     mockGetAnswer.mockReturnValue(null);
     mockIsAnswered.mockReturnValue(false);
@@ -262,7 +267,9 @@ describe('HomeContent', () => {
     mockIsPostDisabled.mockReturnValue(false);
 
     (useCredibilityStore as jest.Mock).mockReturnValue({
+      point: 0,
       credibility: 80,
+      setPoint: mockSetPoint,
       setCredibility: mockSetCredibility,
     });
   });
@@ -319,6 +326,7 @@ describe('HomeContent', () => {
 
     expect(mockSetAnswer).toHaveBeenCalledWith('1', 'like');
     expect(mockSetCredibility).not.toHaveBeenCalled();
+    expect(mockSetPoint).toHaveBeenCalledWith(1);
   });
 
   it('decreases credibility when sharing a misleading post', async () => {
@@ -330,6 +338,7 @@ describe('HomeContent', () => {
 
     expect(mockSetAnswer).toHaveBeenCalledWith('2', 'share');
     expect(mockSetCredibility).toHaveBeenCalledWith(75);
+    expect(mockSetPoint).toHaveBeenCalledWith(0);
   });
 
   it('maintains credibility when sharing a trustworthy post', async () => {
@@ -341,6 +350,36 @@ describe('HomeContent', () => {
 
     expect(mockSetAnswer).toHaveBeenCalledWith('1', 'share');
     expect(mockSetCredibility).not.toHaveBeenCalled();
+    expect(mockSetPoint).toHaveBeenCalledWith(1);
+  });
+
+  it('shows the simulation result when every question has been answered', () => {
+    mockAnswers = {
+      '1': 'like',
+      '2': 'dislike',
+    };
+
+    render(<HomeContent />);
+
+    expect(screen.getByText('Simulation complete!')).toBeInTheDocument();
+    expect(screen.getByText('2 / 2')).toBeInTheDocument();
+    expect(screen.getByText('Prebunking Champion')).toBeInTheDocument();
+  });
+
+  it('restarts the simulation from the result screen', async () => {
+    mockAnswers = {
+      '1': 'like',
+      '2': 'dislike',
+    };
+    const user = userEvent.setup();
+
+    render(<HomeContent />);
+
+    await user.click(screen.getByRole('button', { name: 'Restart simulation' }));
+
+    expect(mockResetGame).toHaveBeenCalled();
+    expect(mockSetCredibility).toHaveBeenCalledWith(80);
+    expect(mockSetPoint).toHaveBeenCalledWith(0);
   });
 
   it('does not allow changing answer for previously answered questions', async () => {
@@ -421,7 +460,9 @@ describe('HomeContent', () => {
 
   it('prevents credibility from going below 0', async () => {
     (useCredibilityStore as jest.Mock).mockReturnValue({
+      point: 0,
       credibility: 3,
+      setPoint: mockSetPoint,
       setCredibility: mockSetCredibility,
     });
 

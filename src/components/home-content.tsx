@@ -7,6 +7,7 @@ import { useLocale } from 'next-intl';
 import { STORAGE_KEYS } from '@/lib/local-storage';
 import { useLocalStorage } from '@/lib/use-local-storage';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
+import SimulationResult from '@/components/newfeeds/simulation-result';
 import CONTENTS from '@/contents';
 import { ContentType, LikeDislikeContent } from '@/contents/en';
 import { createGameStore, GameAnswer } from '@/lib/use-game-store';
@@ -43,8 +44,10 @@ export default function HomeContent() {
     setAnswer,
     isAnswered,
     isPostDisabled,
+    resetGame,
+    answers,
   } = useGameStore();
-  const { credibility, setCredibility } = useCredibilityStore();
+  const { credibility, setCredibility, setPoint } = useCredibilityStore();
 
   const handleSkipClick = () => {
     setOnboardingCompleted(true);
@@ -69,6 +72,26 @@ export default function HomeContent() {
     return answer === contentItem.correctAnswer;
   };
 
+  const getCorrectAnswerCount = () => {
+    return (contentList as LikeDislikeContent[]).reduce((count, contentItem) => {
+      const answer = answers[contentItem.id];
+      if (!answer) return count;
+
+      return isCorrectAnswer(answer, contentItem) ? count + 1 : count;
+    }, 0);
+  };
+
+  const allQuestionsAnswered = contentList.length > 0
+    && contentList.every((contentItem) => Boolean(answers[contentItem.id]));
+  const correctAnswerCount = getCorrectAnswerCount();
+
+  const handleRestartSimulation = () => {
+    resetGame();
+    setCredibility(80);
+    setPoint(0);
+    carouselApi?.scrollTo(0);
+  };
+
   const handleOnAnswer = (postId: string, answer: GameAnswer) => {
     // Only allow answer if post is not already answered
     if (!isAnswered(postId)) {
@@ -84,6 +107,8 @@ export default function HomeContent() {
           const newCredibility = Math.max(0, credibility - 5);
           setCredibility(newCredibility);
         }
+
+        setPoint(correctAnswerCount + (isCorrect ? 1 : 0));
       }
       
       // Show modal after answer is set
@@ -101,6 +126,16 @@ export default function HomeContent() {
 
   if (!onboardingCompleted) {
     return <ChatContent startOnboardingText={t('startOnboarding')} skipText={t('skip')} onSkipClick={handleSkipClick} />;
+  }
+
+  if (allQuestionsAnswered && !modalPostId) {
+    return (
+      <SimulationResult
+        correctAnswers={correctAnswerCount}
+        totalQuestions={contentList.length}
+        onRestart={handleRestartSimulation}
+      />
+    );
   }
 
   // return <CarouselOrientation />;

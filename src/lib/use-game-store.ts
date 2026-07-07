@@ -19,7 +19,7 @@ interface GameStore extends GameState {
   isCurrentQuestionAnswered: (contentList: Array<{ id: string }>) => boolean;
   isPostDisabled: (postId: string) => boolean;
   moveToNextQuestion: () => void;
-  // resetGame: () => void;
+  resetGame: () => void;
 }
 
 export const createGameStore = (initialState?: Partial<GameState>) => create<GameStore>()(
@@ -78,10 +78,12 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
           }
         }
       },
-      // resetGame: () => {
-      //   // Clear persisted storage
-
-      // },
+      resetGame: () => {
+        set({
+          answers: {},
+          currentQuestionIndex: 0,
+        });
+      },
     }),
     {
       name: STORAGE_KEYS.GAME_STATE,
