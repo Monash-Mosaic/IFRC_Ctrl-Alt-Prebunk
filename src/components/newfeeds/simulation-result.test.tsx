@@ -4,7 +4,7 @@ import SimulationResult, { getSimulationOutcome } from './simulation-result';
 
 describe('SimulationResult', () => {
   it.each([
-    [0, 'Prebunking emerging (skill issue)'],
+    [0, 'Prebunking Emerging'],
     [1, 'Prebunking Beginner'],
     [2, 'Prebunking Novice'],
     [3, 'Prebunker'],
