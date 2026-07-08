@@ -338,9 +338,7 @@ export const content: Record<ContentId, Content> = {
     post: {
       id: 'like-dislike-6',
       user: users['echo'],
-      content: <Content6Post />,
-      mediaUrl: '/images/posts/post-1.jpg',
-      mediaType: 'image',
+      content: <Content6Post />
     },
     correctAnswer: 'dislike',
     whyCorrectAnswer: {
@@ -358,9 +356,7 @@ export const content: Record<ContentId, Content> = {
     post: {
       id: 'like-dislike-7',
       user: users['echo'],
-      content: <Content7Post />,
-      mediaUrl: '/images/posts/post-2.jpg',
-      mediaType: 'image',
+      content: <Content7Post />
     },
     correctAnswer: 'dislike',
     whyCorrectAnswer: {
@@ -402,9 +398,7 @@ export const content: Record<ContentId, Content> = {
     post: {
       id: 'like-dislike-8',
       user: users['echo'],
-      content: <Content8Post />,
-      mediaUrl: '/images/posts/post-3.jpg',
-      mediaType: 'image',
+      content: <Content8Post />
     },
     correctAnswer: 'like',
     whyCorrectAnswer: {
