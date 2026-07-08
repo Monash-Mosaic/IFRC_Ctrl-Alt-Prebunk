@@ -6,7 +6,43 @@ interface GameCompleteProps {
     restartGame: () => void;
 }
 
+export const OUTCOME_LABELS = [
+    'Prebunking Emerging',
+    'Prebunking Beginner',
+    'Prebunking Novice',
+    'Prebunker',
+    'Prebunking Proficient',
+    'Prebunking Champion',
+] as const;
+
+export const OUTCOME_MESSAGES = [
+    'You are starting to spot misinformation patterns. Try the simulation again and look closely at the explanation after each post.',
+    'You caught some warning signs. Keep practising so misleading posts feel easier to question before sharing.',
+    'You are building stronger prebunking instincts. Review the missed explanations and aim one level higher next time.',
+    'You can recognise several common misinformation tactics. A little more practice will make your judgement sharper.',
+    'You are close to expert level. You spotted most misleading patterns and are ready to help others slow down before sharing.',
+    'You are ready to help stop disinformation in the real world. Check out this article on misinformation on the IFRC Solferino Academy website.',
+] as const;
+
+function getOutcomeIndex(correctAnswers: number, totalQuestions: number) {
+    if (totalQuestions <= 0) return 0;
+
+    const percentage = (correctAnswers / totalQuestions) * 100;
+    return Math.min(5, Math.floor(percentage / 20));
+}
+
+function getSimulationOutcome(correctAnswers: number, totalQuestions: number) {
+    const outcomeIndex = getOutcomeIndex(correctAnswers, totalQuestions);
+
+    return {
+        label: OUTCOME_LABELS[outcomeIndex],
+        message: OUTCOME_MESSAGES[outcomeIndex],
+    };
+}
+
 export default function GameComplete({ correctAnswers, totalQuestions, restartGame }: GameCompleteProps) {
+    const outcome = getSimulationOutcome(correctAnswers, totalQuestions);
+    
     return (
         <div className="text-center">
             <p className={`text-3xl text-[#2979FF] pb-3`}>
@@ -14,9 +50,7 @@ export default function GameComplete({ correctAnswers, totalQuestions, restartGa
             </p>
             <div className="w-full max-w-sm rounded-3xl bg-[#E4EAF3] px-6 py-8 text-center shadow-sm">
                 <p className="mx-auto max-w-xs text-[15px] leading-7 text-slate-700">
-                    You are ready to help stop disinformation in the real world.
-                    Check out this article on misinformation on the IFRC Solferino
-                    Academy website.
+                    {outcome.message}
                 </p>
 
                 <div className="mt-8">
@@ -25,7 +59,7 @@ export default function GameComplete({ correctAnswers, totalQuestions, restartGa
                     </p>
 
                     <p className={`mt-4 text-3xl font-black uppercase leading-tight tracking-[0.25em] text-[#2979FF]`}>
-                        Prebunking Champion
+                        {outcome.label}
                     </p>
                 </div>
 
