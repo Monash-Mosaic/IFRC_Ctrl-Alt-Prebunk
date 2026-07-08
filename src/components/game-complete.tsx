@@ -6,7 +6,7 @@ interface GameCompleteProps {
     restartGame: () => void;
 }
 
-const OUTCOME_LABELS = [
+export const OUTCOME_LABELS = [
     'Prebunking Emerging',
     'Prebunking Beginner',
     'Prebunking Novice',
@@ -15,7 +15,7 @@ const OUTCOME_LABELS = [
     'Prebunking Champion',
 ] as const;
 
-const OUTCOME_MESSAGES = [
+export const OUTCOME_MESSAGES = [
     'You are starting to spot misinformation patterns. Try the simulation again and look closely at the explanation after each post.',
     'You caught some warning signs. Keep practising so misleading posts feel easier to question before sharing.',
     'You are building stronger prebunking instincts. Review the missed explanations and aim one level higher next time.',
@@ -28,7 +28,7 @@ function getOutcomeIndex(correctAnswers: number, totalQuestions: number) {
     if (totalQuestions <= 0) return 0;
 
     const percentage = (correctAnswers / totalQuestions) * 100;
-    return Math.min(5, Math.max(0, Math.round(percentage / 20)));
+    return Math.min(5, Math.floor(percentage / 20));
 }
 
 function getSimulationOutcome(correctAnswers: number, totalQuestions: number) {
