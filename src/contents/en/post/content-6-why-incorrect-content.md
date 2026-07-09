@@ -1,0 +1,1 @@
+Giving equal weight to fringe views misrepresents the actual scientific consensus. [See a full analysis about climate change impacts](https://www.ifrc.org/document/world-disasters-report-2020).
