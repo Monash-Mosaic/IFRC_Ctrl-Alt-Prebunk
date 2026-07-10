@@ -61,8 +61,11 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
             }
 
             await handleDownload();
-        } catch {
-            console.error('Error sharing image');
+        } catch (err) {
+            if (err instanceof Error && err.name === 'AbortError') {
+                return;
+            }
+            console.error('Error sharing image', err);
             await handleDownload();
         }
     }, [correctAnswers, handleDownload, totalQuestions]);
