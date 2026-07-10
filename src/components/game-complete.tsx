@@ -1,5 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Modal from 'react-modal';
+import ShareProgressModal from '@/components/share-progress-modal';
+
 interface GameCompleteProps {
     correctAnswers: number;
     totalQuestions: number;
@@ -41,8 +45,16 @@ function getSimulationOutcome(correctAnswers: number, totalQuestions: number) {
 }
 
 export default function GameComplete({ correctAnswers, totalQuestions, restartGame }: GameCompleteProps) {
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const outcome = getSimulationOutcome(correctAnswers, totalQuestions);
-    
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && typeof Modal.setAppElement === 'function') {
+            Modal.setAppElement(document.body);
+        }
+    }, []);
+
+
     return (
         <div className="text-center">
             <p className={`text-3xl text-[#2979FF] pb-3`}>
@@ -72,16 +84,26 @@ export default function GameComplete({ correctAnswers, totalQuestions, restartGa
                         Learn about Solferino Academy
                     </a>
 
-                    {/* Implement Later */}
-                    {/* <button onClick={} className="rounded-full border border-dashed border-slate-500 bg-white/40 px-6 py-4 text-base font-medium text-slate-800 transition hover:bg-white">
+                    <button
+                        type="button"
+                        onClick={() => setIsShareModalOpen(true)}
+                        className="rounded-full border border-dashed border-slate-500 bg-white/40 px-6 py-4 text-base font-medium text-slate-800 transition hover:bg-white"
+                    >
                         Share my progress
-                    </button> */}
+                    </button>
 
                     <button onClick={restartGame} className="rounded-full bg-[#011E41] px-6 py-4 text-base font-semibold text-white transition hover:bg-[#002552]">
                         Restart simulation
                     </button>
                 </div>
             </div>
+
+            <ShareProgressModal
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                correctAnswers={correctAnswers}
+                totalQuestions={totalQuestions}
+            />
         </div>
     );
 }

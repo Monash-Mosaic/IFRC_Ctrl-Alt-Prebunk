@@ -41,6 +41,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Build
+        run: npm run ci:build
+      
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
       - name: Test with coverage
         if: ${{ !cancelled() }}
         uses: ArtiomTr/jest-coverage-report-action@v2
@@ -58,12 +64,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           header: jest-coverage
           message: ${{ steps.coverage.outputs.report }}
-
-      - name: Build
-        run: npm run ci:build
-
-      - name: Dependency audit
-        run: npm audit --audit-level=high
 
   deploy_preview:
     if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }}
