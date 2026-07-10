@@ -35,8 +35,17 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Lint
         run: npm run lint
+
+      - name: Build
+        run: npm run ci:build
+      
+      - name: Dependency audit
+        run: npm audit --audit-level=high
 
       - name: Test with coverage
         if: ${{ !cancelled() }}
@@ -55,15 +64,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           header: jest-coverage
           message: ${{ steps.coverage.outputs.report }}
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run ci:build
-
-      - name: Dependency audit
-        run: npm audit --audit-level=high
 
   deploy_preview:
     if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }}
