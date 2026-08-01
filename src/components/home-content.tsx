@@ -58,7 +58,7 @@ export default function HomeContent() {
     getNumQuestions,
     resetGame
   } = useGameStore();
-  const { addPoints, increaseCredibility, decreaseCredibility, initCredibility, updateBadges, resetCredibility } = useCredibilityStore();
+  const { addPoints, increaseCredibility, decreaseCredibility, initCredibility, resetCredibility } = useCredibilityStore();
 
   useEffect(() => {
     initCredibility(contentList.length);
@@ -123,7 +123,6 @@ export default function HomeContent() {
       if (isCorrect) {
         increaseCredibility();
         addPoints(5);
-        updateBadges(contentList.length);
         incrCorrectAnswers();
       } else {
         decreaseCredibility();
