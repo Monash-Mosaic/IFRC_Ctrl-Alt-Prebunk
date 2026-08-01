@@ -8,10 +8,9 @@ import type { Metadata } from 'next';
 import CloudflareWebPerformance from '@/components/cloudflare-web-performance';
 import GoogleAnalytics from '@/components/google-analytics';
 import Header from '@/components/header';
-import Navigation from '@/components/navigation-bar';
 import PointsCredibilityBar from '@/components/points-credibility-bar';
 import { routing } from '@/i18n/routing';
-import { getDirection, isRTLLocale } from '@/i18n/utils';
+import { getDirection } from '@/i18n/utils';
 
 import '../globals.css';
 
@@ -75,7 +74,6 @@ export default async function LocaleLayout({
   
   // Determine direction for RTL support
   const direction = getDirection(locale);
-  const isRTL = isRTLLocale(locale);
 
   return (
     <html lang={locale} dir={direction}>
@@ -83,12 +81,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <Header />
           <PointsCredibilityBar />
-          <Navigation />
-          <main id="root"
-            className={`min-h-screen bg-white pt-24 pb-16 md:pb-0 ${
-              isRTL ? 'md:pr-20' : 'md:pl-20'
-            }`}
-          >
+          <main id="root" className="min-h-screen bg-white pt-24">
             {children}
           </main>
         </NextIntlClientProvider>
