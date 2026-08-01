@@ -40,7 +40,12 @@ export function useMDXComponents(_components: MDXComponents): MDXComponents {
     ),
     // Links (URLs are auto-detected on social media, but links can be styled)
     a: ({ children, ...props }) => (
-      <a className="text-[#2FE89F] underline hover:text-[#2FE89F]/80" {...props}>
+      <a
+        className="text-[#2FE89F] underline hover:text-[#2FE89F]/80"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
         {children}
       </a>
     ),
