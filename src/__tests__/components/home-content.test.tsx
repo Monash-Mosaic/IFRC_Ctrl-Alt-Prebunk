@@ -316,7 +316,6 @@ const mockAddPoints = jest.fn();
 const mockIncreaseCredibility = jest.fn();
 const mockDecreaseCredibility = jest.fn();
 const mockInitCredibility = jest.fn();
-const mockUpdateBadges = jest.fn();
 const mockResetCredibility = jest.fn();
 
 describe('HomeContent', () => {
@@ -334,7 +333,6 @@ describe('HomeContent', () => {
       increaseCredibility: mockIncreaseCredibility,
       decreaseCredibility: mockDecreaseCredibility,
       initCredibility: mockInitCredibility,
-      updateBadges: mockUpdateBadges,
       resetCredibility: mockResetCredibility,
     });
   });
@@ -392,7 +390,6 @@ describe('HomeContent', () => {
 
     expect(mockSetAnswer).toHaveBeenCalledWith('1', 'like');
     expect(mockAddPoints).toHaveBeenCalledWith(5);
-    expect(mockUpdateBadges).toHaveBeenCalled();
     expect(mockDecreaseCredibility).not.toHaveBeenCalled();
   });
 
@@ -478,7 +475,6 @@ describe('HomeContent', () => {
       increaseCredibility: mockIncreaseCredibility,
       decreaseCredibility: mockDecreaseCredibility,
       initCredibility: mockInitCredibility,
-      updateBadges: mockUpdateBadges,
       resetCredibility: mockResetCredibility,
     });
 
@@ -515,8 +511,7 @@ describe('HomeContent', () => {
 
       expect(mockSetAnswer).toHaveBeenCalledWith('mcq-1', 'opt-a');
       expect(mockAddPoints).toHaveBeenCalledWith(5);
-      expect(mockUpdateBadges).toHaveBeenCalled();
-      expect(mockIncreaseCredibility).toHaveBeenCalled();
+        expect(mockIncreaseCredibility).toHaveBeenCalled();
       expect(mockDecreaseCredibility).not.toHaveBeenCalled();
     });
 

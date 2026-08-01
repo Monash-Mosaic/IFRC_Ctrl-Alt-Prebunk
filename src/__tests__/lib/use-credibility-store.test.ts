@@ -9,7 +9,6 @@ describe('useCredibilityStore', () => {
         points: 0,
         credibility: 0,
         initialCredibility: 0,
-        earnedBadges: [],
         clickedLinks: [],
       });
     });
@@ -158,44 +157,6 @@ it('should calculate initial credibility using Math.floor(total / 2)', () => {
     });
 
     expect(result.current.points).toBe(15);
-  });
-
-  describe('updateBadges milestones', () => {
-    it('should award badge 0 when progress is >= 33%', () => {
-      const { result } = renderHook(() => useCredibilityStore());
-
-      act(() => {
-        result.current.initCredibility(3); // 3 questions total
-        result.current.addPoints(5); // 1 correct answer (5 pts) -> progress ~33.3%
-        result.current.updateBadges(3);
-      });
-
-      expect(result.current.earnedBadges).toEqual([0]);
-    });
-
-    it('should award badge 1 when progress is >= 66%', () => {
-      const { result } = renderHook(() => useCredibilityStore());
-
-      act(() => {
-        result.current.initCredibility(3);
-        result.current.addPoints(10); // 2 correct answers (10 pts) -> progress ~66.6%
-        result.current.updateBadges(3);
-      });
-
-      expect(result.current.earnedBadges).toEqual([0, 1]);
-    });
-
-    it('should award badge 2 when progress hits exactly 100%', () => {
-      const { result } = renderHook(() => useCredibilityStore());
-
-      act(() => {
-        result.current.initCredibility(2); // 2 questions total
-        result.current.addPoints(10); // 2 correct answers (10 pts) -> progress 100%
-        result.current.updateBadges(2);
-      });
-
-      expect(result.current.earnedBadges).toEqual([0, 1, 2]);
-    });
   });
 
   describe('recordLinkClick unique tracking', () => {
