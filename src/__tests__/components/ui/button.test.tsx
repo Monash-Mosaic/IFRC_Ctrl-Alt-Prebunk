@@ -13,24 +13,12 @@ describe('Button', () => {
     expect(button).toHaveAttribute('data-size', 'default');
   });
 
-  it.each([
-    ['destructive', 'destructive'],
-    ['outline', 'outline'],
-    ['secondary', 'secondary'],
-    ['ghost', 'ghost'],
-    ['link', 'link'],
-  ] as const)('renders the %s variant', (variant) => {
+  it.each(['destructive', 'outline', 'secondary', 'ghost', 'link'] as const)('renders the %s variant', (variant) => {
     render(<Button variant={variant}>Variant</Button>);
     expect(screen.getByRole('button')).toHaveAttribute('data-variant', variant);
   });
 
-  it.each([
-    ['sm', 'sm'],
-    ['lg', 'lg'],
-    ['icon', 'icon'],
-    ['icon-sm', 'icon-sm'],
-    ['icon-lg', 'icon-lg'],
-  ] as const)('renders the %s size', (size) => {
+  it.each(['sm', 'lg', 'icon', 'icon-sm', 'icon-lg'] as const)('renders the %s size', (size) => {
     render(<Button size={size}>Sized</Button>);
     expect(screen.getByRole('button')).toHaveAttribute('data-size', size);
   });
