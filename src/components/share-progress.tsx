@@ -5,6 +5,8 @@ import React, { useCallback, useRef } from 'react';
 
 import Title from '@/components/title';
 
+const GAME_URL = 'https://ctrl-alt-prebunk.wdr26.org/en';
+
 interface ShareProgressProps {
     correctAnswers: number;
     totalQuestions: number;
@@ -47,7 +49,7 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
             if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
                 const shareData = {
                     title: 'Prebunking Champion',
-                    text: `I scored ${correctAnswers}/${totalQuestions} in the IFRC prebunking challenge.`,
+                    text: `I scored ${correctAnswers}/${totalQuestions} in the IFRC prebunking challenge. Play at ${GAME_URL}`,
                     files: [file],
                 };
 
@@ -92,6 +94,10 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
                             Prebunking Champion
                         </p>
                     </div>
+
+                    <p className="mt-4 text-xs font-medium text-slate-500 sm:mt-5 sm:text-sm">
+                        Play at {GAME_URL}
+                    </p>
                 </div>
             </div>
 
