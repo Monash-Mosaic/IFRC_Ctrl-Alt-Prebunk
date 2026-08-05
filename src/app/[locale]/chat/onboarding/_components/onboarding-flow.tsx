@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { initialContextValue, useOnboardingMachine } from '../_machines/onboarding-machine';
 import UserTextMessage from './user-text-message';
@@ -17,21 +17,35 @@ import { STORAGE_KEYS, getStorage, storage as localStorage } from '@/lib/local-s
 import TypingMessage from './typing-message';
 import { CHAT_USERS } from '../../_constants/users';
 import { useRouter } from '@/i18n/routing';
+import CONTENTS from '@/contents';
+import { ContentType, LikeDislikeContent, MCQContent } from '@/contents/en';
+import { createGameStore } from '@/lib/use-game-store';
+import { useCredibilityStore } from '@/lib/use-credibility-store';
+import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
+import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
+import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 
 interface StoredOnboardingState {
   context: OnboardingContext | undefined;
   state: string | undefined;
 }
 
+const VALID_ONBOARDING_STATES = ['initial', 'step2', 'step3', 'practice', 'completed'];
 
 export default function OnboardingFlow() {
   const locale = useLocale();
   const t = useTranslations('chat.onboarding');
   const storage = getStorage<StoredOnboardingState>(STORAGE_KEYS.CHAT_ONBOARDING_STATE);
-  const { context, state: initialState } = storage.getItem({
+  const persisted = storage.getItem({
     context: initialContextValue,
     state: 'initial',
   });
+  // Guard against stale persisted state referencing a state that no longer exists in the
+  // machine (e.g. the removed `example` state) — fall back to a fresh initial state instead
+  // of crashing when the machine library looks up an unknown state name.
+  const isPersistedStateValid = VALID_ONBOARDING_STATES.includes(persisted.state ?? '');
+  const context = isPersistedStateValid ? persisted.context : initialContextValue;
+  const initialState = isPersistedStateValid ? persisted.state : 'initial';
   const [state, send, { currentOptions, isCompleted }] = useOnboardingMachine(
     context,
     initialState
@@ -39,6 +53,33 @@ export default function OnboardingFlow() {
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const post = POSTS[locale];
+
+  const { content, contentList } = CONTENTS[locale as keyof typeof CONTENTS];
+  const practiceItem = contentList[0];
+
+  // Same createGameStore/useCredibilityStore machinery home-content.tsx uses, persisted to
+  // the same localStorage key — the real feed picks up this answer automatically.
+  const [usePracticeGameStore] = useState(() => createGameStore({
+    answers: {},
+    currentQuestionIndex: 0,
+    questions: contentList.map((item) => item.id),
+    questionStore: content,
+    gameCompleted: false,
+    correctAnswers: 0,
+  }));
+  const {
+    getAnswer: getPracticeAnswer,
+    setAnswer: setPracticeAnswer,
+    isAnswered: isPracticeAnswered,
+    moveToNextQuestion: movePracticeToNextQuestion,
+    incrCorrectAnswers: incrPracticeCorrectAnswers,
+  } = usePracticeGameStore();
+  const { increaseCredibility, decreaseCredibility, addPoints, initCredibility } = useCredibilityStore();
+
+  const [showPracticeModal, setShowPracticeModal] = useState(false);
+  const practiceAnswer = getPracticeAnswer(practiceItem.id);
+  const practiceAlreadyAnswered = isPracticeAnswered(practiceItem.id);
+  const isPracticeState = state.value === 'practice';
 
   useEffect(() => {
     if (isCompleted) {
@@ -70,6 +111,42 @@ export default function OnboardingFlow() {
       router.replace('/');
     }
   }, [isCompleted, router]);
+
+  // Resume mid-practice after a reload where the question was already answered: skip
+  // straight to completion instead of re-showing (and re-scoring) it.
+  useEffect(() => {
+    if (!isPracticeState || state.context.typing) return;
+    initCredibility(contentList.length);
+    if (practiceAlreadyAnswered && !showPracticeModal) {
+      movePracticeToNextQuestion();
+      send({ type: 'PRACTICE_ANSWERED' });
+    }
+  }, [isPracticeState, state.context.typing, practiceAlreadyAnswered, showPracticeModal, contentList.length, initCredibility, movePracticeToNextQuestion, send]);
+
+  const handlePracticeAnswer = (postId: string, answer: string) => {
+    if (isPracticeAnswered(postId)) return;
+    setPracticeAnswer(postId, answer);
+
+    const isCorrect = practiceItem.type === ContentType.MCQ
+      ? answer === (practiceItem as MCQContent).correctOptionId
+      : answer === (practiceItem as LikeDislikeContent).correctAnswer;
+
+    if (isCorrect) {
+      increaseCredibility();
+      addPoints(5);
+      incrPracticeCorrectAnswers();
+    } else {
+      decreaseCredibility();
+    }
+
+    setShowPracticeModal(true);
+  };
+
+  const handlePracticeModalDone = () => {
+    setShowPracticeModal(false);
+    movePracticeToNextQuestion();
+    send({ type: 'PRACTICE_ANSWERED' });
+  };
 
   if (isCompleted) {
     return null;
@@ -107,7 +184,7 @@ export default function OnboardingFlow() {
                 />
               );
             case 'typing':
-              return (  
+              return (
                 <TypingMessage
                   key={message.id}
                   senderName={sender.name}
@@ -118,6 +195,34 @@ export default function OnboardingFlow() {
               return null;
           }
         })}
+
+        {/* Interactive practice question: the real first game question, answerable in chat */}
+        {isPracticeState && !state.context.typing && (
+          practiceItem.type === ContentType.MCQ ? (
+            <MCQPostMessage
+              postId={practiceItem.id}
+              user={(practiceItem as MCQContent).post.user}
+              content={(practiceItem as MCQContent).post.content}
+              options={(practiceItem as MCQContent).options}
+              correctOptionId={(practiceItem as MCQContent).correctOptionId}
+              answer={practiceAnswer}
+              onAnswer={handlePracticeAnswer}
+            />
+          ) : (
+            <LikeDislikePostMessage
+              postId={practiceItem.id}
+              user={(practiceItem as LikeDislikeContent).post.user}
+              content={(practiceItem as LikeDislikeContent).post.content}
+              mediaUrl={(practiceItem as LikeDislikeContent).post.mediaUrl}
+              mediaType={(practiceItem as LikeDislikeContent).post.mediaType}
+              answer={practiceAnswer as 'like' | 'dislike' | null | undefined}
+              correctAnswer={(practiceItem as LikeDislikeContent).correctAnswer}
+              onLike={(postId) => handlePracticeAnswer(postId, 'like')}
+              onDislike={(postId) => handlePracticeAnswer(postId, 'dislike')}
+            />
+          )
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -136,6 +241,31 @@ export default function OnboardingFlow() {
           </div>
         </div>
       )}
+
+      {/* Practice question feedback modal — same component the real feed uses */}
+      {showPracticeModal && (() => {
+        const isCorrect = practiceItem.type === ContentType.MCQ
+          ? practiceAnswer === (practiceItem as MCQContent).correctOptionId
+          : practiceAnswer === (practiceItem as LikeDislikeContent).correctAnswer;
+        const reasonContent = isCorrect
+          ? practiceItem.whyCorrectAnswer.content
+          : practiceItem.whyIncorrectAnswer.content;
+        const reasonHeader = isCorrect
+          ? practiceItem.whyCorrectAnswer.title
+          : practiceItem.whyIncorrectAnswer.title;
+
+        return (
+          <PrebunkingModal
+            isOpen={true}
+            onClose={handlePracticeModalDone}
+            onContinue={handlePracticeModalDone}
+            postId={practiceItem.id}
+            content={reasonContent}
+            header={reasonHeader}
+            isCorrect={isCorrect}
+          />
+        );
+      })()}
     </div>
   );
 }

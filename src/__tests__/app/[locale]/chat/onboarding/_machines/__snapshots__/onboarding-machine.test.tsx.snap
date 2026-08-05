@@ -417,7 +417,7 @@ exports[`onboardingMachine matches snapshot following step1 -> step2 -> step3 pa
 }
 `;
 
-exports[`onboardingMachine matches snapshot going through example and completing after delay: after auto-complete (completed state) 1`] = `
+exports[`onboardingMachine matches snapshot going through practice and completing when the question is answered: after practice answered (completed state) 1`] = `
 {
   "context": {
     "messages": [
@@ -479,7 +479,7 @@ exports[`onboardingMachine matches snapshot going through example and completing
       {
         "id": Any<String>,
         "sender": "paula",
-        "text": "example.message",
+        "text": "practice.explanation",
         "timestamp": Any<Number>,
         "type": "text",
       },
@@ -492,7 +492,7 @@ exports[`onboardingMachine matches snapshot going through example and completing
     "typing": false,
   },
   "event": {
-    "type": "AUTO_COMPLETE",
+    "type": "PRACTICE_ANSWERED",
   },
   "nextEvents": [],
   "nextEventsT": [],
@@ -500,7 +500,7 @@ exports[`onboardingMachine matches snapshot going through example and completing
 }
 `;
 
-exports[`onboardingMachine matches snapshot going through example and completing after delay: after example typing timeout 1`] = `
+exports[`onboardingMachine matches snapshot going through practice and completing when the question is answered: after practice typing timeout 1`] = `
 {
   "context": {
     "messages": [
@@ -562,7 +562,7 @@ exports[`onboardingMachine matches snapshot going through example and completing
       {
         "id": Any<String>,
         "sender": "paula",
-        "text": "example.message",
+        "text": "practice.explanation",
         "timestamp": Any<Number>,
         "type": "text",
       },
@@ -579,16 +579,16 @@ exports[`onboardingMachine matches snapshot going through example and completing
     "type": "option2-step3",
   },
   "nextEvents": [
-    "AUTO_COMPLETE",
+    "PRACTICE_ANSWERED",
   ],
   "nextEventsT": [
-    "AUTO_COMPLETE",
+    "PRACTICE_ANSWERED",
   ],
-  "value": "example",
+  "value": "practice",
 }
 `;
 
-exports[`onboardingMachine matches snapshot going through example and completing after delay: after selecting option2-step3 (example state) 1`] = `
+exports[`onboardingMachine matches snapshot going through practice and completing when the question is answered: after selecting option2-step3 (practice state) 1`] = `
 {
   "context": {
     "messages": [
@@ -667,12 +667,12 @@ exports[`onboardingMachine matches snapshot going through example and completing
     "type": "option2-step3",
   },
   "nextEvents": [
-    "AUTO_COMPLETE",
+    "PRACTICE_ANSWERED",
   ],
   "nextEventsT": [
-    "AUTO_COMPLETE",
+    "PRACTICE_ANSWERED",
   ],
-  "value": "example",
+  "value": "practice",
 }
 `;
 

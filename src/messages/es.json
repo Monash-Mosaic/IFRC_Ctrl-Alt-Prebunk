@@ -54,8 +54,8 @@
         "option1": "¡De acuerdo, entrando al feed ahora!",
         "option2": "¿Muéstrame un ejemplo primero?"
       },
-      "example": {
-        "message": "Aquí hay un ejemplo de publicación con explicaciones. Nota el lenguaje exagerado y las fuentes faltantes - ¡estas son señales de alerta!"
+      "practice": {
+        "explanation": "Hay dos tipos de publicaciones que verás: publicaciones de me gusta/no me gusta — dale me gusta si parece verdadera, no me gusta si parece falsa — y publicaciones de opción múltiple donde eliges la mejor respuesta. ¡Probemos una ahora!"
       },
       "completed": {
         "message": "¡El juego comienza! Estás listo para navegar el feed e identificar la desinformación. ¡Buena suerte! 🎮"
