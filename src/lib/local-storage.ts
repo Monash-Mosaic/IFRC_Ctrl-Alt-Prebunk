@@ -8,9 +8,15 @@ export const STORAGE_KEYS = {
 } as const;
 
 /**
- * Type for valid storage keys
+ * Known storage keys used by the application.
  */
-export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
+export type KnownStorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
+
+/**
+ * A localStorage key. The utility supports caller-defined keys as well as the
+ * known application keys above.
+ */
+export type StorageKey = string;
 
 /**
  * Get an item from localStorage
