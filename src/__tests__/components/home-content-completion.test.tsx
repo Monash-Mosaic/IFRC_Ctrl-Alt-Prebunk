@@ -97,12 +97,10 @@ describe('HomeContent game completion (real game store)', () => {
       points: 0,
       credibility: 1,
       initialCredibility: 1,
-      earnedBadges: [],
       addPoints: jest.fn(),
       increaseCredibility: jest.fn(),
       decreaseCredibility: jest.fn(),
       initCredibility: jest.fn(),
-      updateBadges: jest.fn(),
       recordLinkClick: jest.fn(),
       resetCredibility: jest.fn(),
     });
