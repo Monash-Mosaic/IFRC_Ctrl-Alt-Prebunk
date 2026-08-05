@@ -27,7 +27,9 @@ describe('Header', () => {
 
   beforeEach(() => {
     mockGetTranslations.mockResolvedValue(
-      (key: string) => mockTranslations[key as keyof typeof mockTranslations] || key
+      ((key: string) => mockTranslations[key as keyof typeof mockTranslations] || key) as unknown as Awaited<
+        ReturnType<typeof getTranslations>
+      >
     );
   });
 

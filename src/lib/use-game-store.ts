@@ -16,7 +16,7 @@ interface GameStore extends GameState {
   setAnswer: (postId: string, answer: string) => void;
   getAnswer: (postId: string) => string | null;
   isAnswered: (postId: string) => boolean;
-  isCurrentQuestionAnswered: (contentList: Array<{ id: string }>) => boolean;
+  isCurrentQuestionAnswered: () => boolean;
   isPostDisabled: (postId: string) => boolean;
   moveToNextQuestion: () => void;
   isGameCompleted: () => boolean;
