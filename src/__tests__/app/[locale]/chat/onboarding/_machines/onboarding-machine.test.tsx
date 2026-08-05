@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { useOnboardingMachine, type OnboardingOptionEvent } from '@/app/[locale]/chat/onboarding/_machines/onboarding-machine';
+import { useOnboardingMachine, type OnboardingEvent, type OnboardingOptionEvent } from '@/app/[locale]/chat/onboarding/_machines/onboarding-machine';
 
 const FIXED_DATE = new Date('2020-08-20T00:12:00.000Z').getTime();
 
@@ -93,7 +93,7 @@ describe('onboardingMachine', () => {
     expect(normalized4).toMatchSnapshot('after step3 typing timeout');
   });
 
-  it('matches snapshot going through example and completing after delay', () => {
+  it('matches snapshot going through practice and completing when the question is answered', () => {
     const { result } = renderHook(() => useOnboardingMachine());
 
     act(() =>
@@ -122,19 +122,56 @@ describe('onboardingMachine', () => {
     );
 
     const normalized1 = normalizeForSnapshot(result.current[0]);
-    expect(normalized1).toMatchSnapshot('after selecting option2-step3 (example state)');
+    expect(normalized1).toMatchSnapshot('after selecting option2-step3 (practice state)');
 
     act(() => {
       jest.advanceTimersByTime(1000);
     });
     const normalized2 = normalizeForSnapshot(result.current[0]);
-    expect(normalized2).toMatchSnapshot('after example typing timeout');
+    expect(normalized2).toMatchSnapshot('after practice typing timeout');
 
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
+    act(() =>
+      result.current[1]({
+        type: 'PRACTICE_ANSWERED',
+      })
+    );
     const normalized3 = normalizeForSnapshot(result.current[0]);
-    expect(normalized3).toMatchSnapshot('after auto-complete (completed state)');
+    expect(normalized3).toMatchSnapshot('after practice answered (completed state)');
+  });
+
+  it('routes option3-step1 directly into practice', () => {
+    const { result } = renderHook(() => useOnboardingMachine());
+
+    act(() =>
+      result.current[1]({
+        type: 'option3-step1',
+        optionText: 'Option 3',
+      } as OnboardingOptionEvent)
+    );
+
+    expect(result.current[0].value).toBe('practice');
+  });
+
+  it('routes the confident shortcuts (option1-step2, option1-step3) into practice instead of skipping straight to completed', () => {
+    const { result } = renderHook(() => useOnboardingMachine());
+
+    act(() =>
+      result.current[1]({
+        type: 'option2-step1',
+        optionText: 'Option 2',
+      } as OnboardingOptionEvent)
+    );
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    act(() =>
+      result.current[1]({
+        type: 'option1-step2',
+        optionText: 'Option 1',
+      } as OnboardingOptionEvent)
+    );
+
+    expect(result.current[0].value).toBe('practice');
   });
 
   it('matches snapshot accumulating user messages when selecting options', () => {

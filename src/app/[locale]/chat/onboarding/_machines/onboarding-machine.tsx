@@ -54,7 +54,7 @@ export type OnboardingOptionEvent = {
 export type OnboardingEvent =
   | { type: '$$initial' }
   | OnboardingOptionEvent
-  | { type: 'AUTO_COMPLETE' };
+  | { type: 'PRACTICE_ANSWERED' };
 
 export interface OnboardingOption {
   id: string;
@@ -176,10 +176,10 @@ export const useOnboardingMachine = (
         on: {
           'option1-step1': 'completed',
           'option2-step1': 'step2',
-          'option3-step1': 'example',
+          'option3-step1': 'practice',
         },
         effect({ setContext, event }: EffectArgs) {
-          if (!event || event.type === 'AUTO_COMPLETE') return;
+          if (!event) return;
           const timeout = setTimeout(() => {
             setContext((context: OnboardingContext) => {
               return {
@@ -194,15 +194,15 @@ export const useOnboardingMachine = (
       },
       step2: {
         on: {
-          'option1-step2': 'completed',
+          'option1-step2': 'practice',
           'option2-step2': 'step3',
-          'option3-step2': 'example',
+          'option3-step2': 'practice',
         },
         effect({ setContext, event }: EffectArgs) {
-          if (!event || event.type === 'AUTO_COMPLETE' || event.type === '$$initial') return;
+          if (!event || event.type === '$$initial') return;
 
           setContext((context: OnboardingContext) => {
-            const withSelection = appendUserSelection(context, event);
+            const withSelection = appendUserSelection(context, event as OnboardingOptionEvent);
 
             return {
               ...withSelection,
@@ -234,10 +234,10 @@ export const useOnboardingMachine = (
       },
       step3: {
         effect({ setContext, event }: EffectArgs) {
-          if (!event || event.type === 'AUTO_COMPLETE' || event.type === '$$initial') return;
+          if (!event || event.type === '$$initial') return;
 
           setContext((context: OnboardingContext) => {
-            const withSelection = appendUserSelection(context, event);
+            const withSelection = appendUserSelection(context, event as OnboardingOptionEvent);
 
             return {
               ...withSelection,
@@ -257,16 +257,16 @@ export const useOnboardingMachine = (
           return () => clearTimeout(timeout);
         },
         on: {
-          'option1-step3': 'completed',
-          'option2-step3': 'example',
+          'option1-step3': 'practice',
+          'option2-step3': 'practice',
         },
       },
-      example: {
-        effect({ setContext, event, send }: EffectArgs) {
-          if (!event || event.type === 'AUTO_COMPLETE' || event.type === '$$initial') return;
+      practice: {
+        effect({ setContext, event }: EffectArgs) {
+          if (!event || event.type === '$$initial') return;
 
           setContext((context: OnboardingContext) => {
-            const updated = appendUserSelection(context, event);
+            const updated = appendUserSelection(context, event as OnboardingOptionEvent);
             return {
               ...updated,
               messages: [
@@ -280,21 +280,17 @@ export const useOnboardingMachine = (
             setContext((context: OnboardingContext) => {
               return {
                 ...context,
-                messages: [...context.messages.slice(0, -1), 
-                  createMessage('paula', 'example.message'),
+                messages: [...context.messages.slice(0, -1),
+                  createMessage('paula', 'practice.explanation'),
                 ],
                 typing: false,
               };
             });
-            const timeout2 = setTimeout(() => {
-              send({ type: 'AUTO_COMPLETE' });
-              clearTimeout(timeout2);
-            }, 2000);
           }, ONBOARDING_TYPING_TIMEOUT);
           return () => clearTimeout(timeout);
         },
         on: {
-          AUTO_COMPLETE: 'completed',
+          PRACTICE_ANSWERED: 'completed',
         },
       },
       completed: {

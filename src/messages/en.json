@@ -54,8 +54,8 @@
         "option1": "Okay, entering the feed now!",
         "option2": "Show me an example first?"
       },
-      "example": {
-        "message": "Here's an example post with explanations. Notice the exaggerated language and missing sources - these are red flags!"
+      "practice": {
+        "explanation": "There are two kinds of posts you'll see: like/dislike posts — like it if it looks true, dislike if it looks false — and multiple-choice posts where you pick the best response. Let's try one now!"
       },
       "completed": {
         "message": "Game begins! You're all set to navigate the feed and identify misinformation. Good luck! 🎮"

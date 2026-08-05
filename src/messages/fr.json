@@ -54,8 +54,8 @@
         "option1": "D'accord, j'entre dans le fil maintenant !",
         "option2": "Montre-moi un exemple d'abord ?"
       },
-      "example": {
-        "message": "Voici un exemple de post avec des explications. Remarque le langage exagéré et les sources manquantes - ce sont des signaux d'alarme !"
+      "practice": {
+        "explanation": "Il y a deux types de publications que tu verras : les publications j'aime/je n'aime pas — aime si ça semble vrai, n'aime pas si ça semble faux — et les publications à choix multiples où tu choisis la meilleure réponse. Essayons-en une maintenant !"
       },
       "completed": {
         "message": "Le jeu commence ! Tu es prêt à naviguer dans le fil et identifier la désinformation. Bonne chance ! 🎮"
