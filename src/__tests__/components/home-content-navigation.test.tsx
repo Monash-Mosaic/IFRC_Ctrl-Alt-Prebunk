@@ -147,7 +147,7 @@ describe('HomeContent navigation', () => {
     mockCanScrollPrev.mockReturnValue(false);
     mockSelectedScrollSnap.mockReturnValue(0);
 
-    (useCredibilityStore as jest.Mock).mockReturnValue({
+    (useCredibilityStore as unknown as jest.Mock).mockReturnValue({
       points: 0,
       credibility: 1,
       initialCredibility: 1,
