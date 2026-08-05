@@ -25,7 +25,7 @@ export const OUTCOME_MESSAGES = [
     'You are building stronger prebunking instincts. Review the missed explanations and aim one level higher next time.',
     'You can recognise several common misinformation tactics. A little more practice will make your judgement sharper.',
     'You are close to expert level. You spotted most misleading patterns and are ready to help others slow down before sharing.',
-    'You are ready to help stop disinformation in the real world. Check out this article on misinformation on the IFRC Solferino Academy website.',
+    'You are ready to help stop disinformation in the real world. Check out the IFRC Solferino Academy website.',
 ] as const;
 
 function getOutcomeIndex(correctAnswers: number, totalQuestions: number) {
