@@ -104,7 +104,9 @@ export default function Navigation() {
                 href={item.href}
                 onClick={() => handleNavItemClick(item.href)}
                 className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                  isActive ? 'text-(--color-ifrc-red)' : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
+                  isActive
+                    ? 'text-(--color-ifrc-red)'
+                    : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
                 }`}
               >
                 <span className="transition-transform group-hover:scale-110">
