@@ -11,7 +11,7 @@ import type {
   OnboardingOptionEvent,
   OnboardingContext,
 } from '../_machines/onboarding-machine';
-import PostMessage from './post-message';
+import PostMessage from '@/components/post-message';
 import POSTS from '../_posts';
 import { STORAGE_KEYS, getStorage, storage as localStorage } from '@/lib/local-storage';
 import TypingMessage from './typing-message';

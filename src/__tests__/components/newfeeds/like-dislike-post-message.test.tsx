@@ -23,19 +23,35 @@ describe('LikeDislikePostMessage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.mocked(useTranslations).mockReturnValue(((key: string) => ({ like: 'Like', report: 'Report' })[key] ?? key) as ReturnType<typeof useTranslations>);
+    jest
+      .mocked(useTranslations)
+      .mockReturnValue(
+        ((key: string) => ({ like: 'Like', report: 'Report' })[key] ?? key) as ReturnType<
+          typeof useTranslations
+        >
+      );
   });
 
-  it('renders PostMessage with correct props', () => {
+  it('renders one post with prominent Like and Report controls', () => {
     render(<LikeDislikePostMessage {...defaultProps} />);
 
     expect(screen.getByRole('article')).toHaveTextContent('Test post content');
+    expect(screen.getAllByRole('article')).toHaveLength(1);
     expect(screen.getAllByRole('button')).toHaveLength(2);
-    expect(screen.getByRole('button', { name: 'Like' }).querySelector('.lucide-thumbs-up')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Report' }).querySelector('.lucide-circle-alert')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Like' }).querySelector('.lucide-thumbs-up')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Report' }).querySelector('.lucide-circle-alert')
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Like' })).toHaveClass('min-h-12', 'w-full');
+    expect(screen.getByRole('button', { name: 'Report' })).toHaveClass('min-h-12', 'w-full');
+    expect(
+      screen.getByRole('article').querySelector('.lucide-thumbs-down')
+    ).not.toBeInTheDocument();
   });
 
-  it('passes likeDisabled and dislikeDisabled as false when not answered', () => {
+  it('enables both actions when unanswered', () => {
     render(<LikeDislikePostMessage {...defaultProps} answer={null} />);
 
     const likeButton = screen.getByRole('button', { name: 'Like' });
@@ -45,7 +61,7 @@ describe('LikeDislikePostMessage', () => {
     expect(reportButton).not.toBeDisabled();
   });
 
-  it('passes likeDisabled and dislikeDisabled as true when answered', () => {
+  it('disables both actions when answered', () => {
     render(<LikeDislikePostMessage {...defaultProps} answer="like" />);
 
     const likeButton = screen.getByRole('button', { name: 'Like' });
@@ -97,7 +113,6 @@ describe('LikeDislikePostMessage', () => {
     expect(mockOnLike).not.toHaveBeenCalled();
   });
 
-
   it('applies correct color class to like button when answer is correct', () => {
     render(<LikeDislikePostMessage {...defaultProps} correctAnswer="like" answer="like" />);
 
@@ -134,7 +149,6 @@ describe('LikeDislikePostMessage', () => {
     expect(reportButton.querySelector('svg')).not.toHaveClass('fill-(--color-dunder-red)');
   });
 
-
   it('works with null answer (not answered yet)', () => {
     render(<LikeDislikePostMessage {...defaultProps} answer={null} />);
 
@@ -150,13 +164,7 @@ describe('LikeDislikePostMessage', () => {
   it('does not call onDislike through Report if the post is already answered', async () => {
     const mockOnDislike = jest.fn();
     const user = userEvent.setup();
-    render(
-      <LikeDislikePostMessage
-        {...defaultProps}
-        answer="dislike"
-        onDislike={mockOnDislike}
-      />,
-    );
+    render(<LikeDislikePostMessage {...defaultProps} answer="dislike" onDislike={mockOnDislike} />);
 
     await user.click(screen.getByRole('button', { name: 'Report' }));
     expect(mockOnDislike).not.toHaveBeenCalled();
@@ -168,7 +176,7 @@ describe('LikeDislikePostMessage', () => {
     expect(screen.getByRole('button', { name: 'Report' })).toBeDisabled();
   });
 
-  it('forwards the disabled state to the real post and prevents both callbacks', async () => {
+  it('dims a locked post and prevents both callbacks', async () => {
     const user = userEvent.setup();
     render(<LikeDislikePostMessage {...defaultProps} isDisabled />);
     expect(screen.getByRole('article')).toHaveClass('opacity-50');
@@ -180,12 +188,21 @@ describe('LikeDislikePostMessage', () => {
     expect(defaultProps.onDislike).not.toHaveBeenCalled();
   });
 
-  it.each(['like', 'dislike'] as const)('exposes only the selected %s action as pressed', (answer) => {
-    render(<LikeDislikePostMessage {...defaultProps} answer={answer} />);
-    expect(screen.getByRole('button', { name: 'Like' })).toHaveAttribute('aria-pressed', String(answer === 'like'));
-    expect(screen.getByRole('button', { name: 'Report' })).toHaveAttribute('aria-pressed', String(answer === 'dislike'));
-    expect(screen.getByRole('button', { pressed: true })).not.toHaveClass('opacity-50');
-  });
+  it.each(['like', 'dislike'] as const)(
+    'exposes only the selected %s action as pressed',
+    (answer) => {
+      render(<LikeDislikePostMessage {...defaultProps} answer={answer} />);
+      expect(screen.getByRole('button', { name: 'Like' })).toHaveAttribute(
+        'aria-pressed',
+        String(answer === 'like')
+      );
+      expect(screen.getByRole('button', { name: 'Report' })).toHaveAttribute(
+        'aria-pressed',
+        String(answer === 'dislike')
+      );
+      expect(screen.getByRole('button', { pressed: true })).not.toHaveClass('opacity-50');
+    }
+  );
 
   it('treats undefined answer the same as unanswered', () => {
     render(<LikeDislikePostMessage {...defaultProps} answer={undefined} />);
@@ -194,4 +211,50 @@ describe('LikeDislikePostMessage', () => {
     expect(screen.getByRole('button', { name: 'Report' })).not.toBeDisabled();
   });
 
+  it('supports keyboard activation without submitting an enclosing form', async () => {
+    const onSubmit = jest.fn((event) => event.preventDefault());
+    const user = userEvent.setup();
+    render(
+      <form onSubmit={onSubmit}>
+        <LikeDislikePostMessage {...defaultProps} />
+      </form>
+    );
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Like' })).toHaveFocus();
+    await user.keyboard('{Enter}');
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Report' })).toHaveFocus();
+    await user.keyboard(' ');
+    expect(defaultProps.onLike).toHaveBeenCalledTimes(1);
+    expect(defaultProps.onDislike).toHaveBeenCalledTimes(1);
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['onLike', 'Like', 'Report'],
+    ['onDislike', 'Report', 'Like'],
+  ] as const)('disables only the action missing %s', (callback, disabledLabel, enabledLabel) => {
+    render(<LikeDislikePostMessage {...defaultProps} {...{ [callback]: undefined }} />);
+    expect(screen.getByRole('button', { name: disabledLabel })).toBeDisabled();
+    expect(screen.getByRole('button', { name: enabledLabel })).toBeEnabled();
+  });
+
+  it('owns translations for visible labels and accessible names', () => {
+    jest
+      .mocked(useTranslations)
+      .mockReturnValue(
+        ((key: string) => ({ like: 'Me gusta', report: 'Denunciar' })[key] ?? key) as ReturnType<
+          typeof useTranslations
+        >
+      );
+    render(<LikeDislikePostMessage {...defaultProps} />);
+    expect(useTranslations).toHaveBeenCalledWith('postActions');
+    expect(screen.getByRole('button', { name: 'Me gusta' })).toHaveTextContent('Me gusta');
+    expect(screen.getByRole('button', { name: 'Denunciar' })).toHaveTextContent('Denunciar');
+  });
+
+  it('preserves caller presentation classes when applying the disabled appearance', () => {
+    render(<LikeDislikePostMessage {...defaultProps} className="custom-post" isDisabled />);
+    expect(screen.getByRole('article')).toHaveClass('custom-post', 'opacity-50');
+  });
 });

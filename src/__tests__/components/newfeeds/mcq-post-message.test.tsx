@@ -32,6 +32,7 @@ describe('MCQPostMessage', () => {
   describe('rendering', () => {
     it('renders user name and handle', () => {
       render(<MCQPostMessage {...defaultProps} />);
+      expect(screen.getAllByRole('article')).toHaveLength(1);
       expect(screen.getByText('Echo')).toBeInTheDocument();
       expect(screen.getByText('@echo')).toBeInTheDocument();
     });
@@ -56,6 +57,25 @@ describe('MCQPostMessage', () => {
       expect(screen.queryByRole('button', { name: 'Comment' })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Share' })).not.toBeInTheDocument();
     });
+
+    it('renders image media with its existing description', () => {
+      render(<MCQPostMessage {...defaultProps} mediaUrl="/question.jpg" mediaType="image" />);
+      expect(screen.getByRole('img', { name: 'Question post' })).toHaveAttribute(
+        'src',
+        '/question.jpg'
+      );
+    });
+
+    it.each([undefined, 'video'] as const)(
+      'does not render media when mediaType is %s',
+      (mediaType) => {
+        const { container } = render(
+          <MCQPostMessage {...defaultProps} mediaUrl="/question.jpg" mediaType={mediaType} />
+        );
+        expect(screen.queryByRole('img')).not.toBeInTheDocument();
+        expect(container.querySelector('.lucide-video')).not.toBeInTheDocument();
+      }
+    );
   });
 
   describe('option interaction', () => {
@@ -74,6 +94,7 @@ describe('MCQPostMessage', () => {
 
     it('options are disabled when isDisabled is true', () => {
       render(<MCQPostMessage {...defaultProps} answer={null} isDisabled={true} />);
+      expect(screen.getByRole('article')).toHaveClass('opacity-50');
       expect(screen.getByRole('button', { name: 'Option A' })).toBeDisabled();
     });
 
@@ -107,7 +128,11 @@ describe('MCQPostMessage', () => {
     it('supports keyboard answer selection without submitting an enclosing form', async () => {
       const onSubmit = jest.fn((event) => event.preventDefault());
       const user = userEvent.setup();
-      render(<form onSubmit={onSubmit}><MCQPostMessage {...defaultProps} /></form>);
+      render(
+        <form onSubmit={onSubmit}>
+          <MCQPostMessage {...defaultProps} />
+        </form>
+      );
       await user.tab();
       expect(screen.getByRole('button', { name: 'Option A' })).toHaveFocus();
       await user.keyboard('{Enter}');
@@ -115,14 +140,20 @@ describe('MCQPostMessage', () => {
       expect(onSubmit).not.toHaveBeenCalled();
     });
 
-    it.each([null, 'a', 'b'])('shows only answer options without percentages for answer %s', (answer) => {
-      const { container } = render(<MCQPostMessage {...defaultProps} answer={answer} />);
-      expect(screen.getAllByRole('button')).toHaveLength(defaultProps.options.length);
-      expect(container).not.toHaveTextContent(/\d\s*%/);
-      for (const option of defaultProps.options) {
-        expect(screen.getByRole('button', { name: option.label })).toHaveAttribute('aria-pressed', String(answer === option.id));
+    it.each([null, 'a', 'b'])(
+      'shows only answer options without percentages for answer %s',
+      (answer) => {
+        const { container } = render(<MCQPostMessage {...defaultProps} answer={answer} />);
+        expect(screen.getAllByRole('button')).toHaveLength(defaultProps.options.length);
+        expect(container).not.toHaveTextContent(/\d\s*%/);
+        for (const option of defaultProps.options) {
+          expect(screen.getByRole('button', { name: option.label })).toHaveAttribute(
+            'aria-pressed',
+            String(answer === option.id)
+          );
+        }
       }
-    });
+    );
 
     it('preserves incorrect-selection and correct-answer feedback', () => {
       render(<MCQPostMessage {...defaultProps} answer="b" />);

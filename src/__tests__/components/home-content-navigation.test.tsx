@@ -174,32 +174,25 @@ describe('HomeContent navigation', () => {
     expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
   });
 
-  it('uses one responsive set of controls below mobile content and beside desktop content', () => {
+  it('keeps one set of traversal controls hidden below the desktop breakpoint', () => {
     render(<HomeContent />);
     const previous = screen.getByRole('button', { name: 'Previous post' });
     const next = screen.getByRole('button', { name: 'Next post' });
     expect(previous.parentElement).toBe(next.parentElement);
-    expect(next.parentElement).toHaveClass('flex', 'flex-row', 'shrink-0', 'md:flex-col');
-    expect(next.parentElement).not.toHaveClass('hidden');
+    expect(next.parentElement).toHaveClass('hidden', 'md:flex', 'shrink-0', 'flex-col');
     expect(previous).toHaveAttribute('aria-disabled', 'true');
     expect(next).toHaveAttribute('aria-disabled', 'true');
   });
 
-  it.each([375, 1280])('preserves traversal without advancing game state at %ipx', async (width) => {
-    const originalWidth = window.innerWidth;
-    Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
-    try {
-      mockIsAnswered.mockReturnValue(true);
-      mockCanScrollPrev.mockReturnValue(true);
-      mockSelectedScrollSnap.mockReturnValue(1);
-      const user = userEvent.setup();
-      render(<HomeContent />);
-      await user.click(screen.getByRole('button', { name: 'Previous post' }));
-      expect(mockScrollPrev).toHaveBeenCalledTimes(1);
-      expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
-    } finally {
-      Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth });
-    }
+  it('preserves desktop traversal without advancing game state', async () => {
+    mockIsAnswered.mockReturnValue(true);
+    mockCanScrollPrev.mockReturnValue(true);
+    mockSelectedScrollSnap.mockReturnValue(1);
+    const user = userEvent.setup();
+    render(<HomeContent />);
+    await user.click(screen.getByRole('button', { name: 'Previous post' }));
+    expect(mockScrollPrev).toHaveBeenCalledTimes(1);
+    expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
   });
 
   it('shows a toast when next is clicked on the last post', async () => {
