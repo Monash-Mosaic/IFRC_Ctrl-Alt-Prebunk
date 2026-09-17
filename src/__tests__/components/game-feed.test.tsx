@@ -1,6 +1,6 @@
 /**
- * Tests for GameFeed: a one-post-per-screen scroll-snap feed. Each unlocked post
- * gets a full-height slot; a post taller than the screen scrolls inside its slot.
+ * Tests for GameFeed: a one-post-per-screen feed where only the post card scrolls
+ * natively and posts slide in when the user swipes or wheels past a card's edge.
  */
 import React from 'react';
 import { render, screen, fireEvent, act } from '@/test-utils/test-utils';
@@ -19,7 +19,7 @@ function renderFeed(props: Partial<React.ComponentProps<typeof GameFeed>> = {}) 
     <GameFeed
       ref={ref}
       postIds={['a', 'b', 'c']}
-      renderPost={(id) => <div data-testid={`post-${id}`}>Post {id}</div>}
+      renderPost={(id) => <button data-testid={`post-${id}`}>Post {id}</button>}
       isLocked={true}
       labels={labels}
       onActiveIndexChange={onActiveIndexChange}
@@ -27,7 +27,8 @@ function renderFeed(props: Partial<React.ComponentProps<typeof GameFeed>> = {}) 
       {...props}
     />
   );
-  return { ...utils, ref, onActiveIndexChange, onBlockedScrollAttempt };
+  const feed = screen.getByRole('feed', { hidden: true });
+  return { ...utils, ref, feed, onActiveIndexChange, onBlockedScrollAttempt };
 }
 
 function setSize(el: Element, clientHeight: number, scrollHeight: number) {
@@ -35,336 +36,371 @@ function setSize(el: Element, clientHeight: number, scrollHeight: number) {
   Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true });
 }
 
+const activeIndex = (feed: HTMLElement) => Number(feed.getAttribute('data-active-index'));
+const scrollerOf = (feed: HTMLElement, index: number) =>
+  feed.querySelector<HTMLElement>(`[data-post-index="${index}"] [data-post-scroller]`)!;
+
+/** Finger moves from `fromY` to `toY` (upward swipe = next post). */
+function swipe(feed: HTMLElement, fromY: number, toY: number, { dx = 0 } = {}) {
+  fireEvent.touchStart(feed, { touches: [{ clientX: 100, clientY: fromY }] });
+  fireEvent.touchEnd(feed, { changedTouches: [{ clientX: 100 + dx, clientY: toY }] });
+}
+const swipeUp = (feed: HTMLElement) => swipe(feed, 500, 300);
+const swipeDown = (feed: HTMLElement) => swipe(feed, 300, 500);
+
 describe('GameFeed', () => {
+  let now = 1_000_000;
+
   beforeEach(() => {
-    // Complete the scroll animation in a single frame.
-    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
-      cb(performance.now() + 10_000);
-      return 1;
-    });
+    now = 1_000_000;
+    jest.spyOn(Date, 'now').mockImplementation(() => now);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('renders each post in its own full-height snap slot inside one snapping feed', () => {
-    renderFeed();
-    const feed = screen.getByRole('feed');
-    expect(feed).toHaveClass('overflow-y-auto', 'snap-y', 'snap-mandatory', 'scrollbar-none');
-    const slots = feed.querySelectorAll('[data-post-index]');
-    expect(slots).toHaveLength(3);
-    slots.forEach((slot) => {
-      expect(slot).toHaveClass('h-full', 'snap-start', 'snap-always');
-      // Tall posts scroll inside the slot, with the scrollbar hidden.
-      expect(slot.querySelector('[data-post-scroller]')).toHaveClass(
-        'overflow-y-auto',
-        'scrollbar-none'
-      );
-    });
-    expect(screen.getByTestId('post-a')).toBeInTheDocument();
-    expect(screen.getByTestId('post-c')).toBeInTheDocument();
-  });
-
-  it('shows the locked hint under the last post while progression is locked', () => {
-    renderFeed({ isLocked: true });
-    const hint = screen.getByText(labels.lockedHint);
-    expect(hint.closest('[data-post-index]')).toHaveAttribute('data-post-index', '2');
-  });
-
-  it('hides the locked hint once progression is unlocked', () => {
-    renderFeed({ isLocked: false });
-    expect(screen.queryByText(labels.lockedHint)).not.toBeInTheDocument();
-  });
-
-  it('snaps the feed to the requested post through the imperative handle', () => {
-    const { ref } = renderFeed();
-    const feed = screen.getByRole('feed');
-    setSize(feed, 600, 1800);
-    act(() => {
-      ref.current?.scrollToPost(1);
-    });
-    expect(feed.scrollTop).toBe(600);
-  });
-
-  it('reports the snapped post as active on scroll', () => {
-    const { onActiveIndexChange } = renderFeed();
-    const feed = screen.getByRole('feed');
-    setSize(feed, 600, 1800);
-    feed.scrollTop = 600;
-
-    fireEvent.scroll(feed);
-
-    expect(onActiveIndexChange).toHaveBeenLastCalledWith(1);
-  });
-
-  it('fires a blocked-scroll attempt when the user wheels past the end while locked', () => {
-    const { onBlockedScrollAttempt } = renderFeed({ isLocked: true });
-    const feed = screen.getByRole('feed');
-    setSize(feed, 500, 1500);
-    feed.scrollTop = 1000; // last slot
-
-    fireEvent.wheel(feed, { deltaY: 40 });
-
-    expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not fire a blocked-scroll attempt while the last post can still scroll internally', () => {
-    const { onBlockedScrollAttempt } = renderFeed({ isLocked: true });
-    const feed = screen.getByRole('feed');
-    setSize(feed, 500, 1500);
-    feed.scrollTop = 1000;
-    const scroller = feed.querySelector('[data-post-index="2"] [data-post-scroller]')!;
-    setSize(scroller, 500, 900);
-    scroller.scrollTop = 0;
-
-    fireEvent.wheel(feed, { deltaY: 40 });
-
-    expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
-  });
-
-  it('does not fire a blocked-scroll attempt when unlocked or not at the end', () => {
-    const { onBlockedScrollAttempt, rerender } = renderFeed({ isLocked: true });
-    const feed = screen.getByRole('feed');
-    setSize(feed, 500, 1500);
-    feed.scrollTop = 500; // middle slot
-
-    fireEvent.wheel(feed, { deltaY: 40 });
-    expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
-
-    feed.scrollTop = 1000;
-    rerender(
-      <GameFeed
-        postIds={['a', 'b', 'c']}
-        renderPost={(id) => <div data-testid={`post-${id}`}>Post {id}</div>}
-        isLocked={false}
-        labels={labels}
-        onActiveIndexChange={jest.fn()}
-        onBlockedScrollAttempt={onBlockedScrollAttempt}
-      />
-    );
-    fireEvent.wheel(feed, { deltaY: 40 });
-    expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
-  });
-
-  it('shows a scroll hint while the current post is taller than its slot and hides it once scrolled', () => {
-    renderFeed();
-    const feed = screen.getByRole('feed');
-    setSize(feed, 500, 1500);
-    const scroller = feed.querySelector('[data-post-index="0"] [data-post-scroller]')!;
-    setSize(scroller, 500, 900);
-
-    act(() => {
-      window.dispatchEvent(new Event('resize'));
-    });
-    expect(screen.getByText(labels.scrollHint)).toBeInTheDocument();
-
-    scroller.scrollTop = 50;
-    fireEvent.scroll(scroller);
-    expect(screen.queryByText(labels.scrollHint)).not.toBeInTheDocument();
-  });
-
-  it('does not show the scroll hint when the current post fits on screen', () => {
-    renderFeed();
-    const feed = screen.getByRole('feed');
-    setSize(feed, 500, 1500);
-    const scroller = feed.querySelector('[data-post-index="0"] [data-post-scroller]')!;
-    setSize(scroller, 500, 400);
-    act(() => {
-      window.dispatchEvent(new Event('resize'));
-    });
-    expect(screen.queryByText(labels.scrollHint)).not.toBeInTheDocument();
-  });
-
-  it('renders safely with no posts', () => {
-    const { onBlockedScrollAttempt } = renderFeed({ postIds: [] });
-    const feed = screen.getByRole('feed');
-    expect(feed.querySelectorAll('[data-post-index]')).toHaveLength(0);
-    setSize(feed, 500, 500);
-    act(() => {
-      window.dispatchEvent(new Event('resize'));
-    });
-    fireEvent.wheel(feed, { deltaY: 40 });
-    expect(screen.queryByText(labels.scrollHint)).not.toBeInTheDocument();
-    expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
-  });
-
-  it('works in browsers without ResizeObserver', () => {
-    const original = global.ResizeObserver;
-    // @ts-expect-error simulate an older browser
-    delete global.ResizeObserver;
-    try {
-      const { unmount } = renderFeed();
-      expect(screen.getByRole('feed')).toBeInTheDocument();
-      unmount();
-    } finally {
-      global.ResizeObserver = original;
-    }
-  });
-
-  describe('touch gestures', () => {
-    function lockedAtEnd() {
-      const utils = renderFeed({ isLocked: true });
-      const feed = screen.getByRole('feed');
-      setSize(feed, 500, 1500);
-      feed.scrollTop = 1000;
-      return { ...utils, feed };
-    }
-
-    it('fires a blocked-scroll attempt on an upward swipe past the end', () => {
-      const { feed, onBlockedScrollAttempt } = lockedAtEnd();
-      fireEvent.touchStart(feed, { touches: [{ clientY: 400 }] });
-      fireEvent.touchMove(feed, { touches: [{ clientY: 300 }] });
-      expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
-    });
-
-    it('ignores small moves, downward swipes and touches without a point', () => {
-      const { feed, onBlockedScrollAttempt } = lockedAtEnd();
-      fireEvent.touchStart(feed, { touches: [] });
-      fireEvent.touchMove(feed, { touches: [{ clientY: 100 }] });
-      fireEvent.touchStart(feed, { touches: [{ clientY: 400 }] });
-      fireEvent.touchMove(feed, { touches: [{ clientY: 390 }] });
-      fireEvent.touchMove(feed, { touches: [{ clientY: 500 }] });
-      fireEvent.touchMove(feed, { touches: [] });
-      expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
-    });
-
-    it('throttles repeated attempts and ignores upward wheel movement', () => {
-      const { feed, onBlockedScrollAttempt } = lockedAtEnd();
-      fireEvent.wheel(feed, { deltaY: -40 });
-      expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
-      fireEvent.wheel(feed, { deltaY: 40 });
-      fireEvent.wheel(feed, { deltaY: 40 });
-      fireEvent.touchStart(feed, { touches: [{ clientY: 400 }] });
-      fireEvent.touchMove(feed, { touches: [{ clientY: 300 }] });
-      expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('scroll animation', () => {
-    function manualFrames() {
-      jest.restoreAllMocks();
-      const frames: FrameRequestCallback[] = [];
-      jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
-        frames.push(cb);
-        return frames.length;
+  describe('layout', () => {
+    it('keeps the viewport fixed and gives each post its own scroll area', () => {
+      const { feed } = renderFeed();
+      expect(feed).toHaveClass('overflow-hidden');
+      expect(feed).not.toHaveClass('overflow-y-auto');
+      const slots = feed.querySelectorAll('[data-post-index]');
+      expect(slots).toHaveLength(3);
+      slots.forEach((slot) => {
+        expect(slot).toHaveClass('h-full');
+        expect(slot.querySelector('[data-post-scroller]')).toHaveClass(
+          'overflow-y-auto',
+          'overscroll-contain',
+          'scrollbar-none'
+        );
       });
-      return frames;
-    }
-
-    function sizedFeed() {
-      const utils = renderFeed();
-      const feed = screen.getByRole('feed');
-      setSize(feed, 600, 1800);
-      return { ...utils, feed };
-    }
-
-    afterEach(() => {
-      jest.useRealTimers();
     });
 
-    it('animates over several frames with the snap lifted, then restores it', () => {
-      const frames = manualFrames();
-      jest.spyOn(performance, 'now').mockReturnValue(1000);
-      const { ref, feed, onActiveIndexChange } = sizedFeed();
+    it('shows only the active post and keeps the others out of focus order', () => {
+      const { feed } = renderFeed();
+      const track = feed.querySelector<HTMLElement>('[data-feed-track]')!;
+      expect(track.style.transform).toBe('translate3d(0, 0%, 0)');
+      expect(feed.querySelector('[data-post-index="0"]')).not.toHaveAttribute('inert');
+      expect(feed.querySelector('[data-post-index="1"]')).toHaveAttribute('inert');
+      expect(feed.querySelector('[data-post-index="1"]')).toHaveAttribute('aria-hidden', 'true');
+    });
 
-      act(() => ref.current?.scrollToPost(2));
-      expect(feed.style.scrollSnapType).toBe('none');
-
-      act(() => frames.shift()!(1100));
-      expect(feed.scrollTop).toBeGreaterThan(0);
-      expect(feed.scrollTop).toBeLessThan(1200);
-      expect(feed.style.scrollSnapType).toBe('none');
-
-      act(() => frames.shift()!(5000));
-      expect(feed.scrollTop).toBe(1200);
-      expect(feed.style.scrollSnapType).toBe('');
+    it('starts on the requested initial post', () => {
+      const { feed, onActiveIndexChange } = renderFeed({ initialIndex: 2 });
+      expect(activeIndex(feed)).toBe(2);
+      expect(feed.querySelector<HTMLElement>('[data-feed-track]')!.style.transform).toBe(
+        'translate3d(0, -200%, 0)'
+      );
       expect(onActiveIndexChange).toHaveBeenLastCalledWith(2);
     });
 
-    it('finishes through the safety timer when frames never arrive', () => {
-      jest.useFakeTimers();
-      manualFrames();
-      const { ref, feed, onActiveIndexChange } = sizedFeed();
+    it('clamps an out-of-range initial post to the unlocked ones', () => {
+      expect(activeIndex(renderFeed({ initialIndex: 9 }).feed)).toBe(2);
+    });
 
+    it('shows the locked hint under the last post only while locked', () => {
+      const { rerender } = renderFeed({ isLocked: true });
+      expect(screen.getByTestId('feed-locked-hint').closest('[data-post-index]')).toHaveAttribute(
+        'data-post-index',
+        '2'
+      );
+      rerender(
+        <GameFeed
+          postIds={['a', 'b', 'c']}
+          renderPost={() => null}
+          isLocked={false}
+          labels={labels}
+        />
+      );
+      expect(screen.queryByTestId('feed-locked-hint')).not.toBeInTheDocument();
+    });
+
+    it('renders safely with no posts', () => {
+      const { ref, feed, onBlockedScrollAttempt } = renderFeed({ postIds: [], isLocked: false });
+      expect(feed.querySelectorAll('[data-post-index]')).toHaveLength(0);
       act(() => ref.current?.scrollToPost(1));
-      expect(feed.scrollTop).toBe(0);
+      swipeUp(feed);
+      fireEvent.wheel(feed, { deltaY: 100 });
+      expect(activeIndex(feed)).toBe(0);
+      expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
+    });
 
-      act(() => {
-        jest.runOnlyPendingTimers();
-      });
-      expect(feed.scrollTop).toBe(600);
-      expect(feed.style.scrollSnapType).toBe('');
+    it('works in browsers without ResizeObserver', () => {
+      const original = global.ResizeObserver;
+      // @ts-expect-error simulate an older browser
+      delete global.ResizeObserver;
+      try {
+        const { unmount, feed } = renderFeed();
+        expect(feed).toBeInTheDocument();
+        unmount();
+      } finally {
+        global.ResizeObserver = original;
+      }
+    });
+
+    it('undoes any scroll applied to the fixed viewport', () => {
+      const { feed } = renderFeed();
+      feed.scrollTop = 120;
+      fireEvent.scroll(feed);
+      expect(feed.scrollTop).toBe(0);
+    });
+  });
+
+  describe('imperative handle', () => {
+    it('moves to the requested post and reports it', () => {
+      const { ref, feed, onActiveIndexChange } = renderFeed();
+      act(() => ref.current?.scrollToPost(1));
+      expect(activeIndex(feed)).toBe(1);
+      expect(feed.querySelector<HTMLElement>('[data-feed-track]')!.style.transform).toBe(
+        'translate3d(0, -100%, 0)'
+      );
       expect(onActiveIndexChange).toHaveBeenLastCalledWith(1);
     });
 
-    it('ignores frames from a jump that was superseded', () => {
-      const frames = manualFrames();
-      const { ref, feed } = sizedFeed();
-
-      act(() => {
-        ref.current?.scrollToPost(2);
-        ref.current?.scrollToPost(1);
-      });
-      act(() => frames.forEach((cb) => cb(performance.now() + 10_000)));
-      expect(feed.scrollTop).toBe(600);
-    });
-
-    it("does not let a superseded jump's safety timer undo a later jump", () => {
-      // Regression: only the old frame loop used to be cancelled, so the old
-      // safety timer later snapped the feed back to the stale target.
-      jest.useFakeTimers();
-      manualFrames();
-      const { ref, feed } = sizedFeed();
-
-      act(() => ref.current?.scrollToPost(2)); // stale target 1200, timer at 700ms
-      act(() => {
-        jest.advanceTimersByTime(100);
-      });
-      act(() => ref.current?.scrollToPost(1)); // live target 600, timer at 800ms
-
-      act(() => {
-        jest.advanceTimersByTime(650); // past the stale deadline only
-      });
-      expect(feed.scrollTop).not.toBe(1200);
-
-      act(() => {
-        jest.advanceTimersByTime(100);
-      });
-      expect(feed.scrollTop).toBe(600);
-    });
-
-    it('leaves no timer armed after the feed unmounts mid-jump', () => {
-      jest.useFakeTimers();
-      manualFrames();
-      const { ref, unmount } = sizedFeed();
-      act(() => ref.current?.scrollToPost(2));
-      expect(jest.getTimerCount()).toBeGreaterThan(0);
-
-      unmount();
-      expect(jest.getTimerCount()).toBe(0);
-    });
-
-    it('jumps instantly when the viewer prefers reduced motion', () => {
-      const frames = manualFrames();
-      (window.matchMedia as jest.Mock).mockImplementationOnce((query: string) => ({
-        matches: query.includes('reduce'),
-        media: query,
-      }));
-      const { ref, feed, onActiveIndexChange } = sizedFeed();
-
-      act(() => ref.current?.scrollToPost(2));
-      expect(feed.scrollTop).toBe(1200);
-      expect(frames).toHaveLength(0);
-      expect(onActiveIndexChange).toHaveBeenLastCalledWith(2);
-    });
-
     it('clamps the requested index to the available posts', () => {
-      const { ref, feed } = sizedFeed();
+      const { ref, feed } = renderFeed();
       act(() => ref.current?.scrollToPost(10));
-      expect(feed.scrollTop).toBe(1200);
+      expect(activeIndex(feed)).toBe(2);
       act(() => ref.current?.scrollToPost(-3));
-      expect(feed.scrollTop).toBe(0);
+      expect(activeIndex(feed)).toBe(0);
+    });
+
+    it('opens the target post at its top', () => {
+      const { ref, feed } = renderFeed();
+      const target = scrollerOf(feed, 1);
+      target.scrollTop = 200;
+      act(() => ref.current?.scrollToPost(1));
+      expect(target.scrollTop).toBe(0);
+    });
+  });
+
+  describe('touch', () => {
+    it('moves to the next post on an upward swipe and back on a downward swipe', () => {
+      const { feed } = renderFeed();
+      swipeUp(feed);
+      expect(activeIndex(feed)).toBe(1);
+      swipeDown(feed);
+      expect(activeIndex(feed)).toBe(0);
+    });
+
+    it('does not go above the first post', () => {
+      const { feed } = renderFeed();
+      swipeDown(feed);
+      expect(activeIndex(feed)).toBe(0);
+    });
+
+    it('accepts a short but fast flick', () => {
+      const { feed } = renderFeed();
+      fireEvent.touchStart(feed, { touches: [{ clientX: 100, clientY: 500 }] });
+      now += 50;
+      fireEvent.touchEnd(feed, { changedTouches: [{ clientX: 100, clientY: 470 }] });
+      expect(activeIndex(feed)).toBe(1);
+    });
+
+    it('ignores short slow drags, horizontal swipes, multi-touch and cancelled touches', () => {
+      const { feed } = renderFeed();
+
+      fireEvent.touchStart(feed, { touches: [{ clientX: 100, clientY: 500 }] });
+      now += 1000;
+      fireEvent.touchEnd(feed, { changedTouches: [{ clientX: 100, clientY: 470 }] });
+
+      swipe(feed, 500, 400, { dx: 150 });
+
+      fireEvent.touchStart(feed, {
+        touches: [
+          { clientX: 100, clientY: 500 },
+          { clientX: 200, clientY: 500 },
+        ],
+      });
+      fireEvent.touchEnd(feed, { changedTouches: [{ clientX: 100, clientY: 300 }] });
+
+      fireEvent.touchStart(feed, { touches: [{ clientX: 100, clientY: 500 }] });
+      fireEvent.touchCancel(feed);
+      fireEvent.touchEnd(feed, { changedTouches: [{ clientX: 100, clientY: 300 }] });
+
+      fireEvent.touchStart(feed, { touches: [] });
+      fireEvent.touchEnd(feed, { changedTouches: [{ clientX: 100, clientY: 300 }] });
+
+      fireEvent.touchStart(feed, { touches: [{ clientX: 100, clientY: 500 }] });
+      fireEvent.touchEnd(feed, { changedTouches: [] });
+
+      expect(activeIndex(feed)).toBe(0);
+    });
+
+    it('lets a tall post scroll first and only moves on once the swipe starts at its edge', () => {
+      const { feed } = renderFeed();
+      const scroller = scrollerOf(feed, 0);
+      setSize(scroller, 500, 1200);
+
+      // Mid-post: the swipe scrolls the card natively, the feed stays put.
+      scroller.scrollTop = 300;
+      swipeUp(feed);
+      expect(activeIndex(feed)).toBe(0);
+
+      // At the bottom edge when the finger lands: next post.
+      scroller.scrollTop = 700;
+      swipeUp(feed);
+      expect(activeIndex(feed)).toBe(1);
+    });
+
+    it('only goes back from a tall post once it is scrolled to its top', () => {
+      const { ref, feed } = renderFeed();
+      act(() => ref.current?.scrollToPost(1));
+      const scroller = scrollerOf(feed, 1);
+      setSize(scroller, 500, 1200);
+
+      scroller.scrollTop = 300;
+      swipeDown(feed);
+      expect(activeIndex(feed)).toBe(1);
+
+      scroller.scrollTop = 0;
+      swipeDown(feed);
+      expect(activeIndex(feed)).toBe(0);
+    });
+  });
+
+  describe('blocked progression', () => {
+    it('reports a blocked attempt when swiping past the last post while locked', () => {
+      const { ref, feed, onBlockedScrollAttempt } = renderFeed();
+      act(() => ref.current?.scrollToPost(2));
+      swipeUp(feed);
+      expect(activeIndex(feed)).toBe(2);
+      expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not report while the last post can still scroll', () => {
+      const { ref, feed, onBlockedScrollAttempt } = renderFeed();
+      act(() => ref.current?.scrollToPost(2));
+      setSize(scrollerOf(feed, 2), 500, 1200);
+      swipeUp(feed);
+      expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
+    });
+
+    it('does not report when unlocked or without a handler', () => {
+      const unlocked = renderFeed({ isLocked: false, initialIndex: 2 });
+      swipeUp(unlocked.feed);
+      expect(unlocked.onBlockedScrollAttempt).not.toHaveBeenCalled();
+      unlocked.unmount();
+
+      const noHandler = renderFeed({ onBlockedScrollAttempt: undefined, initialIndex: 2 });
+      expect(() => swipeUp(noHandler.feed)).not.toThrow();
+    });
+
+    it('throttles repeated attempts', () => {
+      const { feed, onBlockedScrollAttempt } = renderFeed({ initialIndex: 2 });
+      swipeUp(feed);
+      swipeUp(feed);
+      expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
+      now += 3100;
+      swipeUp(feed);
+      expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('wheel', () => {
+    it('moves one post per wheel gesture at the edge', () => {
+      const { feed } = renderFeed();
+      fireEvent.wheel(feed, { deltaY: 100 });
+      expect(activeIndex(feed)).toBe(1);
+
+      // Trackpad inertia from the same gesture is ignored...
+      for (let i = 0; i < 10; i += 1) {
+        now += 50;
+        fireEvent.wheel(feed, { deltaY: 30 });
+      }
+      expect(activeIndex(feed)).toBe(1);
+
+      // ...but a new gesture after a pause moves again, in either direction.
+      now += 500;
+      fireEvent.wheel(feed, { deltaY: -100 });
+      expect(activeIndex(feed)).toBe(0);
+    });
+
+    it('releases the lock after a long continuous gesture', () => {
+      const { feed } = renderFeed();
+      fireEvent.wheel(feed, { deltaY: 100 });
+      for (let i = 0; i < 40; i += 1) {
+        now += 50;
+        fireEvent.wheel(feed, { deltaY: 100 });
+      }
+      expect(activeIndex(feed)).toBe(2);
+    });
+
+    it('accumulates small deltas within one gesture and resets on reversal or a pause', () => {
+      const { feed } = renderFeed();
+      fireEvent.wheel(feed, { deltaY: 30 });
+      now += 20;
+      fireEvent.wheel(feed, { deltaY: -30 });
+      now += 20;
+      fireEvent.wheel(feed, { deltaY: 30 });
+      now += 400;
+      fireEvent.wheel(feed, { deltaY: 30 });
+      expect(activeIndex(feed)).toBe(0);
+      now += 20;
+      fireEvent.wheel(feed, { deltaY: 30 });
+      expect(activeIndex(feed)).toBe(1);
+    });
+
+    it('lets a tall post scroll natively before moving on', () => {
+      const { feed } = renderFeed();
+      const scroller = scrollerOf(feed, 0);
+      setSize(scroller, 500, 1200);
+      scroller.scrollTop = 100;
+      fireEvent.wheel(feed, { deltaY: 100 });
+      fireEvent.wheel(feed, { deltaY: -100 });
+      expect(activeIndex(feed)).toBe(0);
+    });
+
+    it('ignores horizontal and empty wheel events', () => {
+      const { feed } = renderFeed();
+      fireEvent.wheel(feed, { deltaY: 0 });
+      fireEvent.wheel(feed, { deltaX: 200, deltaY: 100 });
+      expect(activeIndex(feed)).toBe(0);
+    });
+
+    it('reports a blocked attempt when wheeling past the last post while locked', () => {
+      const { feed, onBlockedScrollAttempt } = renderFeed({ initialIndex: 2 });
+      fireEvent.wheel(feed, { deltaY: 100 });
+      expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('scroll hint', () => {
+    it('shows while the current post overflows and hides once it is scrolled', () => {
+      const { feed } = renderFeed();
+      const scroller = scrollerOf(feed, 0);
+      setSize(scroller, 500, 900);
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+      expect(screen.getByText(labels.scrollHint)).toBeInTheDocument();
+
+      scroller.scrollTop = 50;
+      fireEvent.scroll(scroller);
+      expect(screen.queryByText(labels.scrollHint)).not.toBeInTheDocument();
+
+      // Scrolling back to the top does not bring it back for this post.
+      scroller.scrollTop = 0;
+      fireEvent.scroll(scroller);
+      expect(screen.queryByText(labels.scrollHint)).not.toBeInTheDocument();
+    });
+
+    it('is re-evaluated for each post the user moves to', () => {
+      const { ref, feed } = renderFeed();
+      setSize(scrollerOf(feed, 1), 500, 900);
+      expect(screen.queryByText(labels.scrollHint)).not.toBeInTheDocument();
+      act(() => ref.current?.scrollToPost(1));
+      expect(screen.getByText(labels.scrollHint)).toBeInTheDocument();
+    });
+
+    it('stays hidden when the current post fits on screen', () => {
+      const { feed } = renderFeed();
+      setSize(scrollerOf(feed, 0), 500, 400);
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+      expect(screen.queryByText(labels.scrollHint)).not.toBeInTheDocument();
     });
   });
 });

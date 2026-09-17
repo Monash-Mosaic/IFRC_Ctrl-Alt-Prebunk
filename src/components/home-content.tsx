@@ -109,16 +109,6 @@ export default function HomeContent() {
     showFeedToast(feedT('blockedScroll'));
   }, [feedT, showFeedToast]);
 
-  // Returning players (persisted answers) land on their current question rather than post 1.
-  const initialScrollDoneRef = useRef(false);
-  useEffect(() => {
-    if (initialScrollDoneRef.current || !onboardingCompleted) return;
-    initialScrollDoneRef.current = true;
-    if (firstUnansweredIndex > 0) {
-      feedRef.current?.scrollToPost(firstUnansweredIndex);
-    }
-  }, [firstUnansweredIndex, onboardingCompleted]);
-
   const activePostId = unlockedPosts[activeIndex]?.id;
   const hasEngagedCurrent = activePostId ? isAnswered(activePostId) : false;
   const isLastPost = activeIndex >= contentList.length - 1;
@@ -300,6 +290,8 @@ export default function HomeContent() {
           <div className="relative flex min-h-0 w-full flex-1 flex-col md:w-[28rem] md:max-w-[calc(100vw-12rem)]">
             <GameFeed
               ref={feedRef}
+              // Returning players (persisted answers) land on their current question.
+              initialIndex={isFeedLocked ? firstUnansweredIndex : unlockedPosts.length - 1}
               postIds={unlockedPostIds}
               renderPost={renderPost}
               isLocked={isFeedLocked}

@@ -154,29 +154,27 @@ jest.mock('@/components/newfeeds/prebunking-modal', () => {
 jest.mock('@/components/chat-content', () => () => <div data-testid="chat-content" />);
 jest.mock('@/components/game-complete', () => () => <div data-testid="game-complete" />);
 
-// Real GameFeed is used; its scroll animation is collapsed into a single frame below.
+// The real GameFeed is used: posts are moved between with swipes, and the feed
+// exposes the post on screen through its data-active-index attribute.
 
-const SLOT_HEIGHT = 600;
-
-/** Give the (jsdom, zero-sized) feed a real slot height so snapping can be asserted. */
-function sizeFeed() {
-  const feed = screen.getByRole('feed');
-  Object.defineProperty(feed, 'clientHeight', { value: SLOT_HEIGHT, configurable: true });
-  Object.defineProperty(feed, 'scrollHeight', { value: SLOT_HEIGHT * 2, configurable: true });
-  return feed;
-}
-
-/** Pretend the feed has snapped so that the post at `index` fills the screen. */
-function setActivePost(index: number) {
-  const feed = sizeFeed();
-  feed.scrollTop = SLOT_HEIGHT * index;
-  fireEvent.scroll(feed);
-}
-
-/** Index of the post the feed is currently snapped to. */
+/** Index of the post currently on screen. */
 function snappedPostIndex(): number {
+  return Number(screen.getByRole('feed').getAttribute('data-active-index'));
+}
+
+function swipe(direction: 'up' | 'down') {
   const feed = screen.getByRole('feed');
-  return Math.round(feed.scrollTop / SLOT_HEIGHT);
+  const [from, to] = direction === 'up' ? [500, 300] : [300, 500];
+  fireEvent.touchStart(feed, { touches: [{ clientX: 100, clientY: from }] });
+  fireEvent.touchEnd(feed, { changedTouches: [{ clientX: 100, clientY: to }] });
+}
+
+/** Swipe until the post at `index` is on screen. */
+function setActivePost(index: number) {
+  for (let guard = 0; guard < 10 && snappedPostIndex() !== index; guard += 1) {
+    swipe(snappedPostIndex() < index ? 'up' : 'down');
+  }
+  expect(snappedPostIndex()).toBe(index);
 }
 
 describe('HomeContent navigation', () => {
@@ -186,10 +184,6 @@ describe('HomeContent navigation', () => {
     mockIsAnswered.mockReturnValue(false);
     mockIsPostDisabled.mockReturnValue(false);
     mockIsGameCompleted.mockReturnValue(false);
-    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
-      cb(performance.now() + 10_000);
-      return 1;
-    });
 
     (useCredibilityStore as unknown as jest.Mock).mockReturnValue({
       points: 0,
@@ -277,7 +271,8 @@ describe('HomeContent navigation', () => {
     mockIsAnswered.mockImplementation((id: string) => id === '1');
     const user = userEvent.setup();
     render(<HomeContent />);
-    sizeFeed();
+    // Returning players open on their current question; go back to the answered one first.
+    setActivePost(0);
 
     await user.click(screen.getByRole('button', { name: 'Next post' }));
 
@@ -318,24 +313,53 @@ describe('HomeContent navigation', () => {
     mockIsAnswered.mockImplementation((id: string) => id === '1');
     rerender(<HomeContent />);
     expect(screen.getByTestId('post-2')).toBeInTheDocument();
-    sizeFeed();
 
     await user.click(screen.getByTestId('continue-modal-1'));
     expect(mockMoveToNextQuestion).toHaveBeenCalledTimes(1);
     expect(snappedPostIndex()).toBe(1);
   });
 
-  it('shows a toast when the user tries to scroll past a locked post', () => {
+  it('shows a toast when the user wheels past a locked post', () => {
     render(<HomeContent />);
-    const feed = screen.getByRole('feed');
-    Object.defineProperty(feed, 'scrollHeight', { value: 1000, configurable: true });
-    Object.defineProperty(feed, 'clientHeight', { value: 500, configurable: true });
-    feed.scrollTop = 500;
 
-    fireEvent.wheel(feed, { deltaY: 40 });
+    fireEvent.wheel(screen.getByRole('feed'), { deltaY: 100 });
 
-    expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText('blockedScroll')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('blockedScroll');
+    expect(snappedPostIndex()).toBe(0);
+  });
+
+  it('shows a toast when the user swipes past a locked post', () => {
+    render(<HomeContent />);
+
+    swipe('up');
+
+    expect(screen.getByRole('alert')).toHaveTextContent('blockedScroll');
+    expect(snappedPostIndex()).toBe(0);
+  });
+
+  it('keeps swiping working after the blocked toast is tapped', async () => {
+    // Regression: on iOS, tapping the blocked toast used to leave the feed
+    // unresponsive to swipes for a while.
+    mockIsAnswered.mockImplementation((id: string) => id === '1');
+    const user = userEvent.setup();
+    render(<HomeContent />);
+    setActivePost(1);
+
+    swipe('up');
+    await user.click(screen.getByRole('alert'));
+    await user.click(screen.getByRole('button', { name: 'Close notification' }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    swipe('down');
+    expect(snappedPostIndex()).toBe(0);
+    swipe('up');
+    expect(snappedPostIndex()).toBe(1);
+  });
+
+  it('opens a returning player on their current question', () => {
+    mockIsAnswered.mockImplementation((id: string) => id === '1');
+    render(<HomeContent />);
+    expect(snappedPostIndex()).toBe(1);
   });
 
   it('ignores an answer for a post that is not in the content list', async () => {
