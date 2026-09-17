@@ -260,6 +260,163 @@ describe('GameFeed', () => {
     });
   });
 
+  describe('dragging', () => {
+    const track = (feed: HTMLElement) => feed.querySelector<HTMLElement>('[data-feed-track]')!;
+    const start = (feed: HTMLElement, y: number, x = 100) =>
+      fireEvent.touchStart(feed, { touches: [{ clientX: x, clientY: y }] });
+    /** Returns false when the feed cancelled the browser's default (scroll / pull-to-refresh). */
+    const move = (feed: HTMLElement, y: number, x = 100) =>
+      fireEvent.touchMove(feed, { touches: [{ clientX: x, clientY: y }] });
+    const end = (feed: HTMLElement, y: number, x = 100) =>
+      fireEvent.touchEnd(feed, { changedTouches: [{ clientX: x, clientY: y }] });
+
+    it("blocks Safari's pull-to-refresh as soon as a pull starts at a card's top", () => {
+      const { feed } = renderFeed({ initialIndex: 1 });
+      start(feed, 300);
+      expect(move(feed, 302)).toBe(false);
+    });
+
+    it('moves the posts with the finger and slides to the previous post on release', () => {
+      const { feed } = renderFeed({ initialIndex: 1 });
+      start(feed, 300);
+      expect(move(feed, 340)).toBe(false);
+      expect(track(feed).style.transform).toBe('translate3d(0, calc(-100% + 40px), 0)');
+      expect(track(feed).style.transition).toBe('none');
+
+      move(feed, 420);
+      end(feed, 420);
+      expect(activeIndex(feed)).toBe(0);
+      expect(track(feed).style.transform).toBe('translate3d(0, 0%, 0)');
+      expect(track(feed).style.transition).toBe('');
+    });
+
+    it('slides to the next post when dragged up from the bottom of a card', () => {
+      const { feed } = renderFeed();
+      start(feed, 500);
+      expect(move(feed, 420)).toBe(false);
+      expect(track(feed).style.transform).toBe('translate3d(0, calc(0% + -80px), 0)');
+      end(feed, 420);
+      expect(activeIndex(feed)).toBe(1);
+      expect(track(feed).style.transform).toBe('translate3d(0, -100%, 0)');
+    });
+
+    it('springs back when released before the swipe threshold', () => {
+      const { feed } = renderFeed({ initialIndex: 1 });
+      start(feed, 300);
+      move(feed, 330);
+      now += 1000;
+      end(feed, 330);
+      expect(activeIndex(feed)).toBe(1);
+      expect(track(feed).style.transform).toBe('translate3d(0, -100%, 0)');
+    });
+
+    it('resists and springs back when pulled past the first post', () => {
+      const { feed, onBlockedScrollAttempt } = renderFeed();
+      start(feed, 300);
+      expect(move(feed, 400)).toBe(false);
+      expect(track(feed).style.transform).toBe('translate3d(0, calc(0% + 30px), 0)');
+      end(feed, 400);
+      expect(activeIndex(feed)).toBe(0);
+      expect(track(feed).style.transform).toBe('translate3d(0, 0%, 0)');
+      expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
+    });
+
+    it('resists, springs back and reports a blocked attempt past a locked last post', () => {
+      const { feed, onBlockedScrollAttempt } = renderFeed({ initialIndex: 2 });
+      start(feed, 500);
+      move(feed, 400);
+      expect(track(feed).style.transform).toBe('translate3d(0, calc(-200% + -30px), 0)');
+      end(feed, 400);
+      expect(activeIndex(feed)).toBe(2);
+      expect(track(feed).style.transform).toBe('translate3d(0, -200%, 0)');
+      expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not follow the finger past where the gesture started', () => {
+      const { feed } = renderFeed({ initialIndex: 1 });
+      start(feed, 300);
+      move(feed, 340);
+      move(feed, 200);
+      expect(track(feed).style.transform).toBe('translate3d(0, -100%, 0)');
+      end(feed, 200);
+      // Released in the opposite direction to the drag: stay put.
+      expect(activeIndex(feed)).toBe(1);
+    });
+
+    it('leaves a tall card to scroll natively when the swipe starts mid-card', () => {
+      const { feed } = renderFeed();
+      const scroller = scrollerOf(feed, 0);
+      setSize(scroller, 500, 1200);
+      scroller.scrollTop = 300;
+      start(feed, 500);
+      expect(move(feed, 498)).toBe(true);
+      expect(move(feed, 400)).toBe(true);
+      expect(move(feed, 300)).toBe(true);
+      end(feed, 300);
+      expect(activeIndex(feed)).toBe(0);
+      expect(track(feed).style.transform).toBe('translate3d(0, 0%, 0)');
+    });
+
+    it('still follows the finger when the browser will not let the move be cancelled', () => {
+      const { feed } = renderFeed({ initialIndex: 1 });
+      start(feed, 300);
+      move(feed, 340);
+      fireEvent.touchMove(feed, { touches: [{ clientX: 100, clientY: 360 }], cancelable: false });
+      expect(track(feed).style.transform).toBe('translate3d(0, calc(-100% + 60px), 0)');
+      end(feed, 360);
+      expect(activeIndex(feed)).toBe(0);
+    });
+
+    it('leaves horizontal drags alone', () => {
+      const { feed } = renderFeed({ initialIndex: 1 });
+      start(feed, 300, 100);
+      expect(move(feed, 310, 200)).toBe(true);
+      end(feed, 380, 200);
+      expect(activeIndex(feed)).toBe(1);
+    });
+
+    it('springs back when the gesture is cancelled, gains a second finger or ends without a point', () => {
+      const { feed } = renderFeed({ initialIndex: 1 });
+
+      start(feed, 300);
+      move(feed, 400);
+      fireEvent.touchCancel(feed);
+      expect(track(feed).style.transform).toBe('translate3d(0, -100%, 0)');
+      end(feed, 400);
+      expect(activeIndex(feed)).toBe(1);
+
+      start(feed, 300);
+      move(feed, 400);
+      fireEvent.touchMove(feed, {
+        touches: [
+          { clientX: 100, clientY: 400 },
+          { clientX: 200, clientY: 400 },
+        ],
+      });
+      expect(track(feed).style.transform).toBe('translate3d(0, -100%, 0)');
+      expect(move(feed, 450)).toBe(true);
+
+      start(feed, 300);
+      move(feed, 400);
+      fireEvent.touchEnd(feed, { changedTouches: [] });
+      expect(track(feed).style.transform).toBe('translate3d(0, -100%, 0)');
+      expect(activeIndex(feed)).toBe(1);
+
+      fireEvent.touchCancel(feed);
+      expect(move(feed, 450)).toBe(true);
+    });
+
+    it('turns off page-level pull-to-refresh only while mounted', () => {
+      document.documentElement.style.overscrollBehaviorY = 'auto';
+      const { unmount } = renderFeed();
+      expect(document.documentElement.style.overscrollBehaviorY).toBe('none');
+      expect(document.body.style.overscrollBehaviorY).toBe('none');
+      unmount();
+      expect(document.documentElement.style.overscrollBehaviorY).toBe('auto');
+      expect(document.body.style.overscrollBehaviorY).toBe('');
+    });
+  });
+
   describe('blocked progression', () => {
     it('reports a blocked attempt when swiping past the last post while locked', () => {
       const { ref, feed, onBlockedScrollAttempt } = renderFeed();
@@ -350,6 +507,13 @@ describe('GameFeed', () => {
       fireEvent.wheel(feed, { deltaY: 100 });
       fireEvent.wheel(feed, { deltaY: -100 });
       expect(activeIndex(feed)).toBe(0);
+    });
+
+    it('does nothing when wheeling up on the first post', () => {
+      const { feed, onBlockedScrollAttempt } = renderFeed();
+      fireEvent.wheel(feed, { deltaY: -100 });
+      expect(activeIndex(feed)).toBe(0);
+      expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
     });
 
     it('ignores horizontal and empty wheel events', () => {

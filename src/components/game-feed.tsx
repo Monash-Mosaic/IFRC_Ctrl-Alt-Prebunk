@@ -38,6 +38,10 @@ const EDGE_THRESHOLD_PX = 2;
 const SWIPE_DISTANCE_PX = 60;
 const FLICK_DISTANCE_PX = 20;
 const FLICK_VELOCITY_PX_PER_MS = 0.4;
+/** Movement below this is treated as a tap until the gesture's direction is known. */
+const DRAG_SLOP_PX = 6;
+/** Dragging past the first/last post only moves the feed this fraction of the finger travel. */
+const EDGE_RESISTANCE = 0.3;
 /** Wheel travel needed at a post's edge before moving on (one mouse notch is ~100px). */
 const WHEEL_DISTANCE_PX = 50;
 /** Wheel events closer together than this belong to one gesture (incl. trackpad inertia). */
@@ -47,6 +51,27 @@ const WHEEL_MIN_LOCK_MS = 400;
 const WHEEL_MAX_LOCK_MS = 1500;
 
 type Direction = 1 | -1;
+
+/**
+ * A touch gesture on the feed. It is `pending` until it has moved far enough to
+ * tell its direction, then either `feed` (we move the posts with the finger) or
+ * `native` (the card scrolls itself and we stay out of the way).
+ */
+interface Gesture {
+  x: number;
+  y: number;
+  time: number;
+  atTop: boolean;
+  atEnd: boolean;
+  mode: 'pending' | 'feed' | 'native';
+  /** For `feed` gestures: 1 = towards the next post, -1 = towards the previous one. */
+  direction: Direction;
+}
+
+const trackTransform = (index: number, offsetPx = 0) =>
+  offsetPx === 0
+    ? `translate3d(0, ${-index * 100}%, 0)`
+    : `translate3d(0, calc(${-index * 100}% + ${offsetPx}px), 0)`;
 
 function isAtTop(el: HTMLElement) {
   return el.scrollTop <= EDGE_THRESHOLD_PX;
@@ -64,8 +89,10 @@ function overflows(el: HTMLElement) {
  * One-post-per-screen feed (TikTok / Instagram style).
  *
  * Only the post card scrolls natively. The feed viewport itself never scrolls:
- * posts slide in with a CSS transform when the user swipes (or wheels) past the
- * top or bottom edge of the current card. Keeping a single native scroll area
+ * when a swipe starts at the top or bottom edge of the current card, the posts
+ * follow the finger and then slide to the neighbouring post (or spring back).
+ * Those edge swipes cancel the browser's default, which also stops Safari's
+ * pull-to-refresh from grabbing the page. The wheel moves one post per gesture. Keeping a single native scroll area
  * avoids iOS Safari latching a gesture onto one of two nested scrollers, which
  * used to leave the feed unresponsive for a while.
  *
@@ -88,13 +115,8 @@ export default function GameFeed({
   const [showScrollHint, setShowScrollHint] = useState(false);
   const scrolledSlotsRef = useRef<Set<number>>(new Set());
   const lastBlockedAttemptRef = useRef(0);
-  const touchStartRef = useRef<{
-    x: number;
-    y: number;
-    time: number;
-    atTop: boolean;
-    atEnd: boolean;
-  } | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const gestureRef = useRef<Gesture | null>(null);
   const wheelRef = useRef({ distance: 0, lastEvent: 0, lastNavigation: 0, locked: false });
 
   const lastIndex = Math.max(0, postIds.length - 1);
@@ -151,22 +173,171 @@ export default function GameFeed({
     };
   }, [postIds.length, updateScrollHint]);
 
-  const attemptBlocked = () => {
+  const attemptBlocked = useCallback(() => {
     if (!isLocked || !onBlockedScrollAttempt) return;
     const now = Date.now();
     if (now - lastBlockedAttemptRef.current < BLOCKED_ATTEMPT_THROTTLE_MS) return;
     lastBlockedAttemptRef.current = now;
     onBlockedScrollAttempt();
-  };
+  }, [isLocked, onBlockedScrollAttempt]);
+
+  /** The post a move in `direction` lands on, or null when there is none. */
+  const neighbourOf = useCallback(
+    (direction: Direction) => {
+      const target = activeIndex + direction;
+      return target >= 0 && target <= lastIndex && postIds.length > 0 ? target : null;
+    },
+    [activeIndex, lastIndex, postIds.length]
+  );
 
   const navigate = (direction: Direction) => {
-    if (direction === 1) {
-      if (activeIndex < lastIndex) goTo(activeIndex + 1);
-      else attemptBlocked();
-    } else if (activeIndex > 0) {
-      goTo(activeIndex - 1);
-    }
+    const target = neighbourOf(direction);
+    if (target !== null) goTo(target);
+    else if (direction === 1) attemptBlocked();
   };
+
+  // Keep Safari's pull-to-refresh and page rubber-banding out of the feed while it is on screen.
+  useEffect(() => {
+    const roots = [document.documentElement, document.body];
+    const previous = roots.map((el) => el.style.overscrollBehaviorY);
+    roots.forEach((el) => {
+      el.style.overscrollBehaviorY = 'none';
+    });
+    return () => {
+      roots.forEach((el, i) => {
+        el.style.overscrollBehaviorY = previous[i];
+      });
+    };
+  }, []);
+
+  // Touch handling is attached natively: touchmove must be non-passive so a pull at a
+  // card's edge can cancel Safari's own pull-to-refresh / bounce and drive the feed instead.
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    if (!viewport || !track) return;
+
+    const dragTo = (offset: number) => {
+      track.style.transition = 'none';
+      track.style.transform = trackTransform(activeIndex, offset);
+    };
+
+    // Animate from wherever the finger left the track to `index`. Setting the final
+    // transform here (rather than waiting for React) avoids a frame snapping back first.
+    const settleOn = (index: number) => {
+      track.style.transition = '';
+      track.style.transform = trackTransform(index);
+    };
+
+    const cancel = () => {
+      const gesture = gestureRef.current;
+      gestureRef.current = null;
+      if (gesture?.mode === 'feed') settleOn(activeIndex);
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (!touch || event.touches.length > 1) {
+        cancel();
+        return;
+      }
+      const scroller = getScroller(activeIndex);
+      // Edges are read when the finger lands, so one swipe never both scrolls the
+      // card to its end and moves to another post.
+      gestureRef.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        time: Date.now(),
+        atTop: !scroller || isAtTop(scroller),
+        atEnd: !scroller || isAtEnd(scroller),
+        mode: 'pending',
+        direction: 1,
+      };
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      const gesture = gestureRef.current;
+      if (!gesture || gesture.mode === 'native') return;
+      const touch = event.touches[0];
+      if (!touch || event.touches.length > 1) {
+        cancel();
+        return;
+      }
+
+      // Positive when the finger moves up, i.e. towards the next post.
+      const dy = gesture.y - touch.clientY;
+      const dx = gesture.x - touch.clientX;
+
+      if (gesture.mode === 'pending') {
+        const ours = (dy > 0 && gesture.atEnd) || (dy < 0 && gesture.atTop);
+        if (Math.abs(dy) < DRAG_SLOP_PX && Math.abs(dx) < DRAG_SLOP_PX) {
+          // Stop Safari committing to pull-to-refresh before the direction is known.
+          if (ours && event.cancelable) event.preventDefault();
+          return;
+        }
+        if (!ours || Math.abs(dx) >= Math.abs(dy)) {
+          gesture.mode = 'native';
+          return;
+        }
+        gesture.mode = 'feed';
+        gesture.direction = dy > 0 ? 1 : -1;
+      }
+
+      if (event.cancelable) event.preventDefault();
+      // Only follow the finger in the direction the gesture started in.
+      const travel = gesture.direction === 1 ? Math.max(0, dy) : Math.min(0, dy);
+      const hasNeighbour = neighbourOf(gesture.direction) !== null;
+      const height = viewport.clientHeight || Number.POSITIVE_INFINITY;
+      const offset = -Math.max(
+        -height,
+        Math.min(height, hasNeighbour ? travel : travel * EDGE_RESISTANCE)
+      );
+      dragTo(offset);
+    };
+
+    const onTouchEnd = (event: TouchEvent) => {
+      const gesture = gestureRef.current;
+      gestureRef.current = null;
+      if (!gesture || gesture.mode === 'native') return;
+      const touch = event.changedTouches[0];
+      if (!touch) {
+        if (gesture.mode === 'feed') settleOn(activeIndex);
+        return;
+      }
+
+      const dy = gesture.y - touch.clientY;
+      const distance = Math.abs(dy);
+      const direction: Direction = dy > 0 ? 1 : -1;
+      const elapsed = Math.max(1, Date.now() - gesture.time);
+      const isSwipe =
+        distance > Math.abs(gesture.x - touch.clientX) &&
+        (distance >= SWIPE_DISTANCE_PX ||
+          (distance >= FLICK_DISTANCE_PX && distance / elapsed >= FLICK_VELOCITY_PX_PER_MS));
+      const allowed =
+        gesture.mode === 'feed'
+          ? direction === gesture.direction
+          : direction === 1
+            ? gesture.atEnd
+            : gesture.atTop;
+      const commit = isSwipe && allowed;
+      const target = commit ? neighbourOf(direction) : null;
+
+      if (gesture.mode === 'feed') settleOn(target ?? activeIndex);
+      if (target !== null) goTo(target);
+      else if (commit && direction === 1) attemptBlocked();
+    };
+
+    viewport.addEventListener('touchstart', onTouchStart, { passive: true });
+    viewport.addEventListener('touchmove', onTouchMove, { passive: false });
+    viewport.addEventListener('touchend', onTouchEnd);
+    viewport.addEventListener('touchcancel', cancel);
+    return () => {
+      viewport.removeEventListener('touchstart', onTouchStart);
+      viewport.removeEventListener('touchmove', onTouchMove);
+      viewport.removeEventListener('touchend', onTouchEnd);
+      viewport.removeEventListener('touchcancel', cancel);
+    };
+  }, [activeIndex, attemptBlocked, getScroller, goTo, neighbourOf]);
 
   // Scroll events do not bubble, so capture them from the post scrollers.
   const handleScrollCapture = (event: React.UIEvent<HTMLDivElement>) => {
@@ -180,49 +351,6 @@ export default function GameFeed({
       scrolledSlotsRef.current.add(activeIndex);
     }
     updateScrollHint();
-  };
-
-  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
-    const touch = event.touches[0];
-    if (!touch || event.touches.length > 1) {
-      touchStartRef.current = null;
-      return;
-    }
-    const scroller = getScroller(activeIndex);
-    // Edges are read when the finger lands, so one swipe never both scrolls the
-    // card to its end and jumps to the next post.
-    touchStartRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now(),
-      atTop: !scroller || isAtTop(scroller),
-      atEnd: !scroller || isAtEnd(scroller),
-    };
-  };
-
-  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
-    const start = touchStartRef.current;
-    touchStartRef.current = null;
-    const touch = event.changedTouches[0];
-    if (!start || !touch) return;
-
-    // Positive when the finger moved up, i.e. the user wants the next post.
-    const dy = start.y - touch.clientY;
-    const distance = Math.abs(dy);
-    if (distance <= Math.abs(start.x - touch.clientX)) return;
-
-    const elapsed = Math.max(1, Date.now() - start.time);
-    const isSwipe =
-      distance >= SWIPE_DISTANCE_PX ||
-      (distance >= FLICK_DISTANCE_PX && distance / elapsed >= FLICK_VELOCITY_PX_PER_MS);
-    if (!isSwipe) return;
-
-    if (dy > 0 && start.atEnd) navigate(1);
-    else if (dy < 0 && start.atTop) navigate(-1);
-  };
-
-  const handleTouchCancel = () => {
-    touchStartRef.current = null;
   };
 
   const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {
@@ -275,15 +403,13 @@ export default function GameFeed({
         data-active-index={activeIndex}
         onScrollCapture={handleScrollCapture}
         onWheel={handleWheel}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchCancel}
         className="h-full w-full overflow-hidden overscroll-none"
       >
         <div
+          ref={trackRef}
           data-feed-track=""
-          className="h-full w-full transition-transform duration-[350ms] ease-out motion-reduce:transition-none"
-          style={{ transform: `translate3d(0, ${-activeIndex * 100}%, 0)` }}
+          className="h-full w-full transition-transform duration-[350ms] ease-out will-change-transform motion-reduce:transition-none"
+          style={{ transform: trackTransform(activeIndex) }}
         >
           {postIds.map((postId, index) => {
             const isActive = index === activeIndex;
