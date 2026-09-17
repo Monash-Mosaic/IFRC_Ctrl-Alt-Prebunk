@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import { ThumbsUp, ThumbsDown, MessageCircle, Send } from 'lucide-react';
+import PostMessage from '@/components/post-message';
 import { cn } from '@/lib/utils';
 import type { MCQOption, User } from '@/contents/en';
 
@@ -53,80 +52,32 @@ export default function MCQPostMessage({
   };
 
   return (
-    <article
-      className={cn(
-        'w-full rounded-lg border border-[#E8E9ED] bg-white p-4 shadow-sm',
-        isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-      )}
-    >
-      {/* Header */}
-      <header className="mb-3 flex items-start gap-3">
-        <div className="shrink-0 w-[40px] h-[40px] flex items-center justify-center" aria-hidden="true">
-          {user.avatar}
+    <PostMessage
+      user={user}
+      content={<div className="mb-4 text-sm text-[#0D1B3E]">{content}</div>}
+      mediaUrl={mediaType === 'image' ? mediaUrl : undefined}
+      mediaType={mediaType}
+      mediaAlt="Question post"
+      className={isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+      interaction={
+        <div className="space-y-2 mb-4">
+          {options.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              aria-pressed={answer === option.id}
+              disabled={hasAnswered || isDisabled}
+              onClick={() => onAnswer(postId, option.id)}
+              className={cn(
+                'w-full min-h-12 text-start rounded-lg px-4 py-3 text-sm font-medium border transition-colors',
+                getOptionClass(option.id)
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
-        <div className="flex flex-col items-start justify-between">
-          {user.name && <h3 className="text-sm font-semibold text-[#0D1B3E]">{user.name}</h3>}
-          {user.handle && <p className="text-xs text-[#6B7280]">{user.handle}</p>}
-        </div>
-      </header>
-
-      {/* Question content */}
-      <div className="mb-4 text-sm text-[#0D1B3E]">
-        {content}
-      </div>
-
-      {/* Media attachment */}
-      {mediaUrl && mediaType === 'image' && (
-        <div className="relative mb-4 w-full overflow-hidden rounded-lg bg-[#E8E9ED]">
-          <div className="aspect-video w-full">
-            <Image
-              src={mediaUrl}
-              alt="Question post"
-              width={500}
-              height={500}
-              className="h-full w-full object-cover"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Answer options */}
-      <div className="space-y-2 mb-4">
-        {options.map((option) => (
-          <button
-            key={option.id}
-            disabled={hasAnswered || isDisabled}
-            onClick={() => onAnswer(postId, option.id)}
-            className={cn(
-              'w-full text-left rounded-lg px-4 py-3 text-sm font-medium border transition-colors',
-              getOptionClass(option.id)
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Social action bar (all disabled - MCQ interaction is via options) */}
-      <div className="flex items-center justify-between border-t border-[#E8E9ED] pt-3">
-        <div className="flex items-center gap-4">
-          <button disabled className="flex items-center gap-1 text-(--color-ifrc-blue)/30 cursor-not-allowed" aria-label="Like" type="button">
-            <ThumbsUp size={20} strokeWidth={2} aria-hidden="true" />
-          </button>
-          <button disabled className="flex items-center gap-1 text-(--color-ifrc-blue)/30 cursor-not-allowed" aria-label="Dislike" type="button">
-            <ThumbsDown size={20} strokeWidth={2} aria-hidden="true" />
-          </button>
-        </div>
-        <div className="flex items-center gap-4">
-          <button disabled className="flex items-center gap-1 text-(--color-ifrc-blue)/30 cursor-not-allowed" aria-label="Comment" type="button">
-            <MessageCircle size={20} strokeWidth={2} aria-hidden="true" />
-          </button>
-          <button disabled className="flex items-center gap-1 text-(--color-ifrc-blue)/30 cursor-not-allowed" aria-label="Share" type="button">
-            <Send size={20} strokeWidth={2} aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-
-    </article>
+      }
+    />
   );
 }

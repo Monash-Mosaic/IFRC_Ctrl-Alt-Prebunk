@@ -170,6 +170,29 @@ describe('HomeContent navigation', () => {
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(screen.getByText('Please engage with this post before moving to the next one')).toBeInTheDocument();
+    expect(mockScrollNext).not.toHaveBeenCalled();
+    expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
+  });
+
+  it('keeps one set of traversal controls hidden below the desktop breakpoint', () => {
+    render(<HomeContent />);
+    const previous = screen.getByRole('button', { name: 'Previous post' });
+    const next = screen.getByRole('button', { name: 'Next post' });
+    expect(previous.parentElement).toBe(next.parentElement);
+    expect(next.parentElement).toHaveClass('hidden', 'md:flex', 'shrink-0', 'flex-col');
+    expect(previous).toHaveAttribute('aria-disabled', 'true');
+    expect(next).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('preserves desktop traversal without advancing game state', async () => {
+    mockIsAnswered.mockReturnValue(true);
+    mockCanScrollPrev.mockReturnValue(true);
+    mockSelectedScrollSnap.mockReturnValue(1);
+    const user = userEvent.setup();
+    render(<HomeContent />);
+    await user.click(screen.getByRole('button', { name: 'Previous post' }));
+    expect(mockScrollPrev).toHaveBeenCalledTimes(1);
+    expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
   });
 
   it('shows a toast when next is clicked on the last post', async () => {
@@ -197,6 +220,7 @@ describe('HomeContent navigation', () => {
     await user.click(nextButton);
 
     expect(mockScrollNext).toHaveBeenCalled();
+    expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
   });
 
   it('shows a toast when previous is clicked on the first post', async () => {

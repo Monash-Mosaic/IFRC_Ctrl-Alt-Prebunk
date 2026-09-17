@@ -4,13 +4,6 @@ import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
 
-jest.mock('lucide-react', () => ({
-  ThumbsUp: () => <svg />,
-  ThumbsDown: () => <svg />,
-  MessageCircle: () => <svg />,
-  Send: () => <svg />,
-}));
-
 const defaultProps = {
   postId: 'mcq-1',
   user: {
@@ -39,6 +32,7 @@ describe('MCQPostMessage', () => {
   describe('rendering', () => {
     it('renders user name and handle', () => {
       render(<MCQPostMessage {...defaultProps} />);
+      expect(screen.getAllByRole('article')).toHaveLength(1);
       expect(screen.getByText('Echo')).toBeInTheDocument();
       expect(screen.getByText('@echo')).toBeInTheDocument();
     });
@@ -55,13 +49,33 @@ describe('MCQPostMessage', () => {
       expect(screen.getByRole('button', { name: 'Option C' })).toBeInTheDocument();
     });
 
-    it('always disables like, dislike, comment, and share buttons', () => {
+    it('does not render unrelated social actions', () => {
       render(<MCQPostMessage {...defaultProps} />);
-      expect(screen.getByRole('button', { name: 'Like' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Dislike' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Comment' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Share' })).toBeDisabled();
+      expect(screen.queryByRole('button', { name: 'Like' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Dislike' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Report' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Comment' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Share' })).not.toBeInTheDocument();
     });
+
+    it('renders image media with its existing description', () => {
+      render(<MCQPostMessage {...defaultProps} mediaUrl="/question.jpg" mediaType="image" />);
+      expect(screen.getByRole('img', { name: 'Question post' })).toHaveAttribute(
+        'src',
+        '/question.jpg'
+      );
+    });
+
+    it.each([undefined, 'video'] as const)(
+      'does not render media when mediaType is %s',
+      (mediaType) => {
+        const { container } = render(
+          <MCQPostMessage {...defaultProps} mediaUrl="/question.jpg" mediaType={mediaType} />
+        );
+        expect(screen.queryByRole('img')).not.toBeInTheDocument();
+        expect(container.querySelector('.lucide-video')).not.toBeInTheDocument();
+      }
+    );
   });
 
   describe('option interaction', () => {
@@ -80,6 +94,7 @@ describe('MCQPostMessage', () => {
 
     it('options are disabled when isDisabled is true', () => {
       render(<MCQPostMessage {...defaultProps} answer={null} isDisabled={true} />);
+      expect(screen.getByRole('article')).toHaveClass('opacity-50');
       expect(screen.getByRole('button', { name: 'Option A' })).toBeDisabled();
     });
 
@@ -101,6 +116,49 @@ describe('MCQPostMessage', () => {
       await user.click(screen.getByRole('button', { name: 'Option A' }));
 
       expect(mockOnAnswer).not.toHaveBeenCalled();
+    });
+
+    it('does not call onAnswer when the post is disabled', async () => {
+      const user = userEvent.setup();
+      render(<MCQPostMessage {...defaultProps} isDisabled />);
+      await user.click(screen.getByRole('button', { name: 'Option B' }));
+      expect(defaultProps.onAnswer).not.toHaveBeenCalled();
+    });
+
+    it('supports keyboard answer selection without submitting an enclosing form', async () => {
+      const onSubmit = jest.fn((event) => event.preventDefault());
+      const user = userEvent.setup();
+      render(
+        <form onSubmit={onSubmit}>
+          <MCQPostMessage {...defaultProps} />
+        </form>
+      );
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Option A' })).toHaveFocus();
+      await user.keyboard('{Enter}');
+      expect(defaultProps.onAnswer).toHaveBeenCalledWith('mcq-1', 'a');
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it.each([null, 'a', 'b'])(
+      'shows only answer options without percentages for answer %s',
+      (answer) => {
+        const { container } = render(<MCQPostMessage {...defaultProps} answer={answer} />);
+        expect(screen.getAllByRole('button')).toHaveLength(defaultProps.options.length);
+        expect(container).not.toHaveTextContent(/\d\s*%/);
+        for (const option of defaultProps.options) {
+          expect(screen.getByRole('button', { name: option.label })).toHaveAttribute(
+            'aria-pressed',
+            String(answer === option.id)
+          );
+        }
+      }
+    );
+
+    it('preserves incorrect-selection and correct-answer feedback', () => {
+      render(<MCQPostMessage {...defaultProps} answer="b" />);
+      expect(screen.getByRole('button', { name: 'Option B' })).toHaveClass('bg-[#FF1E56]');
+      expect(screen.getByRole('button', { name: 'Option A' })).toHaveClass('bg-[#00FF9C]');
     });
   });
 });
