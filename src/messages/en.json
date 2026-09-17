@@ -97,5 +97,13 @@
       "description": "Something went wrong on our end. Please try again later.",
       "reload": "Reload"
     }
+  },
+  "feed": {
+    "scrollHint": "Scroll to see more",
+    "lockedHint": "Answer this post to unlock the next one",
+    "blockedScroll": "Answer this post first to keep scrolling",
+    "answerToContinue": "Please engage with this post before moving to the next one",
+    "alreadyLast": "You're already on the last post",
+    "alreadyFirst": "You're already on the first post"
   }
 }

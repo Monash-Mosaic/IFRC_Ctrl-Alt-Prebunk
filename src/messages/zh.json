@@ -97,5 +97,13 @@
       "description": "出现了问题。请稍后再试。",
       "reload": "重新加载"
     }
+  },
+  "feed": {
+    "scrollHint": "向下滑动查看更多",
+    "lockedHint": "回答此帖子以解锁下一条",
+    "blockedScroll": "请先回答此帖子再继续滑动",
+    "answerToContinue": "请先与此帖子互动，再进入下一条",
+    "alreadyLast": "您已在最后一条帖子",
+    "alreadyFirst": "您已在第一条帖子"
   }
 }

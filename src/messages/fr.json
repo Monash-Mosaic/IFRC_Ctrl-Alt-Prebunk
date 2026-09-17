@@ -97,5 +97,13 @@
       "description": "Une erreur s'est produite. Veuillez réessayer plus tard.",
       "reload": "Recharger"
     }
+  },
+  "feed": {
+    "scrollHint": "Faites défiler pour voir plus",
+    "lockedHint": "Répondez à cette publication pour débloquer la suivante",
+    "blockedScroll": "Répondez d'abord à cette publication pour continuer à faire défiler",
+    "answerToContinue": "Interagissez avec cette publication avant de passer à la suivante",
+    "alreadyLast": "Vous êtes déjà sur la dernière publication",
+    "alreadyFirst": "Vous êtes déjà sur la première publication"
   }
 }

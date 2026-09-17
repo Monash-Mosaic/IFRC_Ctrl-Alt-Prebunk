@@ -49,7 +49,7 @@ const mockUseGameStore = jest.fn(() => ({
   questionStore: {},
   answers: {},
   gameCompleted: false,
-  correctAnswers: 0
+  correctAnswers: 0,
 }));
 
 jest.mock('@/lib/use-game-store', () => ({
@@ -131,7 +131,10 @@ jest.mock('@/contents', () => ({
             },
             content: <div>MCQ question</div>,
           },
-          options: [{ id: 'opt-a', label: 'Option A' }, { id: 'opt-b', label: 'Option B' }],
+          options: [
+            { id: 'opt-a', label: 'Option A' },
+            { id: 'opt-b', label: 'Option B' },
+          ],
           correctOptionId: 'opt-a',
           whyCorrectAnswer: {
             title: <div>MCQ Correct Title</div>,
@@ -212,22 +215,19 @@ jest.mock('@/contents', () => ({
   },
 }));
 
-
-
 // Mock MCQPostMessage
 jest.mock('@/components/newfeeds/mcq-post-message', () => {
-  return function MockMCQPostMessage({
-    postId,
-    answer,
-    onAnswer,
-  }: any) {
+  return function MockMCQPostMessage({ postId, answer, onAnswer }: any) {
     return (
       <div data-testid={`mcq-post-${postId}`}>
         <div data-testid={`mcq-answer-${postId}`}>{answer || 'null'}</div>
         <button data-testid={`mcq-option-${postId}`} onClick={() => onAnswer?.(postId, 'opt-a')}>
           Answer Option A
         </button>
-        <button data-testid={`mcq-option-incorrect-${postId}`} onClick={() => onAnswer?.(postId, 'opt-b')}>
+        <button
+          data-testid={`mcq-option-incorrect-${postId}`}
+          onClick={() => onAnswer?.(postId, 'opt-b')}
+        >
           Answer Option B
         </button>
       </div>
@@ -287,11 +287,7 @@ jest.mock('@/components/newfeeds/prebunking-modal', () => {
 
 // Mock ChatContent
 jest.mock('@/components/chat-content', () => {
-  return function MockChatContent({
-    onSkipClick,
-  }: {
-    onSkipClick?: () => void;
-  }) {
+  return function MockChatContent({ onSkipClick }: { onSkipClick?: () => void }) {
     return (
       <div data-testid="chat-content">
         <button type="button" data-testid="skip-onboarding" onClick={onSkipClick}>
@@ -334,9 +330,11 @@ const mockResetCredibility = jest.fn();
 describe('HomeContent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockGetAnswer.mockReturnValue(null);
-    mockIsAnswered.mockReturnValue(false);
+    // The feed only renders answered posts plus the current one. By default the
+    // first (MCQ) post is answered so the like/dislike post '1' is the current post.
+    mockIsAnswered.mockImplementation((postId: string) => postId === 'mcq-1');
     mockIsPostDisabled.mockReturnValue(false);
     mockIsGameCompleted.mockReturnValue(false);
     mockUseLocalStorage.mockReturnValue([true, mockSetOnboardingCompleted]);
@@ -356,18 +354,21 @@ describe('HomeContent', () => {
 
     render(<HomeContent />);
     expect(screen.getByTestId('chat-content')).toBeInTheDocument();
-    
+
     // Reset back to default for other tests
     mockUseLocalStorage.mockReturnValue([true, mockSetOnboardingCompleted]);
   });
 
-  it('renders posts when onboarding is completed', () => {
+  it('renders answered posts plus the current one when onboarding is completed', () => {
     render(<HomeContent />);
+    expect(screen.getByTestId('mcq-post-mcq-1')).toBeInTheDocument();
     expect(screen.getByTestId('post-1')).toBeInTheDocument();
-    expect(screen.getByTestId('post-2')).toBeInTheDocument();
+    // Not yet reachable: post '1' is still unanswered.
+    expect(screen.queryByTestId('post-2')).not.toBeInTheDocument();
   });
 
   it('does not route dormant Share content to Like/Report', () => {
+    mockIsAnswered.mockReturnValue(true);
     render(<HomeContent />);
 
     expect(screen.queryByTestId('post-share-1')).not.toBeInTheDocument();
@@ -377,6 +378,7 @@ describe('HomeContent', () => {
   });
 
   it('passes answer from game store to LikeDislikePostMessage', () => {
+    mockIsAnswered.mockReturnValue(true);
     mockGetAnswer.mockImplementation((postId: string) => {
       if (postId === '1') return 'like';
       if (postId === '2') return 'dislike';
@@ -384,7 +386,7 @@ describe('HomeContent', () => {
     });
 
     render(<HomeContent />);
-    
+
     expect(screen.getByTestId('answer-1')).toHaveTextContent('like');
     expect(screen.getByTestId('answer-2')).toHaveTextContent('dislike');
   });
@@ -434,17 +436,17 @@ describe('HomeContent', () => {
     mockSetAnswer.mockImplementation(() => {
       answerSet = true;
     });
-    
+
     // Mock isAnswered to return true for post-1 after answer is set
     mockIsAnswered.mockImplementation((postId: string) => {
-      return postId === '1' && answerSet;
+      return postId === 'mcq-1' || (postId === '1' && answerSet);
     });
     // Mock getAnswer to return 'like' for post-1 when answer is set
     mockGetAnswer.mockImplementation((postId: string) => {
       if (postId === '1' && answerSet) return 'like';
       return null;
     });
-    
+
     const user = userEvent.setup();
     render(<HomeContent />);
 
@@ -467,7 +469,7 @@ describe('HomeContent', () => {
 
   it('does not move to next question if current question is not answered', async () => {
     mockIsCurrentQuestionAnswered.mockReturnValue(false);
-    mockIsAnswered.mockReturnValue(false);
+    mockIsAnswered.mockImplementation((postId: string) => postId === 'mcq-1');
     // Mock getAnswer to return 'like' for post-1 after it's set
     mockGetAnswer.mockImplementation((postId: string) => {
       if (postId === '1') return 'like';
@@ -512,6 +514,7 @@ describe('HomeContent', () => {
   });
 
   it('passes correct answer to LikeDislikePostMessage', () => {
+    mockIsAnswered.mockReturnValue(true);
     render(<HomeContent />);
 
     expect(screen.getByTestId('correct-1')).toHaveTextContent('like');
@@ -519,6 +522,10 @@ describe('HomeContent', () => {
   });
 
   describe('MCQ content', () => {
+    beforeEach(() => {
+      mockIsAnswered.mockReturnValue(false);
+    });
+
     it('renders MCQ post', () => {
       render(<HomeContent />);
       expect(screen.getByTestId('mcq-post-mcq-1')).toBeInTheDocument();
@@ -533,7 +540,7 @@ describe('HomeContent', () => {
 
       expect(mockSetAnswer).toHaveBeenCalledWith('mcq-1', 'opt-a');
       expect(mockAddPoints).toHaveBeenCalledWith(5);
-        expect(mockIncreaseCredibility).toHaveBeenCalled();
+      expect(mockIncreaseCredibility).toHaveBeenCalled();
       expect(mockDecreaseCredibility).not.toHaveBeenCalled();
     });
 
@@ -570,7 +577,7 @@ describe('HomeContent', () => {
     });
 
     it('opens modal for MCQ answers', async () => {
-      mockGetAnswer.mockImplementation((postId: string) => postId === 'mcq-1' ? 'opt-a' : null);
+      mockGetAnswer.mockImplementation((postId: string) => (postId === 'mcq-1' ? 'opt-a' : null));
       const user = userEvent.setup();
       render(<HomeContent />);
 
@@ -613,9 +620,13 @@ describe('HomeContent', () => {
 
     it('does not move to next question when MCQ modal is closed', async () => {
       let answerSet = false;
-      mockSetAnswer.mockImplementation(() => { answerSet = true; });
+      mockSetAnswer.mockImplementation(() => {
+        answerSet = true;
+      });
       mockIsAnswered.mockImplementation((postId: string) => postId === 'mcq-1' && answerSet);
-      mockGetAnswer.mockImplementation((postId: string) => postId === 'mcq-1' && answerSet ? 'opt-a' : null);
+      mockGetAnswer.mockImplementation((postId: string) =>
+        postId === 'mcq-1' && answerSet ? 'opt-a' : null
+      );
 
       const user = userEvent.setup();
       render(<HomeContent />);
@@ -628,9 +639,13 @@ describe('HomeContent', () => {
 
     it('calls moveToNextQuestion when continue is clicked on an answered MCQ question', async () => {
       let answerSet = false;
-      mockSetAnswer.mockImplementation(() => { answerSet = true; });
+      mockSetAnswer.mockImplementation(() => {
+        answerSet = true;
+      });
       mockIsAnswered.mockImplementation((postId: string) => postId === 'mcq-1' && answerSet);
-      mockGetAnswer.mockImplementation((postId: string) => (postId === 'mcq-1' && answerSet ? 'opt-a' : null));
+      mockGetAnswer.mockImplementation((postId: string) =>
+        postId === 'mcq-1' && answerSet ? 'opt-a' : null
+      );
 
       const user = userEvent.setup();
       render(<HomeContent />);
@@ -741,9 +756,15 @@ describe('HomeContent', () => {
 
   it('calls moveToNextQuestion when continue is clicked on an answered question', async () => {
     let answerSet = false;
-    mockSetAnswer.mockImplementation(() => { answerSet = true; });
-    mockIsAnswered.mockImplementation((postId: string) => postId === '1' && answerSet);
-    mockGetAnswer.mockImplementation((postId: string) => (postId === '1' && answerSet ? 'like' : null));
+    mockSetAnswer.mockImplementation(() => {
+      answerSet = true;
+    });
+    mockIsAnswered.mockImplementation(
+      (postId: string) => postId === 'mcq-1' || (postId === '1' && answerSet)
+    );
+    mockGetAnswer.mockImplementation((postId: string) =>
+      postId === '1' && answerSet ? 'like' : null
+    );
 
     const user = userEvent.setup();
     render(<HomeContent />);
@@ -759,7 +780,7 @@ describe('HomeContent', () => {
   });
 
   it('does not call moveToNextQuestion when continue is clicked on an unanswered question', async () => {
-    mockIsAnswered.mockReturnValue(false);
+    mockIsAnswered.mockImplementation((postId: string) => postId === 'mcq-1');
     mockGetAnswer.mockImplementation((postId: string) => (postId === '1' ? 'like' : null));
 
     const user = userEvent.setup();

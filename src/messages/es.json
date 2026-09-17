@@ -97,5 +97,13 @@
       "description": "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
       "reload": "Recargar"
     }
+  },
+  "feed": {
+    "scrollHint": "Desliza para ver más",
+    "lockedHint": "Responde a esta publicación para desbloquear la siguiente",
+    "blockedScroll": "Responde primero a esta publicación para seguir desplazándote",
+    "answerToContinue": "Interactúa con esta publicación antes de pasar a la siguiente",
+    "alreadyLast": "Ya estás en la última publicación",
+    "alreadyFirst": "Ya estás en la primera publicación"
   }
 }
