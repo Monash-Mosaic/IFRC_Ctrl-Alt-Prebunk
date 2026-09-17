@@ -27,7 +27,13 @@ jest.mock('@/contents', () => ({
         '1': {
           id: '1',
           type: 'like_dislike',
-          post: { id: '1', user: { id: 'echo', name: 'Echo', handle: '@echo', avatar: null, isUser: false }, content: <div>Post 1</div>, mediaUrl: '', mediaType: 'image' as const },
+          post: {
+            id: '1',
+            user: { id: 'echo', name: 'Echo', handle: '@echo', avatar: null, isUser: false },
+            content: <div>Post 1</div>,
+            mediaUrl: '',
+            mediaType: 'image' as const,
+          },
           correctAnswer: 'like' as const,
           whyCorrectAnswer: { title: <div>Correct</div>, content: <div>Because</div> },
           whyIncorrectAnswer: { title: <div>Incorrect</div>, content: <div>Try again</div> },
@@ -35,15 +41,47 @@ jest.mock('@/contents', () => ({
         '2': {
           id: '2',
           type: 'like_dislike',
-          post: { id: '2', user: { id: 'echo', name: 'Echo', handle: '@echo', avatar: null, isUser: false }, content: <div>Post 2</div>, mediaUrl: '', mediaType: 'image' as const },
+          post: {
+            id: '2',
+            user: { id: 'echo', name: 'Echo', handle: '@echo', avatar: null, isUser: false },
+            content: <div>Post 2</div>,
+            mediaUrl: '',
+            mediaType: 'image' as const,
+          },
           correctAnswer: 'dislike' as const,
           whyCorrectAnswer: { title: <div>Correct</div>, content: <div>Because</div> },
           whyIncorrectAnswer: { title: <div>Incorrect</div>, content: <div>Try again</div> },
         },
       },
       contentList: [
-        { id: '1', type: 'like_dislike', post: { id: '1', user: { id: 'echo', name: 'Echo', handle: '@echo', avatar: null, isUser: false }, content: <div>Post 1</div>, mediaUrl: '', mediaType: 'image' as const }, correctAnswer: 'like' as const, whyCorrectAnswer: { title: <div>Correct</div>, content: <div>Because</div> }, whyIncorrectAnswer: { title: <div>Incorrect</div>, content: <div>Try again</div> } },
-        { id: '2', type: 'like_dislike', post: { id: '2', user: { id: 'echo', name: 'Echo', handle: '@echo', avatar: null, isUser: false }, content: <div>Post 2</div>, mediaUrl: '', mediaType: 'image' as const }, correctAnswer: 'dislike' as const, whyCorrectAnswer: { title: <div>Correct</div>, content: <div>Because</div> }, whyIncorrectAnswer: { title: <div>Incorrect</div>, content: <div>Try again</div> } },
+        {
+          id: '1',
+          type: 'like_dislike',
+          post: {
+            id: '1',
+            user: { id: 'echo', name: 'Echo', handle: '@echo', avatar: null, isUser: false },
+            content: <div>Post 1</div>,
+            mediaUrl: '',
+            mediaType: 'image' as const,
+          },
+          correctAnswer: 'like' as const,
+          whyCorrectAnswer: { title: <div>Correct</div>, content: <div>Because</div> },
+          whyIncorrectAnswer: { title: <div>Incorrect</div>, content: <div>Try again</div> },
+        },
+        {
+          id: '2',
+          type: 'like_dislike',
+          post: {
+            id: '2',
+            user: { id: 'echo', name: 'Echo', handle: '@echo', avatar: null, isUser: false },
+            content: <div>Post 2</div>,
+            mediaUrl: '',
+            mediaType: 'image' as const,
+          },
+          correctAnswer: 'dislike' as const,
+          whyCorrectAnswer: { title: <div>Correct</div>, content: <div>Because</div> },
+          whyIncorrectAnswer: { title: <div>Incorrect</div>, content: <div>Try again</div> },
+        },
       ],
     },
   },
@@ -53,8 +91,12 @@ jest.mock('@/components/newfeeds/like-dislike-post-message', () => {
   return function MockLikeDislikePostMessage({ postId, onLike, onDislike }: any) {
     return (
       <div data-testid={`post-${postId}`}>
-        <button data-testid={`like-${postId}`} onClick={() => onLike?.(postId)}>Like</button>
-        <button data-testid={`dislike-${postId}`} onClick={() => onDislike?.(postId)}>Dislike</button>
+        <button data-testid={`like-${postId}`} onClick={() => onLike?.(postId)}>
+          Like
+        </button>
+        <button data-testid={`dislike-${postId}`} onClick={() => onDislike?.(postId)}>
+          Dislike
+        </button>
       </div>
     );
   };
@@ -65,7 +107,9 @@ jest.mock('@/components/newfeeds/prebunking-modal', () => {
     if (!isOpen) return null;
     return (
       <div data-testid={`modal-${postId}`}>
-        <button data-testid={`continue-modal-${postId}`} onClick={onContinue}>Continue</button>
+        <button data-testid={`continue-modal-${postId}`} onClick={onContinue}>
+          Continue
+        </button>
       </div>
     );
   };
@@ -76,15 +120,11 @@ jest.mock('@/components/game-complete', () => {
   return function MockGameComplete({ correctAnswers, totalQuestions }: any) {
     return (
       <div data-testid="game-complete">
-        <span data-testid="game-score">{correctAnswers}/{totalQuestions}</span>
+        <span data-testid="game-score">
+          {correctAnswers}/{totalQuestions}
+        </span>
       </div>
     );
-  };
-});
-
-jest.mock('@/components/vertical-carousel', () => {
-  return function MockVerticalCarousel({ children }: any) {
-    return <div data-testid="carousel">{children?.(null)}</div>;
   };
 });
 

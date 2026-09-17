@@ -175,4 +175,196 @@ describe('GameFeed', () => {
     });
     expect(screen.queryByText(labels.scrollHint)).not.toBeInTheDocument();
   });
+
+  it('renders safely with no posts', () => {
+    const { onBlockedScrollAttempt } = renderFeed({ postIds: [] });
+    const feed = screen.getByRole('feed');
+    expect(feed.querySelectorAll('[data-post-index]')).toHaveLength(0);
+    setSize(feed, 500, 500);
+    act(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+    fireEvent.wheel(feed, { deltaY: 40 });
+    expect(screen.queryByText(labels.scrollHint)).not.toBeInTheDocument();
+    expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
+  });
+
+  it('works in browsers without ResizeObserver', () => {
+    const original = global.ResizeObserver;
+    // @ts-expect-error simulate an older browser
+    delete global.ResizeObserver;
+    try {
+      const { unmount } = renderFeed();
+      expect(screen.getByRole('feed')).toBeInTheDocument();
+      unmount();
+    } finally {
+      global.ResizeObserver = original;
+    }
+  });
+
+  describe('touch gestures', () => {
+    function lockedAtEnd() {
+      const utils = renderFeed({ isLocked: true });
+      const feed = screen.getByRole('feed');
+      setSize(feed, 500, 1500);
+      feed.scrollTop = 1000;
+      return { ...utils, feed };
+    }
+
+    it('fires a blocked-scroll attempt on an upward swipe past the end', () => {
+      const { feed, onBlockedScrollAttempt } = lockedAtEnd();
+      fireEvent.touchStart(feed, { touches: [{ clientY: 400 }] });
+      fireEvent.touchMove(feed, { touches: [{ clientY: 300 }] });
+      expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
+    });
+
+    it('ignores small moves, downward swipes and touches without a point', () => {
+      const { feed, onBlockedScrollAttempt } = lockedAtEnd();
+      fireEvent.touchStart(feed, { touches: [] });
+      fireEvent.touchMove(feed, { touches: [{ clientY: 100 }] });
+      fireEvent.touchStart(feed, { touches: [{ clientY: 400 }] });
+      fireEvent.touchMove(feed, { touches: [{ clientY: 390 }] });
+      fireEvent.touchMove(feed, { touches: [{ clientY: 500 }] });
+      fireEvent.touchMove(feed, { touches: [] });
+      expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
+    });
+
+    it('throttles repeated attempts and ignores upward wheel movement', () => {
+      const { feed, onBlockedScrollAttempt } = lockedAtEnd();
+      fireEvent.wheel(feed, { deltaY: -40 });
+      expect(onBlockedScrollAttempt).not.toHaveBeenCalled();
+      fireEvent.wheel(feed, { deltaY: 40 });
+      fireEvent.wheel(feed, { deltaY: 40 });
+      fireEvent.touchStart(feed, { touches: [{ clientY: 400 }] });
+      fireEvent.touchMove(feed, { touches: [{ clientY: 300 }] });
+      expect(onBlockedScrollAttempt).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('scroll animation', () => {
+    function manualFrames() {
+      jest.restoreAllMocks();
+      const frames: FrameRequestCallback[] = [];
+      jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+        frames.push(cb);
+        return frames.length;
+      });
+      return frames;
+    }
+
+    function sizedFeed() {
+      const utils = renderFeed();
+      const feed = screen.getByRole('feed');
+      setSize(feed, 600, 1800);
+      return { ...utils, feed };
+    }
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('animates over several frames with the snap lifted, then restores it', () => {
+      const frames = manualFrames();
+      jest.spyOn(performance, 'now').mockReturnValue(1000);
+      const { ref, feed, onActiveIndexChange } = sizedFeed();
+
+      act(() => ref.current?.scrollToPost(2));
+      expect(feed.style.scrollSnapType).toBe('none');
+
+      act(() => frames.shift()!(1100));
+      expect(feed.scrollTop).toBeGreaterThan(0);
+      expect(feed.scrollTop).toBeLessThan(1200);
+      expect(feed.style.scrollSnapType).toBe('none');
+
+      act(() => frames.shift()!(5000));
+      expect(feed.scrollTop).toBe(1200);
+      expect(feed.style.scrollSnapType).toBe('');
+      expect(onActiveIndexChange).toHaveBeenLastCalledWith(2);
+    });
+
+    it('finishes through the safety timer when frames never arrive', () => {
+      jest.useFakeTimers();
+      manualFrames();
+      const { ref, feed, onActiveIndexChange } = sizedFeed();
+
+      act(() => ref.current?.scrollToPost(1));
+      expect(feed.scrollTop).toBe(0);
+
+      act(() => {
+        jest.runOnlyPendingTimers();
+      });
+      expect(feed.scrollTop).toBe(600);
+      expect(feed.style.scrollSnapType).toBe('');
+      expect(onActiveIndexChange).toHaveBeenLastCalledWith(1);
+    });
+
+    it('ignores frames from a jump that was superseded', () => {
+      const frames = manualFrames();
+      const { ref, feed } = sizedFeed();
+
+      act(() => {
+        ref.current?.scrollToPost(2);
+        ref.current?.scrollToPost(1);
+      });
+      act(() => frames.forEach((cb) => cb(performance.now() + 10_000)));
+      expect(feed.scrollTop).toBe(600);
+    });
+
+    it("does not let a superseded jump's safety timer undo a later jump", () => {
+      // Regression: only the old frame loop used to be cancelled, so the old
+      // safety timer later snapped the feed back to the stale target.
+      jest.useFakeTimers();
+      manualFrames();
+      const { ref, feed } = sizedFeed();
+
+      act(() => ref.current?.scrollToPost(2)); // stale target 1200, timer at 700ms
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+      act(() => ref.current?.scrollToPost(1)); // live target 600, timer at 800ms
+
+      act(() => {
+        jest.advanceTimersByTime(650); // past the stale deadline only
+      });
+      expect(feed.scrollTop).not.toBe(1200);
+
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+      expect(feed.scrollTop).toBe(600);
+    });
+
+    it('leaves no timer armed after the feed unmounts mid-jump', () => {
+      jest.useFakeTimers();
+      manualFrames();
+      const { ref, unmount } = sizedFeed();
+      act(() => ref.current?.scrollToPost(2));
+      expect(jest.getTimerCount()).toBeGreaterThan(0);
+
+      unmount();
+      expect(jest.getTimerCount()).toBe(0);
+    });
+
+    it('jumps instantly when the viewer prefers reduced motion', () => {
+      const frames = manualFrames();
+      (window.matchMedia as jest.Mock).mockImplementationOnce((query: string) => ({
+        matches: query.includes('reduce'),
+        media: query,
+      }));
+      const { ref, feed, onActiveIndexChange } = sizedFeed();
+
+      act(() => ref.current?.scrollToPost(2));
+      expect(feed.scrollTop).toBe(1200);
+      expect(frames).toHaveLength(0);
+      expect(onActiveIndexChange).toHaveBeenLastCalledWith(2);
+    });
+
+    it('clamps the requested index to the available posts', () => {
+      const { ref, feed } = sizedFeed();
+      act(() => ref.current?.scrollToPost(10));
+      expect(feed.scrollTop).toBe(1200);
+      act(() => ref.current?.scrollToPost(-3));
+      expect(feed.scrollTop).toBe(0);
+    });
+  });
 });

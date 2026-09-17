@@ -103,7 +103,11 @@ export default function GameFeed({
     }
   }, [currentIndex, onActiveIndexChange]);
 
-  const animationRef = useRef<number | null>(null);
+  // Tears down the in-flight scrollToPost animation (frame loop and safety timer).
+  const cancelAnimationRef = useRef<(() => void) | null>(null);
+
+  // Never leave a timer armed after unmount: it would report an index to a gone parent.
+  useEffect(() => () => cancelAnimationRef.current?.(), []);
 
   useImperativeHandle(
     ref,
@@ -111,9 +115,12 @@ export default function GameFeed({
       scrollToPost: (index: number) => {
         const el = containerRef.current;
         if (!el) return;
-        const target = Math.max(0, Math.min(index, postIds.length - 1)) * el.clientHeight;
-        if (animationRef.current !== null) cancelAnimationFrame(animationRef.current);
+        // Supersede any jump in flight. Its safety timer must go too, or it would
+        // fire later and snap the feed back to the stale target.
+        cancelAnimationRef.current?.();
+        cancelAnimationRef.current = null;
 
+        const target = Math.max(0, Math.min(index, postIds.length - 1)) * el.clientHeight;
         const reduceMotion =
           typeof window.matchMedia === 'function' &&
           window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -130,14 +137,17 @@ export default function GameFeed({
         const start = el.scrollTop;
         const distance = target - start;
         const startTime = performance.now();
-        el.style.scrollSnapType = 'none';
         let finished = false;
-        const finish = () => {
-          if (finished) return;
+        let rafId = 0;
+        let safetyTimer = 0;
+        const cancel = () => {
           finished = true;
-          if (animationRef.current !== null) cancelAnimationFrame(animationRef.current);
-          animationRef.current = null;
+          cancelAnimationFrame(rafId);
           window.clearTimeout(safetyTimer);
+        };
+        const finish = () => {
+          cancel();
+          cancelAnimationRef.current = null;
           el.scrollTop = target;
           el.style.scrollSnapType = '';
           // Do not depend on the follow-up scroll event (it never fires in a hidden tab).
@@ -147,17 +157,22 @@ export default function GameFeed({
         const step = (now: number) => {
           if (finished) return;
           const progress = Math.min(1, (now - startTime) / SCROLL_ANIMATION_MS);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          el.scrollTop = start + distance * eased;
+          el.scrollTop = start + distance * (1 - Math.pow(1 - progress, 3));
           if (progress < 1) {
-            animationRef.current = requestAnimationFrame(step);
+            rafId = requestAnimationFrame(step);
           } else {
             finish();
           }
         };
+
+        el.style.scrollSnapType = 'none';
+        // Register the handle before scheduling: a rAF callback may run synchronously.
+        cancelAnimationRef.current = cancel;
         // Frames stall in hidden tabs; never leave the feed stuck mid-way with snap off.
-        const safetyTimer = window.setTimeout(finish, SCROLL_ANIMATION_MS * 2);
-        animationRef.current = requestAnimationFrame(step);
+        safetyTimer = window.setTimeout(() => {
+          if (!finished) finish();
+        }, SCROLL_ANIMATION_MS * 2);
+        rafId = requestAnimationFrame(step);
       },
     }),
     [postIds.length, reportActiveIndex, updateScrollHint]

@@ -127,6 +127,9 @@ jest.mock('@/components/newfeeds/like-dislike-post-message', () => {
         <button data-testid={`dislike-${postId}`} onClick={() => onDislike?.(postId)}>
           Dislike
         </button>
+        <button data-testid={`like-unknown-${postId}`} onClick={() => onLike?.('not-in-feed')}>
+          Like unknown
+        </button>
       </div>
     );
   };
@@ -333,6 +336,18 @@ describe('HomeContent navigation', () => {
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(screen.getByText('blockedScroll')).toBeInTheDocument();
+  });
+
+  it('ignores an answer for a post that is not in the content list', async () => {
+    const user = userEvent.setup();
+    const { addPoints, decreaseCredibility } = (useCredibilityStore as unknown as jest.Mock)();
+    render(<HomeContent />);
+
+    await user.click(screen.getByTestId('like-unknown-1'));
+
+    expect(addPoints).not.toHaveBeenCalled();
+    expect(decreaseCredibility).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('modal-not-in-feed')).not.toBeInTheDocument();
   });
 
   it('dismisses the toast when its close button is clicked', async () => {
