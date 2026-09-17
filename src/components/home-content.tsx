@@ -217,7 +217,7 @@ export default function HomeContent() {
 
   if (isGameCompleted()) {
     return (
-      <div className="flex min-h-[calc(100vh-10rem)] flex-col p-4 items-center justify-center max-md:mb-16">
+      <div className="flex min-h-[calc(100dvh-10rem)] flex-col items-center justify-center p-4 md:min-h-[calc(100vh-6rem)]">
         <GameComplete
           correctAnswers={getCorrectAnswers()}
           totalQuestions={getNumQuestions()}
@@ -275,13 +275,13 @@ export default function HomeContent() {
   return (
     <div
       className={cn(
-        'mx-auto flex w-full flex-col p-4',
-        // Mobile: exactly the space between the fixed header/credibility bar (6rem) and the
-        // bottom nav (4rem + safe area). The feed itself is the only thing that scrolls.
-        'max-md:h-[calc(100vh-10rem)] max-md:h-[calc(100dvh-10rem-env(safe-area-inset-bottom,0px))]',
-        'max-md:max-w-md max-md:min-h-0',
+        'flex w-full flex-col p-4',
+        // Mobile: pin the feed between the fixed header/credibility bar (6rem) and the fixed
+        // bottom nav (4rem). Fixed edges track the real visible viewport on iOS Safari, unlike
+        // vh/dvh maths, so the feed never overshoots or leaves a gap above the nav.
+        'max-md:fixed max-md:inset-x-0 max-md:top-24 max-md:bottom-16 max-md:mx-auto max-md:max-w-md',
         // Desktop: fill the viewport below the header so tall posts get as much room as possible.
-        'md:h-[calc(100vh-6rem)] md:h-[calc(100dvh-6rem)] md:max-w-none'
+        'md:mx-auto md:h-[calc(100vh-6rem)] md:h-[calc(100dvh-6rem)] md:max-w-none'
       )}
     >
       <div

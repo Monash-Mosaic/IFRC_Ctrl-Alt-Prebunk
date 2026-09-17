@@ -83,7 +83,7 @@ export default async function LocaleLayout({
           <Navigation />
           <Header />
           <PointsCredibilityBar />
-          <main id="root" className="min-h-screen min-h-dvh bg-white pt-24">
+          <main id="root" className="min-h-screen min-h-dvh bg-white pt-24 max-md:pb-16">
             {children}
           </main>
         </NextIntlClientProvider>
