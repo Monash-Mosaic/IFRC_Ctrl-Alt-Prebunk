@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import ChatContent from '@/components/chat-content';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
@@ -14,9 +14,8 @@ import { useCredibilityStore } from '@/lib/use-credibility-store';
 import GameComplete from '@/components/game-complete';
 
 import Modal from 'react-modal';
-import type { EmblaCarouselType } from 'embla-carousel';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import VerticalCarousel from '@/components/vertical-carousel';
+import GameFeed, { type GameFeedHandle } from '@/components/game-feed';
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
 import { cn } from '@/lib/utils';
@@ -25,26 +24,32 @@ import Toast from '@/components/toast';
 export default function HomeContent() {
   const locale = useLocale();
   const t = useTranslations('chat');
-  const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED, false);
+  const feedT = useTranslations('feed');
+  const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage<boolean>(
+    STORAGE_KEYS.ONBOARDING_COMPLETED,
+    false
+  );
 
   const { content, contentList } = CONTENTS[locale as keyof typeof CONTENTS];
   const [modalPostId, setModalPostId] = useState<string | null>(null);
-  const [emblaApi, setEmblaApi] = useState<EmblaCarouselType | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const feedRef = useRef<GameFeedHandle>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
   // Lazily created once: createGameStore() builds a brand-new Zustand store each call,
   // and gameCompleted/correctAnswers aren't persisted, so recreating it on every render
   // (e.g. from the state updates below) would silently reset them.
-  const [useGameStore] = useState(() => createGameStore({
-    answers: {},
-    currentQuestionIndex: 0,
-    questions: contentList.map(item => item.id),
-    questionStore: content,
-    gameCompleted: false,
-    correctAnswers: 0
-  }));
+  const [useGameStore] = useState(() =>
+    createGameStore({
+      answers: {},
+      currentQuestionIndex: 0,
+      questions: contentList.map((item) => item.id),
+      questionStore: content,
+      gameCompleted: false,
+      correctAnswers: 0,
+    })
+  );
 
   const {
     getAnswer,
@@ -56,9 +61,10 @@ export default function HomeContent() {
     getCorrectAnswers,
     incrCorrectAnswers,
     getNumQuestions,
-    resetGame
+    resetGame,
   } = useGameStore();
-  const { addPoints, increaseCredibility, decreaseCredibility, initCredibility, resetCredibility } = useCredibilityStore();
+  const { addPoints, increaseCredibility, decreaseCredibility, initCredibility, resetCredibility } =
+    useCredibilityStore();
 
   useEffect(() => {
     initCredibility(contentList.length);
@@ -68,39 +74,61 @@ export default function HomeContent() {
     setOnboardingCompleted(true);
   };
 
-  // Stable callback for onApi to prevent infinite loops
-  const handleEmblaApi = useCallback((api: EmblaCarouselType | null) => {
-    setEmblaApi(api);
-  }, []);
+  // The feed only ever contains the answered posts plus the current question:
+  // scrolling is unrestricted inside that set, and nothing beyond it exists to reach.
+  const firstUnansweredIndex = contentList.findIndex((item) => !isAnswered(item.id));
+  const unlockedCount = firstUnansweredIndex === -1 ? contentList.length : firstUnansweredIndex + 1;
+  const unlockedPosts = useMemo(
+    () => contentList.slice(0, unlockedCount),
+    [contentList, unlockedCount]
+  );
+  const unlockedPostIds = useMemo(() => unlockedPosts.map((item) => item.id), [unlockedPosts]);
+  const isFeedLocked = firstUnansweredIndex !== -1;
 
-  // Track selected index for navigation buttons
-  useEffect(() => {
-    if (!emblaApi) return;
+  const showFeedToast = useCallback(
+    (message: string) => {
+      setToastMessage(message);
+      setShowToast(true);
+    },
+    [setToastMessage, setShowToast]
+  );
 
-    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
-    onSelect();
-    emblaApi.on('select', onSelect);
+  const handleCloseToast = useCallback(() => {
+    setShowToast(false);
+    setToastMessage(null);
+  }, [setShowToast, setToastMessage]);
 
-    return () => {
-      emblaApi.off('select', onSelect);
-    };
-  }, [emblaApi]);
+  const handleActiveIndexChange = useCallback(
+    (index: number) => {
+      setActiveIndex(index);
+    },
+    [setActiveIndex]
+  );
 
-  const selectedPostId = contentList[selectedIndex]?.id;
-  const hasEngagedCurrent = selectedPostId ? isAnswered(selectedPostId) : false;
-  const canGoNext = !!emblaApi?.canScrollNext();
-  const canGoPrev = !!emblaApi?.canScrollPrev();
+  const handleBlockedScrollAttempt = useCallback(() => {
+    showFeedToast(feedT('blockedScroll'));
+  }, [feedT, showFeedToast]);
+
+  const activePostId = unlockedPosts[activeIndex]?.id;
+  const hasEngagedCurrent = activePostId ? isAnswered(activePostId) : false;
+  const isLastPost = activeIndex >= contentList.length - 1;
+  const canGoNext = activeIndex < unlockedPosts.length - 1;
+  const canGoPrev = activeIndex > 0;
   const nextEnabled = hasEngagedCurrent && canGoNext;
   const prevEnabled = canGoPrev;
 
   const handleOnCloseModal = () => {
-  setModalPostId(null);
+    setModalPostId(null);
   };
 
   const handleOnContinueModal = (postId: string) => {
     if (isAnswered(postId)) {
       moveToNextQuestion();
-      emblaApi?.scrollNext();
+      const nextIndex = contentList.findIndex((item) => item.id === postId) + 1;
+      if (nextIndex < contentList.length) {
+        // The next post is rendered by now (it unlocked when the answer was stored).
+        feedRef.current?.scrollToPost(nextIndex);
+      }
     }
   };
 
@@ -110,12 +138,13 @@ export default function HomeContent() {
       setAnswer(postId, answer);
 
       // Find the content item to check correctness
-      const contentItem = contentList.find(item => item.id === postId) as Content | undefined;
+      const contentItem = contentList.find((item) => item.id === postId) as Content | undefined;
       if (!contentItem) return;
 
-      const isCorrect = contentItem.type === ContentType.MCQ
-        ? answer === (contentItem as MCQContent).correctOptionId
-        : answer === (contentItem as LikeDislikeContent).correctAnswer;
+      const isCorrect =
+        contentItem.type === ContentType.MCQ
+          ? answer === (contentItem as MCQContent).correctOptionId
+          : answer === (contentItem as LikeDislikeContent).correctAnswer;
 
       if (isCorrect) {
         increaseCredibility();
@@ -134,7 +163,7 @@ export default function HomeContent() {
     resetGame();
     resetCredibility(contentList.length);
     setOnboardingCompleted(false);
-  }
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -144,46 +173,41 @@ export default function HomeContent() {
   }, []);
 
   const handleNext = () => {
-    if (!emblaApi) return;
-
-    // Check if we're at the last post
-    const isLastPost = selectedIndex === contentList.length - 1;
-    if (isLastPost || !canGoNext) {
-      setToastMessage('You\'re already on the last post');
-      setShowToast(true);
+    if (isLastPost) {
+      showFeedToast(feedT('alreadyLast'));
       return;
     }
 
     if (!nextEnabled) {
-      setToastMessage('Please engage with this post before moving to the next one');
-      setShowToast(true);
+      showFeedToast(feedT('answerToContinue'));
       return;
     }
 
-    emblaApi.scrollNext();
+    feedRef.current?.scrollToPost(activeIndex + 1);
   };
 
   const handlePrevious = () => {
-    if (!emblaApi) return;
-
-    // Check if we're at the first post
-    const isFirstPost = selectedIndex === 0;
-    if (isFirstPost || !canGoPrev) {
-      setToastMessage('You\'re already on the first post');
-      setShowToast(true);
+    if (!canGoPrev) {
+      showFeedToast(feedT('alreadyFirst'));
       return;
     }
 
-    emblaApi.scrollPrev();
+    feedRef.current?.scrollToPost(activeIndex - 1);
   };
 
   if (!onboardingCompleted) {
-    return <ChatContent startOnboardingText={t('startOnboarding')} skipText={t('skip')} onSkipClick={handleSkipClick} />;
+    return (
+      <ChatContent
+        startOnboardingText={t('startOnboarding')}
+        skipText={t('skip')}
+        onSkipClick={handleSkipClick}
+      />
+    );
   }
 
-  if(isGameCompleted()) {
+  if (isGameCompleted()) {
     return (
-      <div className="flex min-h-[calc(100vh-10rem)] flex-col p-4 items-center justify-center max-md:mb-16">
+      <div className="flex min-h-[calc(100dvh-10rem)] flex-col items-center justify-center p-4 md:min-h-[calc(100vh-6rem)]">
         <GameComplete
           correctAnswers={getCorrectAnswers()}
           totalQuestions={getNumQuestions()}
@@ -193,100 +217,102 @@ export default function HomeContent() {
     );
   }
 
+  const renderPost = (_postId: string, index: number) => {
+    const contentItem = unlockedPosts[index] as Content | undefined;
+    if (!contentItem) return null;
+    const answer = getAnswer(contentItem.id);
+    const isDisabled = isPostDisabled(contentItem.id);
+
+    if (contentItem.type === ContentType.MCQ) {
+      const mcq = contentItem as MCQContent;
+      return (
+        <MCQPostMessage
+          postId={mcq.id}
+          user={mcq.post.user}
+          content={mcq.post.content}
+          mediaUrl={mcq.post.mediaUrl}
+          mediaType={mcq.post.mediaType}
+          options={mcq.options}
+          correctOptionId={mcq.correctOptionId}
+          answer={answer}
+          isDisabled={isDisabled}
+          onAnswer={handleOnAnswer}
+        />
+      );
+    }
+
+    if (contentItem.type === ContentType.LIKE_DISLIKE) {
+      const likeDislike = contentItem as LikeDislikeContent;
+      return (
+        <LikeDislikePostMessage
+          postId={likeDislike.id}
+          user={likeDislike.post.user}
+          content={likeDislike.post.content}
+          mediaUrl={likeDislike.post.mediaUrl}
+          mediaType={likeDislike.post.mediaType}
+          answer={answer as 'like' | 'dislike' | null | undefined}
+          correctAnswer={likeDislike.correctAnswer}
+          onLike={(id) => handleOnAnswer(id, 'like')}
+          onDislike={(id) => handleOnAnswer(id, 'dislike')}
+          isDisabled={isDisabled}
+        />
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div
       className={cn(
-        'mx-auto flex w-full max-w-md flex-col overflow-hidden overscroll-y-contain md:max-w-none md:overflow-visible p-4',
-        // Mobile: height matches main padding (pt-24 header+credibility + pb-16 bottom nav), not h-screen — avoids extra page scroll & top/bottom gaps
-        'max-md:h-[calc(100dvh-10rem-env(safe-area-inset-bottom,0px))] max-md:min-h-0 max-md:touch-pan-y',
-        'md:h-screen',
+        'flex w-full flex-col p-4',
+        // Mobile: pin the feed between the fixed header/credibility bar (6rem) and the fixed
+        // bottom nav (4rem). Fixed edges track the real visible viewport on iOS Safari, unlike
+        // vh/dvh maths, so the feed never overshoots or leaves a gap above the nav.
+        'max-md:fixed max-md:inset-x-0 max-md:top-24 max-md:bottom-16 max-md:mx-auto max-md:max-w-md',
+        // Desktop: fill the viewport below the header so tall posts get as much room as possible.
+        'md:mx-auto md:h-[calc(100vh-6rem)] md:h-[calc(100dvh-6rem)] md:max-w-none'
       )}
     >
-      {/* overflow-visible on md so desktop nav buttons are not clipped on hover (scale + shadow) */}
       <div
         className={cn(
-          'relative mx-auto flex w-full max-w-md flex-col overflow-visible md:px-1',
-          'h-full min-h-0 max-md:justify-start max-md:items-stretch',
-          'md:h-screen md:items-center md:justify-center',
+          'mx-auto flex h-full min-h-0 w-full max-w-md flex-col',
+          'md:max-w-none md:items-center md:justify-center'
         )}
       >
         <div
           className={cn(
-            'flex min-h-0 w-full flex-1 flex-col md:h-full md:flex-row md:items-center md:justify-center md:gap-4 md:pr-1',
-            'max-md:items-stretch',
+            'flex h-full min-h-0 w-full flex-1 flex-col',
+            'md:w-auto md:flex-row md:items-stretch md:justify-center md:gap-4'
           )}
         >
-          {/* Carousel: fills mobile column; desktop keeps 70vh to pair with side arrows */}
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col items-stretch justify-stretch max-md:h-full md:h-[70vh] md:items-center md:justify-center">
-            <VerticalCarousel
-              options={{
-                axis: 'y',
-                dragFree: false,
-                skipSnaps: false,
-                align: 'start',
-                slidesToScroll: 1,
-                containScroll: 'trimSnaps',
-                watchDrag: true,
+          {/* Feed column; the toast is anchored here so it is centred under the post, not the viewport */}
+          <div className="relative flex min-h-0 w-full flex-1 flex-col md:w-[28rem] md:max-w-[calc(100vw-12rem)]">
+            <GameFeed
+              ref={feedRef}
+              // Returning players (persisted answers) land on their current question.
+              initialIndex={isFeedLocked ? firstUnansweredIndex : unlockedPosts.length - 1}
+              postIds={unlockedPostIds}
+              renderPost={renderPost}
+              isLocked={isFeedLocked}
+              labels={{
+                scrollHint: feedT('scrollHint'),
+                lockedHint: feedT('lockedHint'),
               }}
-              lockNext={!hasEngagedCurrent && canGoNext}
-              onApi={handleEmblaApi}
-            >
-              {(api) => {
-                return contentList.map((contentItem, index) => {
-                  const isActive = api?.selectedScrollSnap() === index;
-                  const answer = getAnswer(contentItem.id);
-                  const isDisabled = isPostDisabled(contentItem.id);
+              onActiveIndexChange={handleActiveIndexChange}
+              onBlockedScrollAttempt={handleBlockedScrollAttempt}
+            />
 
-                  return (
-                    <div
-                      className={cn(
-                        'w-full shrink-0 transform-gpu',
-                        isActive ? 'opacity-100' : 'opacity-70',
-                      )}
-                      style={{
-                        height: '100%',
-                        minHeight: '100%',
-                      }}
-                      key={contentItem.id}
-                    >
-                      <div className="flex h-full items-center justify-center overflow-y-auto">
-                        {contentItem.type === ContentType.MCQ ? (
-                          <MCQPostMessage
-                            postId={contentItem.id}
-                            user={(contentItem as MCQContent).post.user}
-                            content={(contentItem as MCQContent).post.content}
-                            mediaUrl={(contentItem as MCQContent).post.mediaUrl}
-                            mediaType={(contentItem as MCQContent).post.mediaType}
-                            options={(contentItem as MCQContent).options}
-                            correctOptionId={(contentItem as MCQContent).correctOptionId}
-                            answer={answer}
-                            isDisabled={isDisabled}
-                            onAnswer={handleOnAnswer}
-                          />
-                        ) : contentItem.type === ContentType.LIKE_DISLIKE ? (
-                          <LikeDislikePostMessage
-                            postId={contentItem.id}
-                            user={(contentItem as LikeDislikeContent).post.user}
-                            content={(contentItem as LikeDislikeContent).post.content}
-                            mediaUrl={(contentItem as LikeDislikeContent).post.mediaUrl}
-                            mediaType={(contentItem as LikeDislikeContent).post.mediaType}
-                            answer={answer as 'like' | 'dislike' | null | undefined}
-                            correctAnswer={(contentItem as LikeDislikeContent).correctAnswer}
-                            onLike={(postId) => handleOnAnswer(postId, 'like')}
-                            onDislike={(postId) => handleOnAnswer(postId, 'dislike')}
-                            isDisabled={isDisabled}
-                          />
-                        ) : null}
-                      </div>
-                    </div>
-                  );
-                });
-              }}
-            </VerticalCarousel>
+            <Toast
+              message={toastMessage || ''}
+              isVisible={showToast}
+              onClose={handleCloseToast}
+              className="absolute bottom-4 left-1/2 z-40 mx-0 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2"
+            />
           </div>
 
           {/* Desktop only — stays visible behind modal; overlay (z-[100]) blocks interaction */}
-          <div className="relative z-10 hidden h-[70vh] shrink-0 flex-col items-center justify-center gap-4 md:flex md:py-2 md:pl-1">
+          <div className="relative z-10 hidden h-full shrink-0 flex-col items-center justify-center gap-4 md:flex md:py-2 md:pl-1">
             {/* Up arrow (Previous post) */}
             <button
               type="button"
@@ -318,52 +344,50 @@ export default function HomeContent() {
               aria-label="Next post"
               aria-disabled={!nextEnabled}
             >
-              <ChevronDown size={24} className="text-[#011E41]" strokeWidth={2.5} aria-hidden="true" />
+              <ChevronDown
+                size={24}
+                className="text-[#011E41]"
+                strokeWidth={2.5}
+                aria-hidden="true"
+              />
             </button>
           </div>
         </div>
       </div>
 
       {/* Modal - shown when a post is answered */}
-      {modalPostId && (() => {
-        const contentItem = contentList.find(item => item.id === modalPostId) as Content | undefined;
-        if (!contentItem) return null;
+      {modalPostId &&
+        (() => {
+          const contentItem = contentList.find((item) => item.id === modalPostId) as
+            Content | undefined;
+          if (!contentItem) return null;
 
-        const modalAnswer = getAnswer(modalPostId);
-        if (!modalAnswer) return null;
+          const modalAnswer = getAnswer(modalPostId);
+          if (!modalAnswer) return null;
 
-        const isCorrect = contentItem.type === ContentType.MCQ
-          ? modalAnswer === (contentItem as MCQContent).correctOptionId
-          : modalAnswer === (contentItem as LikeDislikeContent).correctAnswer;
-        const reasonContent = isCorrect
-          ? contentItem.whyCorrectAnswer.content
-          : contentItem.whyIncorrectAnswer.content;
-        const reasonHeader = isCorrect
-          ? contentItem.whyCorrectAnswer.title
-          : contentItem.whyIncorrectAnswer.title;
+          const isCorrect =
+            contentItem.type === ContentType.MCQ
+              ? modalAnswer === (contentItem as MCQContent).correctOptionId
+              : modalAnswer === (contentItem as LikeDislikeContent).correctAnswer;
+          const reasonContent = isCorrect
+            ? contentItem.whyCorrectAnswer.content
+            : contentItem.whyIncorrectAnswer.content;
+          const reasonHeader = isCorrect
+            ? contentItem.whyCorrectAnswer.title
+            : contentItem.whyIncorrectAnswer.title;
 
-        return (
-          <PrebunkingModal
-            isOpen={true}
-            onClose={handleOnCloseModal}
-            onContinue={() => handleOnContinueModal(modalPostId)}
-            postId={modalPostId}
-            content={reasonContent}
-            header={reasonHeader}
-            isCorrect={isCorrect}
-          />
-        );
-      })()}
-
-      {/* Toast notification */}
-      <Toast
-        message={toastMessage || ''}
-        isVisible={showToast}
-        onClose={() => {
-          setShowToast(false);
-          setToastMessage(null);
-        }}
-      />
+          return (
+            <PrebunkingModal
+              isOpen={true}
+              onClose={handleOnCloseModal}
+              onContinue={() => handleOnContinueModal(modalPostId)}
+              postId={modalPostId}
+              content={reasonContent}
+              header={reasonHeader}
+              isCorrect={isCorrect}
+            />
+          );
+        })()}
     </div>
   );
 }

@@ -1,11 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, routing, usePathname } from '@/i18n/routing';
 import { Home, MessageSquare, PieChart, Upload, User } from 'lucide-react';
-import { STORAGE_KEYS, storage } from '@/lib/local-storage';
-import Toast from '@/components/toast';
 
 interface NavItem {
   href: keyof typeof routing.pathnames;
@@ -17,18 +14,6 @@ interface NavItem {
 export default function Navigation() {
   const t = useTranslations('nav');
   const pathname = usePathname();
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-
-  const handleNavItemClick = (href: NavItem['href']) => {
-    if (href !== '/') return;
-
-    const onboardingCompleted = storage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED, false);
-    if (!onboardingCompleted) return;
-
-    setToastMessage('You cannot exit to home in between the quiz!');
-    setShowToast(true);
-  };
 
   const navItems: NavItem[] = [
     {
@@ -76,9 +61,10 @@ export default function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => handleNavItemClick(item.href)}
                 className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                  isActive ? 'text-(--color-ifrc-red)' : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
+                  isActive
+                    ? 'text-(--color-ifrc-red)'
+                    : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
                 }`}
               >
                 <span className="transition-transform group-hover:scale-110">
@@ -102,7 +88,6 @@ export default function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => handleNavItemClick(item.href)}
                 className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
                   isActive
                     ? 'text-(--color-ifrc-red)'
@@ -120,15 +105,6 @@ export default function Navigation() {
         {/* Safe area for devices with home indicator */}
         <div className="h-safe-area bg-white" />
       </nav>
-
-      <Toast
-        message={toastMessage}
-        isVisible={showToast}
-        onClose={() => {
-          setShowToast(false);
-          setToastMessage('');
-        }}
-      />
     </>
   );
 }

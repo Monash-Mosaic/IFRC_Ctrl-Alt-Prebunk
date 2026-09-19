@@ -43,7 +43,7 @@ global.IntersectionObserver = class IntersectionObserver {
             time: Date.now(),
           },
         ],
-        this,
+        this
       );
     });
   }
@@ -101,3 +101,6 @@ jest.mock('@/i18n/routing', () => ({
 // Make mocks available globally for tests
 global.mockUsePathname = mockUsePathname;
 global.mockUseRouter = mockUseRouter;
+
+// jsdom does not implement scrollIntoView (used by the game feed)
+Element.prototype.scrollIntoView = jest.fn();

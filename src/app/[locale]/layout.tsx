@@ -72,7 +72,7 @@ export default async function LocaleLayout({
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
-  
+
   // Determine direction for RTL support
   const direction = getDirection(locale);
 
@@ -83,7 +83,7 @@ export default async function LocaleLayout({
           <Navigation />
           <Header />
           <PointsCredibilityBar />
-          <main id="root" className="min-h-screen bg-white pt-24">
+          <main id="root" className="min-h-screen min-h-dvh bg-white pt-24 max-md:pb-16">
             {children}
           </main>
         </NextIntlClientProvider>

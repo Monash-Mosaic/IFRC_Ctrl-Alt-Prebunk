@@ -9,9 +9,17 @@ interface ToastProps {
   isVisible: boolean;
   onClose: () => void;
   duration?: number;
+  /** Extra classes, e.g. to anchor the toast inside a positioned container instead of the viewport. */
+  className?: string;
 }
 
-export default function Toast({ message, isVisible, onClose, duration = 4000 }: ToastProps) {
+export default function Toast({
+  message,
+  isVisible,
+  onClose,
+  duration = 4000,
+  className,
+}: ToastProps) {
   useEffect(() => {
     if (isVisible) {
       const timer = setTimeout(() => {
@@ -33,7 +41,8 @@ export default function Toast({ message, isVisible, onClose, duration = 4000 }: 
         'transition-all duration-300 ease-in-out',
         'max-w-sm w-full mx-4',
         'opacity-100 translate-y-0',
-        'hover:shadow-[#2FE89F]/20'
+        'hover:shadow-[#2FE89F]/20',
+        className
       )}
       role="alert"
       aria-live="polite"

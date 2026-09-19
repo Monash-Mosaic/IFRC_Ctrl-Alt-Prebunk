@@ -169,43 +169,18 @@ describe('Navigation', () => {
     });
   });
 
-  describe('Home toast', () => {
+  describe('Home navigation', () => {
     afterEach(() => {
       storage.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETED);
     });
 
-    it('shows a toast when Home is clicked after onboarding is complete', async () => {
+    it('does not show a toast when Home is clicked during the quiz', async () => {
       storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
       const user = userEvent.setup();
       render(<Navigation />);
 
       const homeLinks = screen.getAllByRole('link', { name: /home/i });
       await user.click(homeLinks[0]);
-
-      expect(screen.getByRole('alert')).toBeInTheDocument();
-      expect(
-        screen.getByText('You cannot exit to home in between the quiz!'),
-      ).toBeInTheDocument();
-    });
-
-    it('does not show a toast when Home is clicked before onboarding is complete', async () => {
-      storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, false);
-      const user = userEvent.setup();
-      render(<Navigation />);
-
-      const homeLinks = screen.getAllByRole('link', { name: /home/i });
-      await user.click(homeLinks[0]);
-
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    });
-
-    it('does not show a toast when a non-Home item is clicked after onboarding is complete', async () => {
-      storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
-      const user = userEvent.setup();
-      render(<Navigation />);
-
-      const chatLinks = screen.getAllByRole('link', { name: /chat/i });
-      await user.click(chatLinks[0]);
 
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
