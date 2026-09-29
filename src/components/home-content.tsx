@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import ChatContent from '@/components/chat-content';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
-import { STORAGE_KEYS } from '@/lib/local-storage';
+import { defaultAlexChatState, STORAGE_KEYS } from '@/lib/local-storage';
 import { useLocalStorage } from '@/lib/use-local-storage';
+import { useAlexChat } from '@/lib/use-alex-chat';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
 import { Content, ContentType, LikeDislikeContent, MCQContent } from '@/contents/en';
@@ -36,6 +37,12 @@ export default function HomeContent() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [alexChat, setAlexChat] = useAlexChat();
+  const alexNoticeSent = useRef(false);
+
+  useEffect(() => {
+    if (alexChat.notified || alexChat.reply) alexNoticeSent.current = true;
+  }, [alexChat]);
 
   // Lazily created once: createGameStore() builds a brand-new Zustand store each call,
   // and gameCompleted/correctAnswers aren't persisted, so recreating it on every render
@@ -117,7 +124,15 @@ export default function HomeContent() {
   const nextEnabled = hasEngagedCurrent && canGoNext;
   const prevEnabled = canGoPrev;
 
+  const maybeNotifyAlex = (postId: string) => {
+    if (postId !== 'like-dislike-7') return;
+    if (alexNoticeSent.current || alexChat.notified || alexChat.reply) return;
+    alexNoticeSent.current = true;
+    setAlexChat({ notified: true, reply: null });
+  };
+
   const handleOnCloseModal = () => {
+    if (modalPostId) maybeNotifyAlex(modalPostId);
     setModalPostId(null);
   };
 
@@ -163,6 +178,8 @@ export default function HomeContent() {
     resetGame();
     resetCredibility(contentList.length);
     setOnboardingCompleted(false);
+    alexNoticeSent.current = false;
+    setAlexChat(defaultAlexChatState);
   };
 
   useEffect(() => {

@@ -50,8 +50,10 @@
       "replyRight": "Wait Alex, that sounds like a Conspiratorial Language without evidence. Check other source before sharing. Let's not amplify it.",
       "correctTitle": "Excellent catch!",
       "correctBody": "That sounded like a Conspiratorial Language without evidence. Check other sources before sharing. Let's not amplify it.",
-      "wrongTitle": "Wait!",
-      "wrongBody": "Wait! That sounds like a Conspiratorial Language without evidence. Check other sources before sharing. Let's not amplify it."
+      "wrongTitle": "Not quite",
+      "wrongBody": "You agreed to share a rumour with no evidence. It uses conspiratorial language: a secret plot with nothing to back it up. Sharing it spreads the claim. Check other sources first, and don't amplify it.",
+      "notification": "Alex sent you a message",
+      "back": "Back to the feed"
     },
     "onboarding": {
       "step1": {
