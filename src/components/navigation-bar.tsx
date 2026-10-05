@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, routing, usePathname } from '@/i18n/routing';
 import { Home, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
@@ -70,10 +70,12 @@ export default function Navigation() {
   const pathname = usePathname();
   const [alexChat] = useAlexChat();
   const [noticeDismissed, setNoticeDismissed] = useState(false);
+  const [wasNotified, setWasNotified] = useState(alexChat.notified);
 
-  useEffect(() => {
+  if (alexChat.notified !== wasNotified) {
+    setWasNotified(alexChat.notified);
     if (!alexChat.notified) setNoticeDismissed(false);
-  }, [alexChat.notified]);
+  }
 
   const showAlexNotice =
     alexChat.notified && !alexChat.reply && !noticeDismissed && !pathname.startsWith('/chat');

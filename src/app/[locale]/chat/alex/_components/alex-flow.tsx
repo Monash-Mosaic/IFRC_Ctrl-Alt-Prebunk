@@ -27,13 +27,13 @@ export default function AlexFlow() {
   const router = useRouter();
   const [alexChat, setAlexChat, ready] = useAlexChat();
   const reply = alexChat.reply;
-  const justReplied = useRef(false);
   const scored = useRef(false);
+  const [justReplied, setJustReplied] = useState(false);
   const [introStep, setIntroStep] = useState(0);
   const [outcomeReady, setOutcomeReady] = useState(false);
   const [wrongPopupOpen, setWrongPopupOpen] = useState(false);
+  const [sentAt, setSentAt] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
-  const sentAt = useRef<string | null>(null);
   const { addPoints, increaseCredibility, decreaseCredibility } = useCredibilityStore();
   const alex = CHAT_USERS.alex;
 
@@ -46,10 +46,10 @@ export default function AlexFlow() {
   }, [ready, reply]);
 
   useEffect(() => {
-    if (!ready || reply !== 'right' || !justReplied.current) return;
+    if (!ready || reply !== 'right' || !justReplied) return;
     const timer = setTimeout(() => setOutcomeReady(true), TYPING_MS);
     return () => clearTimeout(timer);
-  }, [ready, reply]);
+  }, [ready, reply, justReplied]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -58,7 +58,7 @@ export default function AlexFlow() {
   const choose = (next: AlexReply) => {
     if (reply || scored.current) return;
     scored.current = true;
-    justReplied.current = true;
+    setJustReplied(true);
     setAlexChat({ notified: true, reply: next });
     if (next === 'right') {
       increaseCredibility();
@@ -69,7 +69,7 @@ export default function AlexFlow() {
     }
   };
 
-  const seenBefore = reply !== null && !justReplied.current;
+  const seenBefore = reply !== null && !justReplied;
   const showOpening = introStep >= 1 || reply !== null;
   const showSendAgain = introStep >= 2 || reply !== null;
   const showLinkTyping = introStep === 3 && !reply;
@@ -78,10 +78,10 @@ export default function AlexFlow() {
   const showAsk = introStep >= 6 || reply !== null;
   const showRightOutcome = reply === 'right' && (seenBefore || outcomeReady);
   const showBack =
-    showRightOutcome || (reply === 'wrong' && !wrongPopupOpen && (seenBefore || justReplied.current));
+    showRightOutcome || (reply === 'wrong' && !wrongPopupOpen && (seenBefore || justReplied));
 
-  if (showSendAgain && sentAt.current === null) {
-    sentAt.current = formatSentAt(new Date());
+  if (showSendAgain && sentAt === null) {
+    setSentAt(formatSentAt(new Date()));
   }
 
   return (
@@ -100,7 +100,7 @@ export default function AlexFlow() {
         {showSendAgain && (
           <UserTextMessage
             displayText={t('sendAgain')}
-            sentAt={showLink ? (sentAt.current ?? undefined) : undefined}
+            sentAt={showLink ? (sentAt ?? undefined) : undefined}
           />
         )}
         {showLinkTyping && <TypingMessage senderName={alex.name} senderAvatar={alex.avatar} />}
@@ -123,7 +123,7 @@ export default function AlexFlow() {
         {reply && (
           <UserTextMessage displayText={t(reply === 'right' ? 'replyRight' : 'replyWrong')} />
         )}
-        {reply === 'right' && justReplied.current && !outcomeReady && (
+        {reply === 'right' && justReplied && !outcomeReady && (
           <TypingMessage senderName={alex.name} senderAvatar={alex.avatar} />
         )}
         {showRightOutcome && (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import {
   defaultAlexChatState,
   storage,
@@ -9,7 +9,7 @@ import {
 } from './local-storage';
 
 let memory: AlexChatState | null = null;
-const listeners = new Set<(next: AlexChatState) => void>();
+const listeners = new Set<() => void>();
 
 function readAlexChat(): AlexChatState {
   if (memory) return memory;
@@ -18,25 +18,29 @@ function readAlexChat(): AlexChatState {
   return saved;
 }
 
-export function useAlexChat() {
-  const [state, setState] = useState<AlexChatState>(() => memory ?? defaultAlexChatState);
-  const [ready, setReady] = useState(() => memory !== null);
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
 
-  useEffect(() => {
-    const onChange = (next: AlexChatState) => setState(next);
-    listeners.add(onChange);
-    setState(readAlexChat());
-    setReady(true);
-    return () => {
-      listeners.delete(onChange);
-    };
-  }, []);
+function getSnapshot(): AlexChatState {
+  return readAlexChat();
+}
+
+function getServerSnapshot(): AlexChatState {
+  return defaultAlexChatState;
+}
+
+export function useAlexChat() {
+  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const update = (next: AlexChatState) => {
     memory = next;
     storage.setItem(STORAGE_KEYS.ALEX_CHAT, next);
-    listeners.forEach((listener) => listener(next));
+    listeners.forEach((listener) => listener());
   };
 
-  return [state, update, ready] as const;
+  return [state, update, true] as const;
 }
