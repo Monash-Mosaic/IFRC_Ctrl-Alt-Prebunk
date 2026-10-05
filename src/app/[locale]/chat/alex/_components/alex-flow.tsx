@@ -15,6 +15,13 @@ import { useRouter } from '@/i18n/routing';
 
 const TYPING_MS = 1000;
 
+function formatSentAt(date: Date) {
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const suffix = date.getHours() >= 12 ? 'PM' : 'AM';
+  const hours = date.getHours() % 12 || 12;
+  return `${hours}:${minutes}${suffix}`;
+}
+
 export default function AlexFlow() {
   const t = useTranslations('chat.alex');
   const router = useRouter();
@@ -26,6 +33,7 @@ export default function AlexFlow() {
   const [outcomeReady, setOutcomeReady] = useState(false);
   const [wrongPopupOpen, setWrongPopupOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const sentAt = useRef<string | null>(null);
   const { addPoints, increaseCredibility, decreaseCredibility } = useCredibilityStore();
   const alex = CHAT_USERS.alex;
 
@@ -72,6 +80,10 @@ export default function AlexFlow() {
   const showBack =
     showRightOutcome || (reply === 'wrong' && !wrongPopupOpen && (seenBefore || justReplied.current));
 
+  if (showSendAgain && sentAt.current === null) {
+    sentAt.current = formatSentAt(new Date());
+  }
+
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex-1 space-y-4 overflow-y-auto px-4 py-6">
@@ -85,10 +97,20 @@ export default function AlexFlow() {
             displayText={t('opening')}
           />
         )}
-        {showSendAgain && <UserTextMessage displayText={t('sendAgain')} />}
+        {showSendAgain && (
+          <UserTextMessage
+            displayText={t('sendAgain')}
+            sentAt={showLink ? (sentAt.current ?? undefined) : undefined}
+          />
+        )}
         {showLinkTyping && <TypingMessage senderName={alex.name} senderAvatar={alex.avatar} />}
         {showLink && (
-          <BotTextMessage senderName={alex.name} senderAvatar={alex.avatar} displayText={t('link')} />
+          <BotTextMessage
+            senderName={alex.name}
+            senderAvatar={alex.avatar}
+            displayText={t('link')}
+            reaction
+          />
         )}
         {showAskTyping && <TypingMessage senderName={alex.name} senderAvatar={alex.avatar} />}
         {showAsk && (

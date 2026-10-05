@@ -88,6 +88,8 @@ describe('AlexFlow', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(5);
     expect(useCredibilityStore.getState().credibility).toBe(6);
+    expect(screen.getAllByLabelText('Reaction')).toHaveLength(1);
+    expect(screen.getAllByText(/\d{1,2}:\d{2}(AM|PM)/)).toHaveLength(1);
   });
 
   it('shows the Not quite popup for the wrong reply and does not add points', () => {
@@ -101,8 +103,11 @@ describe('AlexFlow', () => {
     expect(screen.queryByText('Excellent catch!')).not.toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(0);
     expect(useCredibilityStore.getState().credibility).toBe(4);
+    expect(screen.getAllByLabelText('Reaction')).toHaveLength(1);
+    expect(screen.getAllByText(/\d{1,2}:\d{2}(AM|PM)/)).toHaveLength(1);
 
     fireEvent.click(screen.getByRole('button', { name: 'Got it! Continue' }));
+    expect(screen.getAllByText(/\d{1,2}:\d{2}(AM|PM)/)).toHaveLength(1);
     expect(router.replace).not.toHaveBeenCalled();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Back to the feed' })).toBeInTheDocument();
