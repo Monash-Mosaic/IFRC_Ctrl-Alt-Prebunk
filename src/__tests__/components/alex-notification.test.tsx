@@ -195,6 +195,22 @@ describe('Alex notification', () => {
     expect(noticeLinks()).toHaveLength(0);
   });
 
+  it('uses the whole notice box as the link and keeps close outside it', () => {
+    setAlex({ notified: true, reply: null });
+    render(<Navigation />);
+
+    const links = noticeLinks();
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', '/chat/alex');
+      expect(link).toHaveClass('border-2');
+      expect(link.querySelector('button')).toBeNull();
+    }
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Close notification' })[0]);
+    expect(noticeLinks()).toHaveLength(0);
+  });
+
   it('keeps Alex coming soon until the notification exists', () => {
     const { unmount } = render(<ChatPage />);
     const locked = screen.getByRole('link', { name: /Alex/ });

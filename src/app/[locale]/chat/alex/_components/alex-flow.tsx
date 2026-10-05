@@ -146,7 +146,6 @@ export default function AlexFlow() {
       <PrebunkingModal
         isOpen={wrongPopupOpen}
         onClose={() => setWrongPopupOpen(false)}
-        onContinue={() => router.replace('/')}
         postId="alex"
         header={<h1 className="text-xl font-bold">{t('wrongTitle')}</h1>}
         content={<p>{t('wrongBody')}</p>}

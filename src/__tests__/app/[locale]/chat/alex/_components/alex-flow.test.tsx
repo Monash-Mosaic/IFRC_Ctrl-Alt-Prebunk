@@ -103,6 +103,11 @@ describe('AlexFlow', () => {
     expect(useCredibilityStore.getState().credibility).toBe(4);
 
     fireEvent.click(screen.getByRole('button', { name: 'Got it! Continue' }));
+    expect(router.replace).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Back to the feed' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back to the feed' }));
     expect(router.replace).toHaveBeenCalledWith('/');
   });
 });
