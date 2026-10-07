@@ -31,6 +31,7 @@ const eslintConfig = defineConfig([
     'jest.setup.js',
     'postcss.config.mjs',
     'src/test-utils/**',
+    'vendor/**',
   ]),
 ]);
 
