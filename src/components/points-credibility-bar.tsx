@@ -11,7 +11,7 @@ export default function PointsCredibilityBar() {
 
   const credibilityPercentage = (credibility / Math.max(initialCredibility, 1)) * 100;
   const correctAnswers = points / 5;
-  const totalQuestions = CONTENTS[locale as keyof typeof CONTENTS].contentList.length;
+  const totalQuestions = CONTENTS[locale as keyof typeof CONTENTS].contentList.length + 1;
 
   return (
     <div className="flex justify-between fixed top-14 left-0 right-0 z-40 flex h-10 items-center gap-4 border-t border-white/50 bg-[#E8E9ED] px-4 md:px-6">

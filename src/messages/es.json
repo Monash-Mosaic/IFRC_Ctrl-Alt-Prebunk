@@ -39,7 +39,21 @@
       "paula": "Paula",
       "alex": "Alex",
       "newMessage": "Nuevo mensaje",
-      "comingSoon": "Próximamente"
+      "busy": "Ocupado"
+    },
+    "alex": {
+      "opening": "Hey, did you see this article my uncle sent? It says those disaster relief funds are actually just being funnelled to politicians' offshore accounts. Sounds super sketchy, right? Should I blast this out to everyone?",
+      "sendAgain": "Can you send it again?",
+      "link": "Here! https://link.com",
+      "askOpinion": "So, what do you think?",
+      "replyWrong": "That's huge if true! Yes, let's share it, so people know!",
+      "replyRight": "Wait Alex, that sounds like a Conspiratorial Language without evidence. Check other source before sharing. Let's not amplify it.",
+      "correctTitle": "Excellent catch!",
+      "correctBody": "That sounded like a Conspiratorial Language without evidence. Check other sources before sharing. Let's not amplify it.",
+      "wrongTitle": "Not quite",
+      "wrongBody": "You agreed to share a rumour with no evidence. It uses conspiratorial language: a secret plot with nothing to back it up. Sharing it spreads the claim. Check other sources first, and don't amplify it.",
+      "notification": "Alex sent you a message",
+      "back": "Back to the feed"
     },
     "onboarding": {
       "step1": {

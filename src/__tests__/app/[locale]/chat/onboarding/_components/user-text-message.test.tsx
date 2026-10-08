@@ -35,6 +35,14 @@ describe('UserTextMessage', () => {
     expect(screen.getByText('Hello, this is a test message')).toBeInTheDocument();
   });
 
+  it('shows ticks and a time only when a sent time is passed', () => {
+    const { rerender } = render(<UserTextMessage displayText="Hello" />);
+    expect(screen.queryByText('3:00PM')).not.toBeInTheDocument();
+
+    rerender(<UserTextMessage displayText="Hello" sentAt="3:00PM" />);
+    expect(screen.getByText('3:00PM')).toBeInTheDocument();
+  });
+
   it('applies correct alignment classes', () => {
     const { container } = render(<UserTextMessage displayText="Test message" />);
 

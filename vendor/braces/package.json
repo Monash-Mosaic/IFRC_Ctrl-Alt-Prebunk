@@ -1,0 +1,14 @@
+{
+  "name": "braces",
+  "version": "3.0.4",
+  "description": "braces 3.0.3 with a nesting-depth limit for GHSA-vfj7-8cjw-p6xm. Upstream has not published a patched release.",
+  "license": "MIT",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "lib"
+  ],
+  "dependencies": {
+    "fill-range": "^7.1.1"
+  }
+}

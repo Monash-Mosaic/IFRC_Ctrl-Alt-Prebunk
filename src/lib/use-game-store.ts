@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { STORAGE_KEYS } from './local-storage';
+import { STORAGE_KEYS, storage } from './local-storage';
 import { ContentBase, ContentId } from '@/contents/en';
 
 interface GameState {
@@ -24,6 +24,12 @@ interface GameStore extends GameState {
   incrCorrectAnswers: () => void;
   getNumQuestions: () => number;
   resetGame: () => void;
+}
+
+/** True once the results screen has been reached. Read from the feed's saved session. */
+export function isPersistedGameCompleted() {
+  const saved = storage.getItem<{ state?: { gameCompleted?: boolean } }>(STORAGE_KEYS.GAME_STATE);
+  return saved?.state?.gameCompleted === true;
 }
 
 const initialGameState = {

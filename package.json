@@ -57,6 +57,7 @@
     "@types/react-dom": "^19",
     "@types/react-modal": "^3.16.3",
     "autoprefixer": "^10.4.22",
+    "braces": "file:vendor/braces",
     "cssnano": "^7.1.2",
     "eslint": "^9",
     "eslint-config-next": "16.0.6",
@@ -72,8 +73,9 @@
   "overrides": {
     "js-yaml": "^4.3.0",
     "postcss": "^8.5.10",
-    "sharp": "^0.35.0",
-    "undici": "7.29.1"
+    "braces": "$braces",
+    "sharp": "0.35.5",
+    "undici": "7.30.0"
   },
   "browserslist": [
     "cover 95%",

@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import ChatContent from '@/components/chat-content';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
-import { STORAGE_KEYS } from '@/lib/local-storage';
+import { defaultAlexChatState, STORAGE_KEYS } from '@/lib/local-storage';
 import { useLocalStorage } from '@/lib/use-local-storage';
+import { useAlexChat } from '@/lib/use-alex-chat';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
 import { Content, ContentType, LikeDislikeContent, MCQContent } from '@/contents/en';
@@ -36,6 +37,12 @@ export default function HomeContent() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [alexChat, setAlexChat] = useAlexChat();
+  const alexNoticeSent = useRef(false);
+
+  useEffect(() => {
+    if (alexChat.notified || alexChat.reply) alexNoticeSent.current = true;
+  }, [alexChat]);
 
   // Lazily created once: createGameStore() builds a brand-new Zustand store each call,
   // and gameCompleted/correctAnswers aren't persisted, so recreating it on every render
@@ -63,6 +70,8 @@ export default function HomeContent() {
     getNumQuestions,
     resetGame,
   } = useGameStore();
+  const answers = useGameStore((state) => state.answers);
+  const gameCompleted = useGameStore((state) => state.gameCompleted);
   const { addPoints, increaseCredibility, decreaseCredibility, initCredibility, resetCredibility } =
     useCredibilityStore();
 
@@ -117,20 +126,45 @@ export default function HomeContent() {
   const nextEnabled = hasEngagedCurrent && canGoNext;
   const prevEnabled = canGoPrev;
 
+  const maybeNotifyAlex = (postId: string) => {
+    if (postId !== 'like-dislike-7') return;
+    if (alexNoticeSent.current || alexChat.notified || alexChat.reply) return;
+    alexNoticeSent.current = true;
+    setAlexChat({ notified: true, reply: null, remind: alexChat.remind ?? 0 });
+  };
+
   const handleOnCloseModal = () => {
+    if (modalPostId) maybeNotifyAlex(modalPostId);
     setModalPostId(null);
   };
 
   const handleOnContinueModal = (postId: string) => {
-    if (isAnswered(postId)) {
-      moveToNextQuestion();
-      const nextIndex = contentList.findIndex((item) => item.id === postId) + 1;
-      if (nextIndex < contentList.length) {
-        // The next post is rendered by now (it unlocked when the answer was stored).
-        feedRef.current?.scrollToPost(nextIndex);
-      }
+    if (!isAnswered(postId)) return;
+
+    const nextIndex = contentList.findIndex((item) => item.id === postId) + 1;
+    const isLast = nextIndex >= contentList.length;
+    if (isLast && !alexChat.reply) {
+      alexNoticeSent.current = true;
+      setAlexChat({
+        notified: true,
+        reply: null,
+        remind: (alexChat.remind ?? 0) + 1,
+      });
+      return;
+    }
+
+    moveToNextQuestion();
+    if (!isLast) {
+      // The next post is rendered by now (it unlocked when the answer was stored).
+      feedRef.current?.scrollToPost(nextIndex);
     }
   };
+
+  useEffect(() => {
+    if (!alexChat.reply || gameCompleted || modalPostId) return;
+    if (!contentList.every((item) => item.id in answers)) return;
+    moveToNextQuestion();
+  }, [alexChat.reply, gameCompleted, modalPostId, answers, contentList, moveToNextQuestion]);
 
   const handleOnAnswer = (postId: string, answer: string) => {
     // Only allow answer if post is not already answered and is not disabled
@@ -163,6 +197,8 @@ export default function HomeContent() {
     resetGame();
     resetCredibility(contentList.length);
     setOnboardingCompleted(false);
+    alexNoticeSent.current = false;
+    setAlexChat(defaultAlexChatState);
   };
 
   useEffect(() => {
@@ -209,8 +245,8 @@ export default function HomeContent() {
     return (
       <div className="flex min-h-[calc(100dvh-10rem)] flex-col items-center justify-center p-4 md:min-h-[calc(100vh-6rem)]">
         <GameComplete
-          correctAnswers={getCorrectAnswers()}
-          totalQuestions={getNumQuestions()}
+          correctAnswers={getCorrectAnswers() + (alexChat.reply === 'right' ? 1 : 0)}
+          totalQuestions={getNumQuestions() + 1}
           restartGame={handleRestartSimulation}
         />
       </div>

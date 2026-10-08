@@ -1,8 +1,61 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, routing, usePathname } from '@/i18n/routing';
-import { Home, MessageSquare, PieChart, Upload, User } from 'lucide-react';
+import { Home, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
+import { useAlexChat } from '@/lib/use-alex-chat';
+
+function AlexNotice({
+  variant,
+  message,
+  closeLabel,
+  onClose,
+}: {
+  variant: 'side' | 'above';
+  message: string;
+  closeLabel: string;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className={
+        variant === 'side'
+          ? 'absolute top-1/2 z-50 w-max max-w-[14rem] -translate-y-1/2 ltr:left-full ltr:ml-3 rtl:right-full rtl:mr-3'
+          : 'absolute bottom-full left-1/2 z-50 mb-3 w-max max-w-[14rem] -translate-x-1/2'
+      }
+    >
+      <div className="relative">
+        <Link
+          href="/chat/alex"
+          className="relative flex items-start rounded-xl border-2 border-[#011E41] bg-white py-2 pl-3 pr-8 text-sm font-medium leading-snug text-[#011E41] shadow-lg rtl:pr-3 rtl:pl-8"
+        >
+          <span
+            aria-hidden
+            className={
+              variant === 'side'
+                ? 'absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rotate-45 border-[#011E41] bg-white ltr:-left-[7px] ltr:border-b-2 ltr:border-l-2 rtl:-right-[7px] rtl:border-r-2 rtl:border-t-2'
+                : 'absolute -bottom-[7px] left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-[#011E41] bg-white'
+            }
+          />
+          {message}
+        </Link>
+        <button
+          type="button"
+          aria-label={closeLabel}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-2 z-10 rounded-full p-0.5 text-[#6B7280] hover:text-[#011E41] ltr:right-2 rtl:left-2"
+        >
+          <X size={14} strokeWidth={2.5} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 interface NavItem {
   href: keyof typeof routing.pathnames;
@@ -13,7 +66,26 @@ interface NavItem {
 
 export default function Navigation() {
   const t = useTranslations('nav');
+  const alexT = useTranslations('chat.alex');
   const pathname = usePathname();
+  const [alexChat] = useAlexChat();
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
+  const [wasNotified, setWasNotified] = useState(alexChat.notified);
+  const remind = alexChat.remind ?? 0;
+  const [seenRemind, setSeenRemind] = useState(remind);
+
+  if (alexChat.notified !== wasNotified) {
+    setWasNotified(alexChat.notified);
+    if (!alexChat.notified) setNoticeDismissed(false);
+  }
+
+  if (remind !== seenRemind) {
+    setSeenRemind(remind);
+    setNoticeDismissed(false);
+  }
+
+  const showAlexNotice =
+    alexChat.notified && !alexChat.reply && !noticeDismissed && !pathname.startsWith('/chat');
 
   const navItems: NavItem[] = [
     {
@@ -58,20 +130,29 @@ export default function Navigation() {
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
 
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                  isActive
-                    ? 'text-(--color-ifrc-red)'
-                    : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
-                }`}
-              >
-                <span className="transition-transform group-hover:scale-110">
-                  {isActive ? item.activeIcon : item.icon}
-                </span>
-                <span className="text-[11px] font-medium">{t(item.labelKey)}</span>
-              </Link>
+              <div key={item.href} className="relative">
+                <Link
+                  href={item.href}
+                  className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
+                    isActive
+                      ? 'text-(--color-ifrc-red)'
+                      : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
+                  }`}
+                >
+                  <span className="transition-transform group-hover:scale-110">
+                    {isActive ? item.activeIcon : item.icon}
+                  </span>
+                  <span className="text-[11px] font-medium">{t(item.labelKey)}</span>
+                </Link>
+                {showAlexNotice && item.href === '/chat' && (
+                  <AlexNotice
+                    variant="side"
+                    message={alexT('notification')}
+                    closeLabel="Close notification"
+                    onClose={() => setNoticeDismissed(true)}
+                  />
+                )}
+              </div>
             );
           })}
         </nav>
@@ -85,20 +166,29 @@ export default function Navigation() {
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
 
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                  isActive
-                    ? 'text-(--color-ifrc-red)'
-                    : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
-                }`}
-              >
-                <span className="transition-transform group-hover:scale-110">
-                  {isActive ? item.activeIcon : item.icon}
-                </span>
-                <span className="text-[11px] font-medium">{t(item.labelKey)}</span>
-              </Link>
+              <div key={item.href} className="relative">
+                <Link
+                  href={item.href}
+                  className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
+                    isActive
+                      ? 'text-(--color-ifrc-red)'
+                      : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
+                  }`}
+                >
+                  <span className="transition-transform group-hover:scale-110">
+                    {isActive ? item.activeIcon : item.icon}
+                  </span>
+                  <span className="text-[11px] font-medium">{t(item.labelKey)}</span>
+                </Link>
+                {showAlexNotice && item.href === '/chat' && (
+                  <AlexNotice
+                    variant="above"
+                    message={alexT('notification')}
+                    closeLabel="Close notification"
+                    onClose={() => setNoticeDismissed(true)}
+                  />
+                )}
+              </div>
             );
           })}
         </div>
