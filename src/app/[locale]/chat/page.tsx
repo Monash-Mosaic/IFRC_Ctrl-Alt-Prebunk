@@ -71,7 +71,7 @@ export default function ChatPage() {
           <ChatListItem
             name={t('alex')}
             avatar={<AlexAvatar />}
-            subText={alexOpen ? t('newMessage') : t('comingSoon')}
+            subText={alexOpen ? t('newMessage') : t('busy')}
             hasSubText={!alexChat.reply}
             isDisabled={!alexOpen}
             href="/chat/alex"

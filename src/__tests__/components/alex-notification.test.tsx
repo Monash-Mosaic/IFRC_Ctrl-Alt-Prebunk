@@ -211,10 +211,10 @@ describe('Alex notification', () => {
     expect(noticeLinks()).toHaveLength(0);
   });
 
-  it('keeps Alex coming soon until the notification exists', () => {
+  it('keeps Alex busy until the notification exists', () => {
     const { unmount } = render(<ChatPage />);
     const locked = screen.getByRole('link', { name: /Alex/ });
-    expect(locked).toHaveTextContent('Coming Soon');
+    expect(locked).toHaveTextContent('Busy');
     expect(locked).toHaveClass('cursor-not-allowed');
 
     const click = new MouseEvent('click', { bubbles: true, cancelable: true });
