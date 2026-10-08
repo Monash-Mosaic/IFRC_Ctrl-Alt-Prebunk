@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
 import BotTextMessage from '../../onboarding/_components/bot-text-message';
 import UserTextMessage from '../../onboarding/_components/user-text-message';
@@ -12,6 +12,7 @@ import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import { type AlexReply } from '@/lib/local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
 import { useRouter } from '@/i18n/routing';
+import { isPersistedGameCompleted } from '@/lib/use-game-store';
 
 const TYPING_MS = 1000;
 
@@ -35,6 +36,11 @@ export default function AlexFlow() {
   const [sentAt, setSentAt] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const { addPoints, increaseCredibility, decreaseCredibility } = useCredibilityStore();
+  const gameOver = useSyncExternalStore(
+    () => () => {},
+    isPersistedGameCompleted,
+    () => false
+  );
   const alex = CHAT_USERS.alex;
 
   useEffect(() => {
@@ -56,7 +62,7 @@ export default function AlexFlow() {
   }, [introStep, outcomeReady, reply]);
 
   const choose = (next: AlexReply) => {
-    if (reply || scored.current) return;
+    if (reply || scored.current || gameOver) return;
     scored.current = true;
     setJustReplied(true);
     setAlexChat({ notified: true, reply: next, remind: alexChat.remind });
@@ -145,7 +151,7 @@ export default function AlexFlow() {
       {((ready && !reply && introStep >= 6) || showBack) && (
         <div className="border-t border-[#E8E9ED] bg-white px-4 py-4 md:pb-4">
           <div className="mx-auto flex max-w-2xl flex-col gap-3">
-            {ready && !reply && introStep >= 6 && (
+            {ready && !reply && introStep >= 6 && !gameOver && (
               <>
                 <OptionButton
                   id="alex-reply-wrong"

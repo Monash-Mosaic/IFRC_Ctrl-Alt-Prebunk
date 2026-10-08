@@ -115,4 +115,17 @@ describe('AlexFlow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Back to the feed' }));
     expect(router.replace).toHaveBeenCalledWith('/');
   });
+
+  it('hides the replies after the simulation ends and does not score them', () => {
+    localStorage.setItem(
+      'game_state',
+      JSON.stringify({ state: { gameCompleted: true }, version: 0 })
+    );
+    showReplyButtons();
+
+    expect(screen.getByText('Here! https://link.com')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Wait Alex, that sounds like/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /That's huge if true/ })).not.toBeInTheDocument();
+    expect(useCredibilityStore.getState().points).toBe(0);
+  });
 });
