@@ -71,10 +71,17 @@ export default function Navigation() {
   const [alexChat] = useAlexChat();
   const [noticeDismissed, setNoticeDismissed] = useState(false);
   const [wasNotified, setWasNotified] = useState(alexChat.notified);
+  const remind = alexChat.remind ?? 0;
+  const [seenRemind, setSeenRemind] = useState(remind);
 
   if (alexChat.notified !== wasNotified) {
     setWasNotified(alexChat.notified);
     if (!alexChat.notified) setNoticeDismissed(false);
+  }
+
+  if (remind !== seenRemind) {
+    setSeenRemind(remind);
+    setNoticeDismissed(false);
   }
 
   const showAlexNotice =

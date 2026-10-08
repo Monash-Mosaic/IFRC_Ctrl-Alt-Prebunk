@@ -14,11 +14,14 @@ export type AlexReply = 'right' | 'wrong';
 export type AlexChatState = {
   notified: boolean;
   reply: AlexReply | null;
+  /** Bumped when the feed is finished and Alex still has no reply, so the notice reopens. */
+  remind?: number;
 };
 
 export const defaultAlexChatState: AlexChatState = {
   notified: false,
   reply: null,
+  remind: 0,
 };
 
 /**

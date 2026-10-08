@@ -59,7 +59,7 @@ export default function AlexFlow() {
     if (reply || scored.current) return;
     scored.current = true;
     setJustReplied(true);
-    setAlexChat({ notified: true, reply: next });
+    setAlexChat({ notified: true, reply: next, remind: alexChat.remind });
     if (next === 'right') {
       increaseCredibility();
       addPoints(5);

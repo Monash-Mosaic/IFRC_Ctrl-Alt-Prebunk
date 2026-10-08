@@ -70,6 +70,8 @@ export default function HomeContent() {
     getNumQuestions,
     resetGame,
   } = useGameStore();
+  const answers = useGameStore((state) => state.answers);
+  const gameCompleted = useGameStore((state) => state.gameCompleted);
   const { addPoints, increaseCredibility, decreaseCredibility, initCredibility, resetCredibility } =
     useCredibilityStore();
 
@@ -128,7 +130,7 @@ export default function HomeContent() {
     if (postId !== 'like-dislike-7') return;
     if (alexNoticeSent.current || alexChat.notified || alexChat.reply) return;
     alexNoticeSent.current = true;
-    setAlexChat({ notified: true, reply: null });
+    setAlexChat({ notified: true, reply: null, remind: alexChat.remind ?? 0 });
   };
 
   const handleOnCloseModal = () => {
@@ -137,15 +139,32 @@ export default function HomeContent() {
   };
 
   const handleOnContinueModal = (postId: string) => {
-    if (isAnswered(postId)) {
-      moveToNextQuestion();
-      const nextIndex = contentList.findIndex((item) => item.id === postId) + 1;
-      if (nextIndex < contentList.length) {
-        // The next post is rendered by now (it unlocked when the answer was stored).
-        feedRef.current?.scrollToPost(nextIndex);
-      }
+    if (!isAnswered(postId)) return;
+
+    const nextIndex = contentList.findIndex((item) => item.id === postId) + 1;
+    const isLast = nextIndex >= contentList.length;
+    if (isLast && !alexChat.reply) {
+      alexNoticeSent.current = true;
+      setAlexChat({
+        notified: true,
+        reply: null,
+        remind: (alexChat.remind ?? 0) + 1,
+      });
+      return;
+    }
+
+    moveToNextQuestion();
+    if (!isLast) {
+      // The next post is rendered by now (it unlocked when the answer was stored).
+      feedRef.current?.scrollToPost(nextIndex);
     }
   };
+
+  useEffect(() => {
+    if (!alexChat.reply || gameCompleted || modalPostId) return;
+    if (!contentList.every((item) => item.id in answers)) return;
+    moveToNextQuestion();
+  }, [alexChat.reply, gameCompleted, modalPostId, answers, contentList, moveToNextQuestion]);
 
   const handleOnAnswer = (postId: string, answer: string) => {
     // Only allow answer if post is not already answered and is not disabled
@@ -226,8 +245,8 @@ export default function HomeContent() {
     return (
       <div className="flex min-h-[calc(100dvh-10rem)] flex-col items-center justify-center p-4 md:min-h-[calc(100vh-6rem)]">
         <GameComplete
-          correctAnswers={getCorrectAnswers()}
-          totalQuestions={getNumQuestions()}
+          correctAnswers={getCorrectAnswers() + (alexChat.reply === 'right' ? 1 : 0)}
+          totalQuestions={getNumQuestions() + 1}
           restartGame={handleRestartSimulation}
         />
       </div>

@@ -69,7 +69,7 @@ jest.mock('@/contents', () => ({
   default: {
     en: {
       content: {},
-      contentList: [post('other'), post('like-dislike-7')],
+      contentList: [post('other'), post('like-dislike-7'), post('end')],
     },
   },
 }));
@@ -209,6 +209,24 @@ describe('Alex notification', () => {
 
     fireEvent.click(screen.getAllByRole('button', { name: 'Close notification' })[0]);
     expect(noticeLinks()).toHaveLength(0);
+  });
+
+  it('shows the notice again when the feed ends without a reply', () => {
+    setAlex({ notified: true, reply: null, remind: 0 });
+    answers.other = 'dislike';
+    answers['like-dislike-7'] = 'dislike';
+    render(
+      <>
+        <Navigation />
+        <HomeContent />
+      </>
+    );
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Close notification' })[0]);
+    expect(noticeLinks()).toHaveLength(0);
+
+    dismissPost('end');
+    expect(noticeLinks()).toHaveLength(2);
   });
 
   it('keeps Alex busy until the notification exists', () => {
