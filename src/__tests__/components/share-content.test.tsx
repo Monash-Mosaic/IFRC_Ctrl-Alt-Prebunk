@@ -128,7 +128,7 @@ describe('ShareContent', () => {
     await user.click(button);
 
     const modal = await screen.findByTestId('react-modal');
-    // 3/5 = 60% → the same tier the completion screen shows.
+    // 3/5 = 60%, so the same tier the completion screen shows.
     expect(within(modal).getByText('3/5')).toBeInTheDocument();
     expect(within(modal).getByText('Prebunker')).toBeInTheDocument();
 
