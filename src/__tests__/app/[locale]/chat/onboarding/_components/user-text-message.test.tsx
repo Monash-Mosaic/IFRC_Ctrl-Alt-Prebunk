@@ -35,6 +35,17 @@ describe('UserTextMessage', () => {
     expect(screen.getByText('Hello, this is a test message')).toBeInTheDocument();
   });
 
+  it('renders the player avatar after the message when provided', () => {
+    render(
+      <UserTextMessage
+        displayText="Hi"
+        senderAvatar={<span data-testid="player-avatar">A</span>}
+      />
+    );
+
+    expect(screen.getByTestId('player-avatar')).toBeInTheDocument();
+  });
+
   it('applies correct alignment classes', () => {
     const { container } = render(<UserTextMessage displayText="Test message" />);
 

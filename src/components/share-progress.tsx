@@ -4,16 +4,21 @@ import React, { useCallback, useRef } from 'react';
 // import { toPng, toBlob } from 'html-to-image';
 
 import Title from '@/components/title';
+import { GAME_URL } from '@/lib/share-links';
+import { getSimulationOutcome } from '@/lib/simulation-outcome';
 
-const GAME_URL = 'https://ctrl-alt-prebunk.wdr26.org/en';
+export type ShareProgressResult = 'shared' | 'downloaded' | 'cancelled' | 'failed';
 
 interface ShareProgressProps {
     correctAnswers: number;
     totalQuestions: number;
+    /** Optional: notified how a share/download attempt ended, e.g. to show feedback. */
+    onResult?: (result: ShareProgressResult) => void;
 }
 
-export default function ShareProgress({ correctAnswers, totalQuestions }: ShareProgressProps) {
+export default function ShareProgress({ correctAnswers, totalQuestions, onResult }: ShareProgressProps) {
     const ref = useRef<HTMLDivElement>(null);
+    const outcomeLabel = getSimulationOutcome(correctAnswers, totalQuestions).label;
 
     const handleDownload = useCallback(async () => {
         if (ref.current === null) return;
@@ -26,11 +31,13 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
                 link.download = 'prebunk-results.png';
                 link.href = dataUrl;
                 link.click();
+                onResult?.('downloaded');
             })
             .catch(() => {
                 console.error('Error generating image');
+                onResult?.('failed');
             });
-    }, []);
+    }, [onResult]);
 
     const handleShare = useCallback(async () => {
         if (ref.current === null) return;
@@ -41,6 +48,7 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
 
             if (!blob) {
                 console.error("Failed to generate image blob");
+                onResult?.('failed');
                 return;
             }
             
@@ -48,7 +56,7 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
 
             if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
                 const shareData = {
-                    title: 'Prebunking Champion',
+                    title: outcomeLabel,
                     text: `I scored ${correctAnswers}/${totalQuestions} in the IFRC prebunking challenge. Play at ${GAME_URL}`,
                     files: [file],
                 };
@@ -59,18 +67,20 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
                 }
 
                 await navigator.share(shareData);
+                onResult?.('shared');
                 return;
             }
 
             await handleDownload();
         } catch (err) {
             if (err instanceof Error && err.name === 'AbortError') {
+                onResult?.('cancelled');
                 return;
             }
             console.error('Error sharing image:', err instanceof Error ? err.name : 'unknown error');
             await handleDownload();
         }
-    }, [correctAnswers, handleDownload, totalQuestions]);
+    }, [correctAnswers, handleDownload, onResult, outcomeLabel, totalQuestions]);
 
     return (
         <div className="flex w-full max-w-[420px] flex-col items-center gap-3 sm:gap-4">
@@ -91,7 +101,7 @@ export default function ShareProgress({ correctAnswers, totalQuestions }: ShareP
                         </p>
 
                         <p className="mt-2 text-xl font-black uppercase leading-tight tracking-[0.2em] text-[#2979FF] sm:mt-3 sm:text-2xl sm:text-3xl">
-                            Prebunking Champion
+                            {outcomeLabel}
                         </p>
                     </div>
 

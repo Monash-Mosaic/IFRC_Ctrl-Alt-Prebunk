@@ -26,6 +26,70 @@
     "title": "Under Development",
     "message": "This page is currently under development. Please check back soon!"
   },
+  "profile": {
+    "title": "Profile",
+    "identityHeading": "Your player profile",
+    "usernameLabel": "Username",
+    "defaultUsername": "Player",
+    "editUsername": "Edit username",
+    "usernameHint": "Up to {max} characters",
+    "usernameRequired": "Please enter a username",
+    "usernameSaved": "Username saved",
+    "save": "Save",
+    "cancel": "Cancel",
+    "avatarLabel": "Choose your avatar",
+    "avatarSaved": "Avatar updated",
+    "score": "Score",
+    "credibility": "Credibility",
+    "progressNote": "Changing your profile does not affect your score, credibility or progress.",
+    "avatars": {
+      "green": "Green",
+      "blue": "Blue",
+      "navy": "Navy",
+      "red": "Red",
+      "yellow": "Yellow",
+      "purple": "Purple"
+    }
+  },
+  "sharePage": {
+    "title": "Share",
+    "subtitle": "Help others slow down before they share. Pass on the game, the evidence and your result.",
+    "game": {
+      "title": "Share the game",
+      "description": "Invite friends to test their prebunking skills.",
+      "action": "Share the game",
+      "shareTitle": "CTRL + ALT + PREBUNK",
+      "shareText": "Can you spot misinformation before it spreads? Try CTRL + ALT + PREBUNK."
+    },
+    "report": {
+      "title": "Share the World Disasters Report",
+      "description": "The IFRC report behind the facts in this simulation.",
+      "action": "Share the report",
+      "shareTitle": "World Disasters Report",
+      "shareText": "Read the IFRC World Disasters Report."
+    },
+    "academy": {
+      "title": "Share Solferino Academy resources",
+      "description": "Learning resources from the IFRC Solferino Academy.",
+      "action": "Share Solferino Academy",
+      "shareTitle": "IFRC Solferino Academy",
+      "shareText": "Explore learning resources from the IFRC Solferino Academy."
+    },
+    "progress": {
+      "title": "Share my progress",
+      "action": "Share my progress",
+      "result": "Your result: {score}",
+      "locked": "Finish the simulation to share your result."
+    },
+    "feedback": {
+      "shared": "Shared successfully",
+      "copied": "Link copied to clipboard",
+      "cancelled": "Sharing cancelled",
+      "downloaded": "Image downloaded",
+      "failed": "Could not share. Please try again.",
+      "linkFailed": "Could not share automatically. Copy this link: {url}"
+    }
+  },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
     "description": "IFRC Solferino Academy - Fact-checking and media literacy platform"
