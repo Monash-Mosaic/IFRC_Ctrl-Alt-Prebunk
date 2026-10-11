@@ -1,20 +1,22 @@
 'use client';
 
 import Modal from 'react-modal';
-import ShareProgress from '@/components/share-progress';
+import ShareProgress, { type ShareProgressResult } from '@/components/share-progress';
 
 interface ShareProgressModalProps {
     isOpen: boolean;
     onClose: () => void;
     correctAnswers: number;
     totalQuestions: number;
+    onResult?: (result: ShareProgressResult) => void;
 }
 
 export default function ShareProgressModal({
     isOpen,
     onClose,
     correctAnswers,
-    totalQuestions
+    totalQuestions,
+    onResult,
 }: ShareProgressModalProps) {
     return (
         <Modal
@@ -45,6 +47,7 @@ export default function ShareProgressModal({
                     <ShareProgress
                         correctAnswers={correctAnswers}
                         totalQuestions={totalQuestions}
+                        onResult={onResult}
                     />
                 </div>
             </div>

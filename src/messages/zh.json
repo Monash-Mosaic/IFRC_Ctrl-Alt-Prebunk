@@ -51,6 +51,45 @@
       "purple": "紫色"
     }
   },
+  "sharePage": {
+    "title": "分享",
+    "subtitle": "帮助他人在分享前三思。分享游戏、事实依据和你的成绩。",
+    "game": {
+      "title": "分享游戏",
+      "description": "邀请朋友测试他们的预防性辟谣能力。",
+      "action": "分享游戏",
+      "shareTitle": "CTRL + ALT + PREBUNK",
+      "shareText": "你能在虚假信息传播前识别它吗？来试试 CTRL + ALT + PREBUNK。"
+    },
+    "report": {
+      "title": "分享《世界灾害报告》",
+      "description": "本模拟中事实依据所来自的红十字与红新月联会报告。",
+      "action": "分享报告",
+      "shareTitle": "世界灾害报告",
+      "shareText": "阅读红十字与红新月联会的《世界灾害报告》。"
+    },
+    "academy": {
+      "title": "分享 Solferino Academy 资源",
+      "description": "来自红十字与红新月联会 Solferino Academy 的学习资源。",
+      "action": "分享 Solferino Academy",
+      "shareTitle": "IFRC Solferino Academy",
+      "shareText": "探索红十字与红新月联会 Solferino Academy 的学习资源。"
+    },
+    "progress": {
+      "title": "分享我的进度",
+      "action": "分享我的进度",
+      "result": "你的成绩：{score}",
+      "locked": "完成模拟后即可分享成绩。"
+    },
+    "feedback": {
+      "shared": "分享成功",
+      "copied": "链接已复制到剪贴板",
+      "cancelled": "已取消分享",
+      "downloaded": "图片已下载",
+      "failed": "分享失败，请重试。",
+      "linkFailed": "无法自动分享。请复制此链接：{url}"
+    }
+  },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
     "description": "国际红十字与红新月运动索尔费里诺学院 - 事实核查和媒体素养平台"

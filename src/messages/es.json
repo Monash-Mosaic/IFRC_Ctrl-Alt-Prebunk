@@ -51,6 +51,45 @@
       "purple": "Morado"
     }
   },
+  "sharePage": {
+    "title": "Compartir",
+    "subtitle": "Ayuda a otros a pensar antes de compartir. Comparte el juego, la evidencia y tu resultado.",
+    "game": {
+      "title": "Compartir el juego",
+      "description": "Invita a tus amistades a poner a prueba su capacidad de prebunking.",
+      "action": "Compartir el juego",
+      "shareTitle": "CTRL + ALT + PREBUNK",
+      "shareText": "¿Puedes detectar la desinformación antes de que se propague? Prueba CTRL + ALT + PREBUNK."
+    },
+    "report": {
+      "title": "Compartir el Informe Mundial sobre Desastres",
+      "description": "El informe de la IFRC detrás de los datos de esta simulación.",
+      "action": "Compartir el informe",
+      "shareTitle": "Informe Mundial sobre Desastres",
+      "shareText": "Lee el Informe Mundial sobre Desastres de la IFRC."
+    },
+    "academy": {
+      "title": "Compartir recursos de la Solferino Academy",
+      "description": "Recursos de aprendizaje de la IFRC Solferino Academy.",
+      "action": "Compartir Solferino Academy",
+      "shareTitle": "IFRC Solferino Academy",
+      "shareText": "Explora los recursos de aprendizaje de la IFRC Solferino Academy."
+    },
+    "progress": {
+      "title": "Compartir mi progreso",
+      "action": "Compartir mi progreso",
+      "result": "Tu resultado: {score}",
+      "locked": "Termina la simulación para compartir tu resultado."
+    },
+    "feedback": {
+      "shared": "Compartido correctamente",
+      "copied": "Enlace copiado al portapapeles",
+      "cancelled": "Se canceló el envío",
+      "downloaded": "Imagen descargada",
+      "failed": "No se pudo compartir. Inténtalo de nuevo.",
+      "linkFailed": "No se pudo compartir automáticamente. Copia este enlace: {url}"
+    }
+  },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
     "description": "Academia Solferino de la FICR - Plataforma de verificación de hechos y alfabetización mediática"
