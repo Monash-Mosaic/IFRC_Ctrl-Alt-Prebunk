@@ -1,8 +1,9 @@
 interface UserTextMessageProps {
   displayText: string;
+  senderAvatar?: React.ReactNode;
 }
 
-export default function UserTextMessage({ displayText }: UserTextMessageProps) {
+export default function UserTextMessage({ displayText, senderAvatar }: UserTextMessageProps) {
   return (
     <div className="flex w-full gap-3 justify-end">
       <div className="w-full flex-col gap-1 md:max-w-[70%]">
@@ -12,6 +13,7 @@ export default function UserTextMessage({ displayText }: UserTextMessageProps) {
           </div>
         </div>
       </div>
+      {senderAvatar && <div className="flex items-end">{senderAvatar}</div>}
     </div>
   );
 }

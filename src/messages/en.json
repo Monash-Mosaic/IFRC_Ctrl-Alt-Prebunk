@@ -26,6 +26,31 @@
     "title": "Under Development",
     "message": "This page is currently under development. Please check back soon!"
   },
+  "profile": {
+    "title": "Profile",
+    "identityHeading": "Your player profile",
+    "usernameLabel": "Username",
+    "defaultUsername": "Player",
+    "editUsername": "Edit username",
+    "usernameHint": "Up to {max} characters",
+    "usernameRequired": "Please enter a username",
+    "usernameSaved": "Username saved",
+    "save": "Save",
+    "cancel": "Cancel",
+    "avatarLabel": "Choose your avatar",
+    "avatarSaved": "Avatar updated",
+    "score": "Score",
+    "credibility": "Credibility",
+    "progressNote": "Changing your profile does not affect your score, credibility or progress.",
+    "avatars": {
+      "green": "Green",
+      "blue": "Blue",
+      "navy": "Navy",
+      "red": "Red",
+      "yellow": "Yellow",
+      "purple": "Purple"
+    }
+  },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
     "description": "IFRC Solferino Academy - Fact-checking and media literacy platform"

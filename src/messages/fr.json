@@ -26,6 +26,31 @@
     "title": "En Développement",
     "message": "Cette page est actuellement en développement. Revenez bientôt!"
   },
+  "profile": {
+    "title": "Profil",
+    "identityHeading": "Votre profil de joueur",
+    "usernameLabel": "Nom d'utilisateur",
+    "defaultUsername": "Joueur",
+    "editUsername": "Modifier le nom d'utilisateur",
+    "usernameHint": "Jusqu'à {max} caractères",
+    "usernameRequired": "Veuillez saisir un nom d'utilisateur",
+    "usernameSaved": "Nom d'utilisateur enregistré",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "avatarLabel": "Choisissez votre avatar",
+    "avatarSaved": "Avatar mis à jour",
+    "score": "Score",
+    "credibility": "Crédibilité",
+    "progressNote": "Modifier votre profil n'affecte pas votre score, votre crédibilité ni votre progression.",
+    "avatars": {
+      "green": "Vert",
+      "blue": "Bleu",
+      "navy": "Bleu marine",
+      "red": "Rouge",
+      "yellow": "Jaune",
+      "purple": "Violet"
+    }
+  },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
     "description": "Académie Solferino de la FICR - Plateforme de vérification des faits et d'éducation aux médias"
