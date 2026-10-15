@@ -57,9 +57,10 @@
     "@types/react-dom": "^19",
     "@types/react-modal": "^3.16.3",
     "autoprefixer": "^10.4.22",
+    "braces": "file:vendor/braces",
     "cssnano": "^7.1.2",
     "eslint": "^9",
-    "eslint-config-next": "16.0.6",
+    "eslint-config-next": "^16.4.1",
     "eslint-plugin-compat": "^6.0.2",
     "eslint-plugin-prettier": "^5.5.4",
     "jest": "^30.2.0",
@@ -70,6 +71,7 @@
     "wrangler": "4.148.0"
   },
   "overrides": {
+    "braces": "$braces",
     "js-yaml": "^4.3.0",
     "postcss": "^8.5.10",
     "sharp": "^0.35.0",
