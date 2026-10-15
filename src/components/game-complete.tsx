@@ -76,11 +76,11 @@ export default function GameComplete({ correctAnswers, totalQuestions, restartGa
                 </div>
 
                 <div className="mt-10 flex flex-col gap-4">
-                    <a href="https://wdr26.org/en" target="_blank" className="btn rounded-full border border-dashed border-slate-500 bg-white/40 px-6 py-4 text-base font-medium text-slate-800 transition hover:bg-white">
+                    <a href="https://wdr26.org/en" target="_blank" rel="noreferrer" className="btn rounded-full border border-dashed border-slate-500 bg-white/40 px-6 py-4 text-base font-medium text-slate-800 transition hover:bg-white">
                         Read the World Disasters Report
                     </a>
 
-                    <a href="https://solferinoacademy.com/" target="_blank" className="btn rounded-full border border-dashed border-slate-500 bg-white/40 px-6 py-4 text-base font-medium text-slate-800 transition hover:bg-white">
+                    <a href="https://solferinoacademy.com/" target="_blank" rel="noreferrer" className="btn rounded-full border border-dashed border-slate-500 bg-white/40 px-6 py-4 text-base font-medium text-slate-800 transition hover:bg-white">
                         Learn about Solferino Academy
                     </a>
 
@@ -92,7 +92,7 @@ export default function GameComplete({ correctAnswers, totalQuestions, restartGa
                         Share my progress
                     </button>
 
-                    <button onClick={restartGame} className="rounded-full bg-[#011E41] px-6 py-4 text-base font-semibold text-white transition hover:bg-[#002552]">
+                    <button type="button" onClick={restartGame} className="rounded-full bg-[#011E41] px-6 py-4 text-base font-semibold text-white transition hover:bg-[#002552]">
                         Restart simulation
                     </button>
                 </div>

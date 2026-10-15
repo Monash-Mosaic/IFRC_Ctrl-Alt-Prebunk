@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { STORAGE_KEYS } from './local-storage';
-import { ContentBase, ContentId } from '@/contents/en';
+import type { ContentBase, ContentId } from '@/contents/en';
 
 interface GameState {
   answers: Record<string, string>;
@@ -42,7 +42,7 @@ export const createGameStore = (initialState?: Partial<GameState>) => create<Gam
       ...initialState,
       isPostDisabled: (postId: string) => {
         const state = get();
-        if (!!state.answers[postId]) return false;
+        if (state.answers[postId]) return false;
         const postIndex = state.questions.indexOf(postId);
         if (postIndex === -1) return true;
         return state.questions.slice(0, postIndex).some(id => !state.answers[id]);

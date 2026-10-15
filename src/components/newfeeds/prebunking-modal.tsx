@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 import Modal from 'react-modal';
 import { useTranslations } from 'next-intl';
 import { CornerUpLeft } from 'lucide-react';
@@ -86,6 +87,7 @@ export default function PrebunkingModal({
           {/* Continue Button */}
           <div className="pt-4">
             <button
+              type="button"
               onClick={handleContinue}
               className={cn(
                 'w-full rounded-lg bg-[#011E41] text-white font-semibold py-3 px-4',

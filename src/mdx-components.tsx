@@ -1,7 +1,6 @@
 import type { MDXComponents } from 'mdx/types';
 
 // Parameter required by MDX but intentionally unused to disable custom components
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function useMDXComponents(_components: MDXComponents): MDXComponents {
   return {
     // Only elements supported on social media platforms (Facebook, Instagram, X/Twitter, WhatsApp, Reddit)

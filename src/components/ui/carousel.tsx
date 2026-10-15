@@ -119,6 +119,7 @@ function Carousel({
         canScrollNext,
       }}
     >
+      {/* biome-ignore lint/a11y/useSemanticElements: this is an ARIA carousel region, not a generic section */}
       <div
         onKeyDownCapture={handleKeyDown}
         className={cn("relative", orientation === "vertical" ? "flex flex-col" : "", className)}
@@ -202,6 +203,7 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
   const { orientation } = useCarousel()
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: a carousel slide is not a fieldset
     <div
       role="group"
       aria-roledescription="slide"

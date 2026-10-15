@@ -4,9 +4,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 
-export default function RootError({
-  error,
-}: {
+export default function RootError(_props: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
@@ -26,7 +24,7 @@ export default function RootError({
         router.replace(`/${routing.defaultLocale}`);
       }
     }
-  }, [pathname, router, error]);
+  }, [pathname, router]);
 
   // Show redirecting message for non-API routes
   return (
