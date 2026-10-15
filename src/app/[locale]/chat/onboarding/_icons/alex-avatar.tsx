@@ -12,6 +12,7 @@ export default function AlexAvatar({ width = 51, height = 69, fill = 'none' }: A
       viewBox="0 0 51 69"
       fill={fill}
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       <path
         fillRule="evenodd"

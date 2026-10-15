@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Link, routing, usePathname } from '@/i18n/routing';
+import { Link, type routing, usePathname } from '@/i18n/routing';
 import { Home, MessageSquare, PieChart, Upload, User } from 'lucide-react';
 
 interface NavItem {

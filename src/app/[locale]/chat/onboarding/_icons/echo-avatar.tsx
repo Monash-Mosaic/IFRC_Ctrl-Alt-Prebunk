@@ -12,6 +12,7 @@ export default function EchoAvatar({ width = 59, height = 59, fill = 'none' }: E
       viewBox="0 0 59 59"
       fill={fill}
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       <mask
         id="mask0_1009_6853"

@@ -18,7 +18,7 @@ import TypingMessage from './typing-message';
 import { CHAT_USERS } from '../../_constants/users';
 import { useRouter } from '@/i18n/routing';
 import CONTENTS from '@/contents';
-import { ContentType, LikeDislikeContent, MCQContent } from '@/contents/en';
+import { ContentType, type LikeDislikeContent, type MCQContent } from '@/contents/en';
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
@@ -78,6 +78,7 @@ export default function OnboardingFlow() {
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
+    if (state.context.messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [state.context.messages]);
 
