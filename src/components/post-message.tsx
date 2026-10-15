@@ -49,7 +49,7 @@ export default function PostMessage({
         {content}
 
         {mediaUrl && (
-          <div className="relative mb-3 w-full overflow-hidden rounded-lg bg-[#E8E9ED]">
+          <div className="relative mb-3 mt-3 w-full overflow-hidden rounded-lg bg-[#E8E9ED]">
             <div className="aspect-video w-full bg-gradient-to-br from-blue-100 to-blue-200">
               <div className="flex h-full items-center justify-center">
                 {mediaType === 'video' && (
