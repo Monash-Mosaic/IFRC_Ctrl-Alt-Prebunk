@@ -9,7 +9,7 @@ import OptionButton from '../../onboarding/_components/option-button';
 import { CHAT_USERS } from '../../_constants/users';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
-import { type AlexReply } from '@/lib/local-storage';
+import type { AlexReply } from '@/lib/local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
 import { useRouter } from '@/i18n/routing';
 import { isPersistedGameCompleted } from '@/lib/use-game-store';
@@ -58,6 +58,9 @@ export default function AlexFlow() {
   }, [ready, reply, justReplied]);
 
   useEffect(() => {
+    void introStep;
+    void outcomeReady;
+    void reply;
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [introStep, outcomeReady, reply]);
 

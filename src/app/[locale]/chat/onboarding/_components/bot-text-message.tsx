@@ -24,6 +24,7 @@ export default function BotTextMessage({
               <p className="whitespace-pre-wrap text-sm leading-relaxed">{displayText}</p>
             </div>
             <span
+              role="img"
               aria-label="Reaction"
               className="absolute -right-2 -top-3 flex h-[30px] w-6 items-center justify-center rounded-full rounded-bl-sm bg-[#F2F2F2]"
             >

@@ -39,7 +39,9 @@ export function useAlexChat() {
   const update = (next: AlexChatState) => {
     memory = next;
     storage.setItem(STORAGE_KEYS.ALEX_CHAT, next);
-    listeners.forEach((listener) => listener());
+    listeners.forEach((listener) => {
+      listener();
+    });
   };
 
   return [state, update, true] as const;
