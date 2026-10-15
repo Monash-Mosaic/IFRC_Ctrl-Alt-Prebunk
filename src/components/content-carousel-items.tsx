@@ -3,7 +3,7 @@
 import { CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
-import { Content, ContentType, LikeDislikeContent, MCQContent } from '@/contents/en';
+import { type Content, ContentType, type LikeDislikeContent, type MCQContent } from '@/contents/en';
 
 interface ContentCarouselItemsProps {
   contentList: Content[];
@@ -20,14 +20,14 @@ export default function ContentCarouselItems({
 }: ContentCarouselItemsProps) {
   return (
     <CarouselContent className="w-full p-2">
-      {contentList.map((contentItem, index) => {
+      {contentList.map((contentItem) => {
         const answer = getAnswer(contentItem.id);
         const isDisabled = isPostDisabled(contentItem.id);
 
         if (contentItem.type === ContentType.MCQ) {
           const mcq = contentItem as MCQContent;
           return (
-            <CarouselItem key={index} className="pt-2">
+            <CarouselItem key={contentItem.id} className="pt-2">
               <MCQPostMessage
                 postId={mcq.id}
                 user={mcq.post.user}
@@ -47,7 +47,7 @@ export default function ContentCarouselItems({
         if (contentItem.type === ContentType.LIKE_DISLIKE) {
           const likeDislike = contentItem as LikeDislikeContent;
           return (
-            <CarouselItem key={index} className="pt-2">
+            <CarouselItem key={contentItem.id} className="pt-2">
               <LikeDislikePostMessage
                 postId={likeDislike.id}
                 user={likeDislike.post.user}

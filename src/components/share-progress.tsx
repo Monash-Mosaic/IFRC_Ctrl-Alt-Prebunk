@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 // import { toPng, toBlob } from 'html-to-image';
 
 import Title from '@/components/title';

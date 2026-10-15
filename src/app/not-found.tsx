@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import Error from 'next/error';
+import NextError from 'next/error';
 import { routing } from '@/i18n/routing';
 
 export default function NotFound() {
@@ -34,7 +34,7 @@ export default function NotFound() {
     return (
       <html lang="en">
         <body>
-          <Error statusCode={404} />
+          <NextError statusCode={404} />
         </body>
       </html>
     );

@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 
-export default function Error({
+export default function RouteError({
   error,
   reset,
 }: {
@@ -19,6 +19,7 @@ export default function Error({
         <p className="mb-4 text-gray-600">{t('description')}</p>
         {error.digest && <p className="mb-8 text-sm text-gray-500">Error ID: {error.digest}</p>}
         <button
+          type="button"
           onClick={reset}
           className="inline-block rounded bg-[#E63946] px-6 py-3 font-medium text-white transition-colors hover:bg-[#D62839] focus:outline-none focus:ring-2 focus:ring-[#E63946] focus:ring-offset-2"
         >
