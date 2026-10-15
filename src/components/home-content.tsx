@@ -9,7 +9,7 @@ import { useLocalStorage } from '@/lib/use-local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
-import { Content, ContentType, LikeDislikeContent, MCQContent } from '@/contents/en';
+import { type Content, ContentType, type LikeDislikeContent, type MCQContent } from '@/contents/en';
 import { createGameStore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import GameComplete from '@/components/game-complete';
@@ -99,20 +99,17 @@ export default function HomeContent() {
       setToastMessage(message);
       setShowToast(true);
     },
-    [setToastMessage, setShowToast]
+    []
   );
 
   const handleCloseToast = useCallback(() => {
     setShowToast(false);
     setToastMessage(null);
-  }, [setShowToast, setToastMessage]);
+  }, []);
 
-  const handleActiveIndexChange = useCallback(
-    (index: number) => {
-      setActiveIndex(index);
-    },
-    [setActiveIndex]
-  );
+  const handleActiveIndexChange = useCallback((index: number) => {
+    setActiveIndex(index);
+  }, []);
 
   const handleBlockedScrollAttempt = useCallback(() => {
     showFeedToast(feedT('blockedScroll'));

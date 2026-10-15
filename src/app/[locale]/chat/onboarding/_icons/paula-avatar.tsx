@@ -12,6 +12,7 @@ export default function PaulaAvatar({ width = 56, height = 61, fill = 'none' }: 
       viewBox="0 0 56 61"
       fill={fill}
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       <path
         fillRule="evenodd"

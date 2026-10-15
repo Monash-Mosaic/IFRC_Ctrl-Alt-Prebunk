@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Link, routing, usePathname } from '@/i18n/routing';
+import { Link, type routing, usePathname } from '@/i18n/routing';
 import { Home, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
 import { useAlexChat } from '@/lib/use-alex-chat';
 

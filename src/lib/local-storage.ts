@@ -43,6 +43,7 @@ export type StorageKey = string;
  */
 function getItem<T = unknown>(key: StorageKey): T | null;
 function getItem<T = unknown>(key: StorageKey, defaultValue: T): T;
+// biome-ignore lint/correctness/noUnusedVariables: referenced as storage.getItem
 function getItem<T = unknown>(key: StorageKey, defaultValue?: T): T | null {
   if (typeof window === 'undefined') return defaultValue ?? null;
 
