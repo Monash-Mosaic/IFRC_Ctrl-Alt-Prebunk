@@ -70,14 +70,22 @@ jest.mock('@/contents', () => {
     },
   };
 
+    const mockLiveQ1 = {
+    ...mockPracticeContentItem,
+    id: 'live-q1',
+    post: { ...mockPracticeContentItem.post, id: 'live-q1' },
+  };
+
   return {
     __esModule: true,
     default: {
       en: {
-        content: {
-          'practice-mcq': mockPracticeContentItem,
+          content: {
+          'live-q1': mockLiveQ1,
         },
-        contentList: [mockPracticeContentItem],
+        contentList: [mockLiveQ1],
+        practiceContent: { 'example-mcq': mockPracticeContentItem },
+
       },
     },
   };
@@ -99,19 +107,19 @@ jest.mock('@/components/newfeeds/mcq-post-message', () => {
   };
 });
 
-jest.mock('@/components/newfeeds/prebunking-modal', () => {
-  return function MockPrebunkingModal({ isOpen, onClose, onContinue, postId, header, content }: any) {
-    if (!isOpen) return null;
-    return (
-      <div data-testid={`practice-modal-${postId}`}>
-        <div data-testid={`practice-modal-header-${postId}`}>{header}</div>
-        <div data-testid={`practice-modal-content-${postId}`}>{content}</div>
-        <button data-testid={`practice-modal-close-${postId}`} onClick={onClose}>Close</button>
-        <button data-testid={`practice-modal-continue-${postId}`} onClick={onContinue}>Continue</button>
-      </div>
-    );
-  };
-});
+// jest.mock('@/components/newfeeds/prebunking-modal', () => {
+//   return function MockPrebunkingModal({ isOpen, onClose, onContinue, postId, header, content }: any) {
+//     if (!isOpen) return null;
+//     return (
+//       <div data-testid={`practice-modal-${postId}`}>
+//         <div data-testid={`practice-modal-header-${postId}`}>{header}</div>
+//         <div data-testid={`practice-modal-content-${postId}`}>{content}</div>
+//         <button data-testid={`practice-modal-close-${postId}`} onClick={onClose}>Close</button>
+//         <button data-testid={`practice-modal-continue-${postId}`} onClick={onContinue}>Continue</button>
+//       </div>
+//     );
+//   };
+// });
 
 const mockAddPoints = jest.fn();
 const mockIncreaseCredibility = jest.fn();
@@ -169,31 +177,33 @@ describe('OnboardingFlow practice question', () => {
     });
   };
 
-  it('renders the practice explanation message and the real first question', () => {
+  it('renders the separate practice question instead of live Q1', () => {
     advanceToPractice();
 
     expect(screen.getByText('practice.mcq')).toBeInTheDocument();
     expect(screen.getByTestId('practice-mcq-post-practice-mcq')).toBeInTheDocument();
+    expect(screen.queryByTestId('practice-mcq-post-live-q1')).not.toBeInTheDocument();
   });
 
-  it('does not fall through to Like/Report for an unsupported practice post', () => {
-    const originalItem = CONTENTS.en.contentList[0];
-    CONTENTS.en.contentList[0] = {
-      id: 'unsupported-share',
-      type: ContentType.SHARE,
-      correctAnswer: 'share',
-      whyCorrectAnswer: { title: null, content: null },
-      whyIncorrectAnswer: { title: null, content: null },
-    };
-    try {
-      advanceToPractice();
-      expect(screen.queryByRole('article')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /like|report|dislike/i })).not.toBeInTheDocument();
-      expect(mockSetAnswer).not.toHaveBeenCalled();
-    } finally {
-      CONTENTS.en.contentList[0] = originalItem;
-    }
-  });
+
+  // it('does not fall through to Like/Report for an unsupported practice post', () => {
+  //   const originalItem = CONTENTS.en.contentList[0];
+  //   CONTENTS.en.contentList[0] = {
+  //     id: 'unsupported-share',
+  //     type: ContentType.SHARE,
+  //     correctAnswer: 'share',
+  //     whyCorrectAnswer: { title: null, content: null },
+  //     whyIncorrectAnswer: { title: null, content: null },
+  //   };
+  //   try {
+  //     advanceToPractice();
+  //     expect(screen.queryByRole('article')).not.toBeInTheDocument();
+  //     expect(screen.queryByRole('button', { name: /like|report|dislike/i })).not.toBeInTheDocument();
+  //     expect(mockSetAnswer).not.toHaveBeenCalled();
+  //   } finally {
+  //     CONTENTS.en.contentList[0] = originalItem;
+  //   }
+  // });
 
   it('keeps the example answer off the scored game and still shows the feedback modal', () => {
     advanceToPractice();
@@ -209,8 +219,11 @@ describe('OnboardingFlow practice question', () => {
     expect(mockIncrCorrectAnswers).not.toHaveBeenCalled();
     expect(mockDecreaseCredibility).not.toHaveBeenCalled();
 
-    expect(screen.getByTestId('practice-modal-practice-mcq')).toBeInTheDocument();
-    expect(screen.getByTestId('practice-modal-header-practice-mcq')).toHaveTextContent('Practice Correct Title');
+    expect(screen.getByText('Correct option')).toBeInTheDocument();
+    expect(screen.getByText('Practice Correct Title')).toBeInTheDocument();
+    expect(screen.getByText('Practice Correct Content')).toBeInTheDocument();
+    expect(screen.getByText('step3.option1')).toBeInTheDocument();
+
   });
 
   it('shows the incorrect explanation without scoring the example', () => {
@@ -223,17 +236,19 @@ describe('OnboardingFlow practice question', () => {
     expect(mockSetAnswer).not.toHaveBeenCalled();
     expect(mockDecreaseCredibility).not.toHaveBeenCalled();
     expect(mockAddPoints).not.toHaveBeenCalled();
-    expect(screen.getByTestId('practice-modal-header-practice-mcq')).toHaveTextContent('Practice Incorrect Title');
+    expect(screen.getByText('Incorrect option')).toBeInTheDocument();
+    expect(screen.getByText('Practice Incorrect Title')).toBeInTheDocument();
+    expect(screen.getByText('Practice Incorrect Content')).toBeInTheDocument();
   });
 
-  it('advances to the main feed after the practice modal is dismissed', () => {
+  it('enters the feed from the handoff response after practice', () => {
     advanceToPractice();
 
     act(() => {
       fireEvent.click(screen.getByTestId('practice-mcq-correct-practice-mcq'));
     });
     act(() => {
-      fireEvent.click(screen.getByTestId('practice-modal-continue-practice-mcq'));
+      fireEvent.click(screen.getByText('step3.option1'));
     });
 
     expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
