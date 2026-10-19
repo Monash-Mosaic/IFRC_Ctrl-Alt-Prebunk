@@ -70,15 +70,22 @@ jest.mock('@/contents', () => {
     },
   };
 
+    const mockLiveQ1 = {
+    ...mockPracticeContentItem,
+    id: 'live-q1',
+    post: { ...mockPracticeContentItem.post, id: 'live-q1' },
+  };
+
   return {
     __esModule: true,
     default: {
       en: {
-        content: {
-          'practice-mcq': mockPracticeContentItem,
+          content: {
+          'live-q1': mockLiveQ1,
         },
-        contentList: [mockPracticeContentItem],
+        contentList: [mockLiveQ1],
         practiceContent: { 'example-mcq': mockPracticeContentItem },
+
       },
     },
   };
@@ -170,12 +177,14 @@ describe('OnboardingFlow practice question', () => {
     });
   };
 
-  it('renders the practice explanation message and the real first question', () => {
+  it('renders the separate practice question instead of live Q1', () => {
     advanceToPractice();
 
     expect(screen.getByText('practice.mcq')).toBeInTheDocument();
     expect(screen.getByTestId('practice-mcq-post-practice-mcq')).toBeInTheDocument();
+    expect(screen.queryByTestId('practice-mcq-post-live-q1')).not.toBeInTheDocument();
   });
+
 
   // it('does not fall through to Like/Report for an unsupported practice post', () => {
   //   const originalItem = CONTENTS.en.contentList[0];
