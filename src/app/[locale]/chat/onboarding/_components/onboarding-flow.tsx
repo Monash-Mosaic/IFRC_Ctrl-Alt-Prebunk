@@ -57,8 +57,7 @@ export default function OnboardingFlow() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const post = POSTS[locale];
 
-  const { practiceContent } = CONTENTS[locale as keyof typeof CONTENTS];
-  const practiceItem = practiceContent['example-mcq'];
+  const practiceItem = CONTENTS.en.practiceContent['example-mcq'];
   const practiceCoachingKey = 'practice.mcq';
 
   const [exampleAnswer, setExampleAnswer] = useState<string | null>(null);
