@@ -76,7 +76,7 @@ export default function OnboardingFlow() {
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
-    if (state.context.messages.length === 0) return;
+    if (state.context.messages.length === 0 && !exampleAnswer) return;
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [state.context.messages, exampleAnswer]);
 
