@@ -1,0 +1,1 @@
+The post suggests a hidden plot without providing evidence. Timing alone does not prove that events were staged. Check reliable sources before believing or sharing the claim.

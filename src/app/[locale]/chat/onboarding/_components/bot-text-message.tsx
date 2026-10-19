@@ -1,7 +1,7 @@
 interface BotTextMessageProps {
   senderAvatar?: React.ReactNode;
   senderName: string;
-  displayText: string;
+  displayText: React.ReactNode;
 }
 
 export default function BotTextMessage({
@@ -14,9 +14,9 @@ export default function BotTextMessage({
       {SenderAvatar && <div className="flex items-end justify-end">{SenderAvatar}</div>}
 
       <div className="w-full flex-col gap-1 md:max-w-[70%]">
-        <div className="flex justify-end">
+        <div className="flex justify-start">
           <div className="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed">{displayText}</p>
+            <div className="whitespace-pre-wrap text-sm leading-relaxed">{displayText}</div>
           </div>
         </div>
         <span className="text-xs font-medium text-[#2979FF]">{senderName}</span>

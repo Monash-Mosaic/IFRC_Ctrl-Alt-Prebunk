@@ -21,14 +21,19 @@ import CONTENTS from '@/contents';
 import { ContentType, type LikeDislikeContent, type MCQContent } from '@/contents/en';
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
-import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
-
 interface StoredOnboardingState {
   context: OnboardingContext | undefined;
   state: string | undefined;
 }
 
-const VALID_ONBOARDING_STATES = ['initial', 'step2', 'step3', 'practice', 'completed'];
+const VALID_ONBOARDING_STATES = [
+  'initial',
+  'step2',
+  'step3',
+  'practice',
+  'example-handoff',
+  'completed',
+];
 
 export default function OnboardingFlow() {
   const locale = useLocale();
@@ -52,18 +57,12 @@ export default function OnboardingFlow() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const post = POSTS[locale];
 
-  const { contentList } = CONTENTS[locale as keyof typeof CONTENTS];
-  const practiceItem = contentList[0];
-  const practiceCoachingKey =
-    practiceItem.type === ContentType.MCQ
-      ? 'practice.mcq'
-      : practiceItem.type === ContentType.SHARE
-        ? 'practice.share'
-        : 'practice.likeDislike';
+  const { practiceContent } = CONTENTS[locale as keyof typeof CONTENTS];
+  const practiceItem = practiceContent['example-mcq'];
+  const practiceCoachingKey = 'practice.mcq';
 
   const [exampleAnswer, setExampleAnswer] = useState<string | null>(null);
-  const [showPracticeModal, setShowPracticeModal] = useState(false);
-  const isPracticeState = state.value === 'practice';
+  const isPracticeState = state.value === 'practice' || state.value === 'example-handoff';
 
   useEffect(() => {
     if (isCompleted) {
@@ -80,7 +79,7 @@ export default function OnboardingFlow() {
   useEffect(() => {
     if (state.context.messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [state.context.messages]);
+  }, [state.context.messages, exampleAnswer]);
 
   const handleOptionClick = (optionId: string, translationKey: string) => {
     send({
@@ -105,17 +104,12 @@ export default function OnboardingFlow() {
   const handlePracticeAnswer = (_postId: string, answer: string) => {
     if (exampleAnswer) return;
     setExampleAnswer(answer);
-    setShowPracticeModal(true);
-  };
-
-  const handlePracticeModalDone = () => {
-    setShowPracticeModal(false);
     send({ type: 'PRACTICE_ANSWERED' });
   };
 
   const canReturnHome =
     !state.context.typing &&
-    (state.value === 'step2' || state.value === 'step3' || state.value === 'practice');
+    (state.value === 'step2' || state.value === 'step3' || isPracticeState);
 
   if (isCompleted) {
     return null;
@@ -130,19 +124,14 @@ export default function OnboardingFlow() {
           switch (message.type) {
             case 'text':
               return message.sender === 'user' ? (
-                <UserTextMessage
-                  key={message.id}
-                  displayText={t(message.text)}
-                />
+                <UserTextMessage key={message.id} displayText={t(message.text)} />
               ) : (
                 <BotTextMessage
                   key={message.id}
                   senderName={sender.name}
                   senderAvatar={sender.avatar}
                   displayText={t(
-                    message.text === 'practice.explanation'
-                      ? practiceCoachingKey
-                      : message.text
+                    message.text === 'practice.explanation' ? practiceCoachingKey : message.text
                   )}
                 />
               );
@@ -169,9 +158,9 @@ export default function OnboardingFlow() {
           }
         })}
 
-        {/* Interactive practice question: the real first game question, answerable in chat */}
+        {/* Interactive practice question: answerable in chat */}
         {isPracticeState && !state.context.typing && (
-          practiceItem.type === ContentType.MCQ ? (
+          <div className="mb-4">
             <MCQPostMessage
               postId={practiceItem.id}
               user={(practiceItem as MCQContent).post.user}
@@ -183,20 +172,39 @@ export default function OnboardingFlow() {
               answer={exampleAnswer}
               onAnswer={handlePracticeAnswer}
             />
-          ) : practiceItem.type === ContentType.LIKE_DISLIKE ? (
-            <LikeDislikePostMessage
-              postId={practiceItem.id}
-              user={(practiceItem as LikeDislikeContent).post.user}
-              content={(practiceItem as LikeDislikeContent).post.content}
-              mediaUrl={(practiceItem as LikeDislikeContent).post.mediaUrl}
-              mediaType={(practiceItem as LikeDislikeContent).post.mediaType}
-              answer={exampleAnswer as 'like' | 'dislike' | null | undefined}
-              correctAnswer={(practiceItem as LikeDislikeContent).correctAnswer}
-              onLike={(postId) => handlePracticeAnswer(postId, 'like')}
-              onDislike={(postId) => handlePracticeAnswer(postId, 'dislike')}
-            />
-          ) : null
+          </div>
         )}
+
+        {isPracticeState &&
+          exampleAnswer &&
+          (() => {
+            const isCorrect = exampleAnswer === (practiceItem as MCQContent).correctOptionId;
+            const feedback = isCorrect
+              ? practiceItem.whyCorrectAnswer
+              : practiceItem.whyIncorrectAnswer;
+            const label =
+              (practiceItem as MCQContent).options.find((o) => o.id === exampleAnswer)?.label ?? '';
+            return (
+              <>
+                <UserTextMessage displayText={label} />
+                <BotTextMessage
+                  senderName={CHAT_USERS.paula.name}
+                  senderAvatar={CHAT_USERS.paula.avatar}
+                  displayText={feedback.title}
+                />
+                <BotTextMessage
+                  senderName={CHAT_USERS.paula.name}
+                  senderAvatar={CHAT_USERS.paula.avatar}
+                  displayText={feedback.content}
+                />
+                <BotTextMessage
+                  senderName={CHAT_USERS.paula.name}
+                  senderAvatar={CHAT_USERS.paula.avatar}
+                  displayText={t('handoff')}
+                />
+              </>
+            );
+          })()}
 
         <div ref={messagesEndRef} />
       </div>
@@ -225,7 +233,7 @@ export default function OnboardingFlow() {
       )}
 
       {/* Practice question feedback modal — same component the real feed uses */}
-      {showPracticeModal && (() => {
+      {/* {showPracticeModal && (() => {
         const isCorrect = practiceItem.type === ContentType.MCQ
           ? exampleAnswer === (practiceItem as MCQContent).correctOptionId
           : exampleAnswer === (practiceItem as LikeDislikeContent).correctAnswer;
@@ -247,7 +255,7 @@ export default function OnboardingFlow() {
             isCorrect={isCorrect}
           />
         );
-      })()}
+      })()} */}
     </div>
   );
 }
