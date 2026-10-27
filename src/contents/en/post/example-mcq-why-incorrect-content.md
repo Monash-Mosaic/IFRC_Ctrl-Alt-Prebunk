@@ -1,0 +1,1 @@
+The timing may sound suspicious, but it does not prove that events were staged. The post suggests a hidden plot without providing evidence. Check reliable sources before believing or sharing the claim.

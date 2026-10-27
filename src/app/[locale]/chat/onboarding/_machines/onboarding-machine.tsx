@@ -149,6 +149,13 @@ const getCurrentOptions = (state: string): OnboardingOption[] => {
           translationKey: 'step3.option2',
         },
       ];
+    case 'example-handoff':
+      return [
+        {
+          id: 'option1-step3',
+          translationKey: 'step3.option1',
+        },
+      ];
     default:
       return [];
   }
@@ -296,7 +303,12 @@ export const useOnboardingMachine = (
           return () => clearTimeout(timeout);
         },
         on: {
-          PRACTICE_ANSWERED: 'completed',
+          PRACTICE_ANSWERED: 'example-handoff',
+        },
+      },
+      'example-handoff': {
+        on: {
+          'option1-step3': 'completed',
         },
       },
       completed: {
