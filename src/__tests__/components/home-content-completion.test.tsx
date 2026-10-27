@@ -3,9 +3,11 @@
  * that only manifest from the actual store lifecycle across re-renders.
  */
 import React from 'react';
-import { render, screen } from '@/test-utils/test-utils';
+import { act, render, renderHook, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import HomeContent from '@/components/home-content';
+import { defaultAlexChatState, type AlexChatState } from '@/lib/local-storage';
+import { useAlexChat } from '@/lib/use-alex-chat';
 
 jest.mock('next-intl', () => ({
   useTranslations: jest.fn(() => (key: string) => key),
@@ -103,11 +105,17 @@ jest.mock('@/components/newfeeds/like-dislike-post-message', () => {
 });
 
 jest.mock('@/components/newfeeds/prebunking-modal', () => {
-  return function MockPrebunkingModal({ isOpen, onContinue, postId }: any) {
+  return function MockPrebunkingModal({ isOpen, onContinue, onClose, postId }: any) {
     if (!isOpen) return null;
     return (
       <div data-testid={`modal-${postId}`}>
-        <button data-testid={`continue-modal-${postId}`} onClick={onContinue}>
+        <button
+          data-testid={`continue-modal-${postId}`}
+          onClick={() => {
+            onContinue?.();
+            onClose?.();
+          }}
+        >
           Continue
         </button>
       </div>
@@ -128,10 +136,19 @@ jest.mock('@/components/game-complete', () => {
   };
 });
 
+function setAlex(next: AlexChatState) {
+  const hook = renderHook(() => useAlexChat());
+  act(() => {
+    hook.result.current[1](next);
+  });
+  hook.unmount();
+}
+
 describe('HomeContent game completion (real game store)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     window.localStorage.clear();
+    setAlex(defaultAlexChatState);
 
     (require('@/lib/use-credibility-store').useCredibilityStore as jest.Mock).mockReturnValue({
       points: 0,
@@ -146,17 +163,46 @@ describe('HomeContent game completion (real game store)', () => {
     });
   });
 
-  it('shows the game complete screen after answering every question', async () => {
+  async function answerFeed() {
     const user = userEvent.setup();
-    render(<HomeContent />);
-
     await user.click(screen.getByTestId('like-1'));
     await user.click(await screen.findByTestId('continue-modal-1'));
-
     await user.click(screen.getByTestId('dislike-2'));
     await user.click(await screen.findByTestId('continue-modal-2'));
+  }
+
+  it('stays on the feed when every post is answered and Alex has no reply', async () => {
+    render(<HomeContent />);
+    await answerFeed();
+    expect(screen.queryByTestId('game-complete')).not.toBeInTheDocument();
+  });
+
+  it('ends on the right Alex reply and counts it in the score', async () => {
+    render(<HomeContent />);
+    await answerFeed();
+
+    setAlex({ notified: true, reply: 'right', remind: 1 });
 
     expect(await screen.findByTestId('game-complete')).toBeInTheDocument();
-    expect(screen.getByTestId('game-score')).toHaveTextContent('2/2');
+    expect(screen.getByTestId('game-score')).toHaveTextContent('3/3');
+  });
+
+  it('ends on a wrong Alex reply without giving that point', async () => {
+    render(<HomeContent />);
+    await answerFeed();
+
+    setAlex({ notified: true, reply: 'wrong', remind: 1 });
+
+    expect(await screen.findByTestId('game-complete')).toBeInTheDocument();
+    expect(screen.getByTestId('game-score')).toHaveTextContent('2/3');
+  });
+
+  it('ends immediately on the last post when Alex was already answered', async () => {
+    setAlex({ notified: true, reply: 'wrong', remind: 0 });
+    render(<HomeContent />);
+    await answerFeed();
+
+    expect(await screen.findByTestId('game-complete')).toBeInTheDocument();
+    expect(screen.getByTestId('game-score')).toHaveTextContent('2/3');
   });
 });

@@ -4,7 +4,8 @@ import { useTranslations } from 'next-intl';
 import PaulaAvatar from './onboarding/_icons/paula-avatar';
 import AlexAvatar from './onboarding/_icons/alex-avatar';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { useAlexChat } from '@/lib/use-alex-chat';
 
 interface ChatListItemProps {
   name: string;
@@ -12,6 +13,7 @@ interface ChatListItemProps {
   subText: string;
   hasSubText?: boolean;
   isDisabled?: boolean;
+  href: '/chat/onboarding' | '/chat/alex';
 }
 
 function ChatListItem({
@@ -20,6 +22,7 @@ function ChatListItem({
   subText,
   hasSubText = false,
   isDisabled = false,
+  href,
 }: ChatListItemProps) {
   return (
     <Link
@@ -27,7 +30,7 @@ function ChatListItem({
         'flex items-center justify-between w-full rounded-3xl border border-dashed border-[#011E41] bg-[#E4EAF3] px-6 py-4 min-h-[60px]',
         isDisabled && 'opacity-50 cursor-not-allowed'
       )}
-      href="/chat/onboarding"
+      href={href}
       onClick={(e) => {
         if (isDisabled) e.preventDefault();
       }}
@@ -48,6 +51,8 @@ function ChatListItem({
 
 export default function ChatPage() {
   const t = useTranslations('chat.list');
+  const [alexChat] = useAlexChat();
+  const alexOpen = alexChat.notified || alexChat.reply !== null;
 
   return (
     <div className="mx-auto flex flex-col md:px-4 md:pt-6 px-4">
@@ -61,13 +66,15 @@ export default function ChatPage() {
             avatar={<PaulaAvatar />}
             subText={t('newMessage')}
             hasSubText={true}
+            href="/chat/onboarding"
           />
           <ChatListItem
             name={t('alex')}
             avatar={<AlexAvatar />}
-            subText={t('comingSoon')}
-            hasSubText={true}
-            isDisabled={true}
+            subText={alexOpen ? t('newMessage') : t('busy')}
+            hasSubText={!alexChat.reply}
+            isDisabled={!alexOpen}
+            href="/chat/alex"
           />
         </div>
       </div>
