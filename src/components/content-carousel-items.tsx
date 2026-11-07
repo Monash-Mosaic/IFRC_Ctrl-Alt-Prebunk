@@ -1,6 +1,6 @@
 'use client';
 
-import { CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
 import { type Content, ContentType, type LikeDislikeContent, type MCQContent } from '@/contents/en';

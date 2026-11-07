@@ -3,7 +3,10 @@ interface TypingMessageProps {
   senderName?: string;
 }
 
-export default function TypingMessage({ senderAvatar: SenderAvatar, senderName }: TypingMessageProps) {
+export default function TypingMessage({
+  senderAvatar: SenderAvatar,
+  senderName,
+}: TypingMessageProps) {
   return (
     <div className="flex w-full gap-3 justify-start">
       {SenderAvatar && <div className="flex items-end justify-end">{SenderAvatar}</div>}

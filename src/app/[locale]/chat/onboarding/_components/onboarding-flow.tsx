@@ -130,19 +130,14 @@ export default function OnboardingFlow() {
           switch (message.type) {
             case 'text':
               return message.sender === 'user' ? (
-                <UserTextMessage
-                  key={message.id}
-                  displayText={t(message.text)}
-                />
+                <UserTextMessage key={message.id} displayText={t(message.text)} />
               ) : (
                 <BotTextMessage
                   key={message.id}
                   senderName={sender.name}
                   senderAvatar={sender.avatar}
                   displayText={t(
-                    message.text === 'practice.explanation'
-                      ? practiceCoachingKey
-                      : message.text
+                    message.text === 'practice.explanation' ? practiceCoachingKey : message.text
                   )}
                 />
               );
@@ -170,8 +165,9 @@ export default function OnboardingFlow() {
         })}
 
         {/* Interactive practice question: the real first game question, answerable in chat */}
-        {isPracticeState && !state.context.typing && (
-          practiceItem.type === ContentType.MCQ ? (
+        {isPracticeState &&
+          !state.context.typing &&
+          (practiceItem.type === ContentType.MCQ ? (
             <MCQPostMessage
               postId={practiceItem.id}
               user={(practiceItem as MCQContent).post.user}
@@ -195,8 +191,7 @@ export default function OnboardingFlow() {
               onLike={(postId) => handlePracticeAnswer(postId, 'like')}
               onDislike={(postId) => handlePracticeAnswer(postId, 'dislike')}
             />
-          ) : null
-        )}
+          ) : null)}
 
         <div ref={messagesEndRef} />
       </div>
@@ -225,29 +220,31 @@ export default function OnboardingFlow() {
       )}
 
       {/* Practice question feedback modal — same component the real feed uses */}
-      {showPracticeModal && (() => {
-        const isCorrect = practiceItem.type === ContentType.MCQ
-          ? exampleAnswer === (practiceItem as MCQContent).correctOptionId
-          : exampleAnswer === (practiceItem as LikeDislikeContent).correctAnswer;
-        const reasonContent = isCorrect
-          ? practiceItem.whyCorrectAnswer.content
-          : practiceItem.whyIncorrectAnswer.content;
-        const reasonHeader = isCorrect
-          ? practiceItem.whyCorrectAnswer.title
-          : practiceItem.whyIncorrectAnswer.title;
+      {showPracticeModal &&
+        (() => {
+          const isCorrect =
+            practiceItem.type === ContentType.MCQ
+              ? exampleAnswer === (practiceItem as MCQContent).correctOptionId
+              : exampleAnswer === (practiceItem as LikeDislikeContent).correctAnswer;
+          const reasonContent = isCorrect
+            ? practiceItem.whyCorrectAnswer.content
+            : practiceItem.whyIncorrectAnswer.content;
+          const reasonHeader = isCorrect
+            ? practiceItem.whyCorrectAnswer.title
+            : practiceItem.whyIncorrectAnswer.title;
 
-        return (
-          <PrebunkingModal
-            isOpen={true}
-            onClose={handlePracticeModalDone}
-            onContinue={handlePracticeModalDone}
-            postId={practiceItem.id}
-            content={reasonContent}
-            header={reasonHeader}
-            isCorrect={isCorrect}
-          />
-        );
-      })()}
+          return (
+            <PrebunkingModal
+              isOpen={true}
+              onClose={handlePracticeModalDone}
+              onContinue={handlePracticeModalDone}
+              postId={practiceItem.id}
+              content={reasonContent}
+              header={reasonHeader}
+              isCorrect={isCorrect}
+            />
+          );
+        })()}
     </div>
   );
 }

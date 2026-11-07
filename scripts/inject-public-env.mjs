@@ -20,7 +20,7 @@ const lines = PUBLIC_ENV_KEYS.filter((key) => {
 
 if (lines.length === 0) {
   process.stdout.write(
-    '[inject-public-env] No NEXT_PUBLIC_* values set; skipping .env.production.local\n',
+    '[inject-public-env] No NEXT_PUBLIC_* values set; skipping .env.production.local\n'
   );
   process.exit(0);
 }
@@ -28,5 +28,5 @@ if (lines.length === 0) {
 writeFileSync(outPath, `${lines.join('\n')}\n`, 'utf8');
 
 process.stdout.write(
-  `[inject-public-env] Wrote ${lines.length} variable(s) to .env.production.local: ${PUBLIC_ENV_KEYS.filter((k) => process.env[k]).join(', ')}\n`,
+  `[inject-public-env] Wrote ${lines.length} variable(s) to .env.production.local: ${PUBLIC_ENV_KEYS.filter((k) => process.env[k]).join(', ')}\n`
 );

@@ -26,7 +26,9 @@ export const useCredibilityStore = create<CredibilityStore>()(
         set((state) => ({ points: state.points + amount }));
       },
       increaseCredibility: () => {
-        set((state) => ({ credibility: Math.min(state.initialCredibility, state.credibility + 1) }));
+        set((state) => ({
+          credibility: Math.min(state.initialCredibility, state.credibility + 1),
+        }));
       },
       decreaseCredibility: () => {
         set((state) => ({ credibility: Math.max(0, state.credibility - 1) }));
@@ -58,9 +60,9 @@ export const useCredibilityStore = create<CredibilityStore>()(
           clickedLinks: [],
         });
       },
-
     }),
     {
       name: 'credibility_state',
     }
-  ));
+  )
+);

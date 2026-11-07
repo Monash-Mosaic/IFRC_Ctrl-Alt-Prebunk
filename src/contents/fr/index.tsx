@@ -1,68 +1,68 @@
-import EchoAvatar from "@/app/[locale]/chat/onboarding/_icons/echo-avatar";
-import PaulaAvatar from "@/app/[locale]/chat/onboarding/_icons/paula-avatar";
-import { ContentType } from "@/contents/en";
-import type { User, UserId, ContentId, Content } from "@/contents/en";
+import EchoAvatar from '@/app/[locale]/chat/onboarding/_icons/echo-avatar';
+import PaulaAvatar from '@/app/[locale]/chat/onboarding/_icons/paula-avatar';
+import { ContentType } from '@/contents/en';
+import type { User, UserId, ContentId, Content } from '@/contents/en';
 
 // Post content imports
-import Content1Post from "./post/content-1-post.md";
-import Content2Post from "./post/content-2-post.md";
-import Content3Post from "./post/content-3-post.md";
-import Content4Post from "./post/content-4-post.md";
-import Content5Post from "./post/content-5-post.md";
+import Content1Post from './post/content-1-post.md';
+import Content2Post from './post/content-2-post.md';
+import Content3Post from './post/content-3-post.md';
+import Content4Post from './post/content-4-post.md';
+import Content5Post from './post/content-5-post.md';
 
 // Explanation imports for content 1
-import Content1WhyCorrectTitle from "./post/content-1-why-correct-title.md";
-import Content1WhyCorrectContent from "./post/content-1-why-correct-content.md";
-import Content1WhyIncorrectTitle from "./post/content-1-why-incorrect-title.md";
-import Content1WhyIncorrectContent from "./post/content-1-why-incorrect-content.md";
+import Content1WhyCorrectTitle from './post/content-1-why-correct-title.md';
+import Content1WhyCorrectContent from './post/content-1-why-correct-content.md';
+import Content1WhyIncorrectTitle from './post/content-1-why-incorrect-title.md';
+import Content1WhyIncorrectContent from './post/content-1-why-incorrect-content.md';
 
 // Explanation imports for content 2
-import Content2WhyCorrectTitle from "./post/content-2-why-correct-title.md";
-import Content2WhyCorrectContent from "./post/content-2-why-correct-content.md";
-import Content2WhyIncorrectTitle from "./post/content-2-why-incorrect-title.md";
-import Content2WhyIncorrectContent from "./post/content-2-why-incorrect-content.md";
+import Content2WhyCorrectTitle from './post/content-2-why-correct-title.md';
+import Content2WhyCorrectContent from './post/content-2-why-correct-content.md';
+import Content2WhyIncorrectTitle from './post/content-2-why-incorrect-title.md';
+import Content2WhyIncorrectContent from './post/content-2-why-incorrect-content.md';
 
 // Explanation imports for content 3
-import Content3WhyCorrectTitle from "./post/content-3-why-correct-title.md";
-import Content3WhyCorrectContent from "./post/content-3-why-correct-content.md";
-import Content3WhyIncorrectTitle from "./post/content-3-why-incorrect-title.md";
-import Content3WhyIncorrectContent from "./post/content-3-why-incorrect-content.md";
+import Content3WhyCorrectTitle from './post/content-3-why-correct-title.md';
+import Content3WhyCorrectContent from './post/content-3-why-correct-content.md';
+import Content3WhyIncorrectTitle from './post/content-3-why-incorrect-title.md';
+import Content3WhyIncorrectContent from './post/content-3-why-incorrect-content.md';
 
 // Explanation imports for content 4
-import Content4WhyCorrectTitle from "./post/content-4-why-correct-title.md";
-import Content4WhyCorrectContent from "./post/content-4-why-correct-content.md";
-import Content4WhyIncorrectTitle from "./post/content-4-why-incorrect-title.md";
-import Content4WhyIncorrectContent from "./post/content-4-why-incorrect-content.md";
+import Content4WhyCorrectTitle from './post/content-4-why-correct-title.md';
+import Content4WhyCorrectContent from './post/content-4-why-correct-content.md';
+import Content4WhyIncorrectTitle from './post/content-4-why-incorrect-title.md';
+import Content4WhyIncorrectContent from './post/content-4-why-incorrect-content.md';
 
 // Explanation imports for content 5
-import Content5WhyCorrectTitle from "./post/content-5-why-correct-title.md";
-import Content5WhyCorrectContent from "./post/content-5-why-correct-content.md";
-import Content5WhyIncorrectTitle from "./post/content-5-why-incorrect-title.md";
-import Content5WhyIncorrectContent from "./post/content-5-why-incorrect-content.md";
+import Content5WhyCorrectTitle from './post/content-5-why-correct-title.md';
+import Content5WhyCorrectContent from './post/content-5-why-correct-content.md';
+import Content5WhyIncorrectTitle from './post/content-5-why-incorrect-title.md';
+import Content5WhyIncorrectContent from './post/content-5-why-incorrect-content.md';
 
 export const users: Record<UserId, User> = {
-  'paula': {
+  paula: {
     id: 'paula',
     name: 'Paula',
     avatar: <PaulaAvatar />,
     handle: '@paula',
     isUser: false,
   },
-  'echo': {
+  echo: {
     id: 'echo',
     name: 'Écho',
     avatar: <EchoAvatar />,
     handle: '@echo',
     isUser: false,
   },
-  'user': {
+  user: {
     id: 'user',
     name: 'Vous',
     avatar: null,
     handle: '@user',
     isUser: true,
   },
-}
+};
 
 export const content: Record<ContentId, Content> = {
   '1': {
@@ -165,6 +165,6 @@ export const content: Record<ContentId, Content> = {
       content: <Content5WhyIncorrectContent />,
     },
   },
-}
+};
 
 export const contentList = Object.values(content);
