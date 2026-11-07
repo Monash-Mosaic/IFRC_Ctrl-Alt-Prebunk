@@ -2,9 +2,9 @@ name: Deploy to Cloudflare (PR Preview)
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, closed]
+    types: [ opened, synchronize, reopened, closed ]
   push:
-    branches: [main]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -18,10 +18,10 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }}
     runs-on: ubuntu-latest
     permissions:
-        checks: write
-        pull-requests: write
-        contents: write
-        issues: write
+      checks: write
+      pull-requests: write
+      contents: write
+      issues: write
 
     steps:
       - name: Checkout code
@@ -75,7 +75,7 @@ jobs:
   deploy_preview:
     if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }}
     runs-on: ubuntu-latest
-    needs: [security_gates, dependency_audit]
+    needs: [ security_gates, dependency_audit ]
     environment: preview
 
     steps:
@@ -173,7 +173,6 @@ jobs:
               issue_number: prNumber,
               body,
             });
-
 
       - name: Update deployment status
         if: ${{ always() }}
