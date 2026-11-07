@@ -85,13 +85,10 @@ export default function HomeContent() {
   const unlockedPostIds = useMemo(() => unlockedPosts.map((item) => item.id), [unlockedPosts]);
   const isFeedLocked = firstUnansweredIndex !== -1;
 
-  const showFeedToast = useCallback(
-    (message: string) => {
-      setToastMessage(message);
-      setShowToast(true);
-    },
-    []
-  );
+  const showFeedToast = useCallback((message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+  }, []);
 
   const handleCloseToast = useCallback(() => {
     setShowToast(false);
@@ -356,7 +353,8 @@ export default function HomeContent() {
       {modalPostId &&
         (() => {
           const contentItem = contentList.find((item) => item.id === modalPostId) as
-            Content | undefined;
+            | Content
+            | undefined;
           if (!contentItem) return null;
 
           const modalAnswer = getAnswer(modalPostId);

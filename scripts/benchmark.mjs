@@ -242,7 +242,7 @@ async function main() {
       `Summary: rps=${Math.round(m.requestsPerSec || 0)} ` +
         `p50=${Math.round(m.latencyMsP50 || 0)}ms ` +
         `p99=${Math.round(m.latencyMsP99 || 0)}ms ` +
-        `non2xx=${m.non2xx || 0} timeouts=${m.timeouts || 0} errors=${m.errors || 0}\n`,
+        `non2xx=${m.non2xx || 0} timeouts=${m.timeouts || 0} errors=${m.errors || 0}\n`
     );
   }
 

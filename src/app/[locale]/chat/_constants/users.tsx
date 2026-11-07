@@ -1,6 +1,6 @@
-import type { User, UserId } from "@/contents/en";
-import EchoAvatar from "../onboarding/_icons/echo-avatar";
-import PaulaAvatar from "../onboarding/_icons/paula-avatar";
+import type { User, UserId } from '@/contents/en';
+import EchoAvatar from '../onboarding/_icons/echo-avatar';
+import PaulaAvatar from '../onboarding/_icons/paula-avatar';
 
 export const CHAT_USERS: Record<UserId, User> = {
   user: {
