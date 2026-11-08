@@ -61,16 +61,16 @@ describe('PointsCredibilityBar', () => {
     render(<PointsCredibilityBar />);
     // Translation returns the key, so we check for "score"
     expect(screen.getByText(/score/i)).toBeInTheDocument();
-    // 0 points / 5 = 0 correct answers, out of 2 total questions
+    // 0 points / 5 = 0 correct answers, out of 2 feed posts plus Alex
     const scoreSpan = screen.getByText(/score/i);
-    expect(scoreSpan.textContent).toContain('0/2');
+    expect(scoreSpan.textContent).toContain('0/3');
   });
 
   it('displays custom score value derived from points', () => {
     // 150 points / 5 = 30 correct answers
     currentMockState.points = 150;
     render(<PointsCredibilityBar />);
-    expect(screen.getByText(/30\/2/)).toBeInTheDocument();
+    expect(screen.getByText(/30\/3/)).toBeInTheDocument();
   });
 
   it('displays credibility label', () => {
@@ -113,7 +113,7 @@ describe('PointsCredibilityBar', () => {
     currentMockState.credibility = 4;
     currentMockState.initialCredibility = 5;
     render(<PointsCredibilityBar />);
-    expect(screen.getByText(/2\/2/)).toBeInTheDocument();
+    expect(screen.getByText(/2\/3/)).toBeInTheDocument();
     expect(screen.getByText(/credibility/i)).toBeInTheDocument();
 
     const progressBar = screen.getByText(/credibility/i).nextElementSibling?.querySelector('div');
