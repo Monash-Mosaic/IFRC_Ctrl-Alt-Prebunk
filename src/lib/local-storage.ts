@@ -6,6 +6,7 @@ export const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: 'onboarding_completed',
   GAME_STATE: 'game_state',
   ALEX_CHAT: 'alex_chat',
+  PROFILE: 'profile_state',
 } as const;
 
 export type AlexReply = 'right' | 'wrong';

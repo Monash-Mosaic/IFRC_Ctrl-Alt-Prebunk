@@ -26,6 +26,31 @@
     "title": "开发中",
     "message": "此页面正在开发中。请稍后再来查看！"
   },
+  "profile": {
+    "title": "个人资料",
+    "identityHeading": "你的玩家资料",
+    "usernameLabel": "用户名",
+    "defaultUsername": "玩家",
+    "editUsername": "编辑用户名",
+    "usernameHint": "最多 {max} 个字符",
+    "usernameRequired": "请输入用户名",
+    "usernameSaved": "用户名已保存",
+    "save": "保存",
+    "cancel": "取消",
+    "avatarLabel": "选择你的头像",
+    "avatarSaved": "头像已更新",
+    "score": "得分",
+    "credibility": "可信度",
+    "progressNote": "修改个人资料不会影响你的得分、可信度或进度。",
+    "avatars": {
+      "green": "绿色",
+      "blue": "蓝色",
+      "navy": "藏青色",
+      "red": "红色",
+      "yellow": "黄色",
+      "purple": "紫色"
+    }
+  },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
     "description": "国际红十字与红新月运动索尔费里诺学院 - 事实核查和媒体素养平台"
