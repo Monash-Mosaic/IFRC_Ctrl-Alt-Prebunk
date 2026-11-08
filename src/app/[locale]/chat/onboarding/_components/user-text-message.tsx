@@ -3,9 +3,14 @@ import { CheckCheck } from 'lucide-react';
 interface UserTextMessageProps {
   displayText: string;
   sentAt?: string;
+  senderAvatar?: React.ReactNode;
 }
 
-export default function UserTextMessage({ displayText, sentAt }: UserTextMessageProps) {
+export default function UserTextMessage({
+  displayText,
+  sentAt,
+  senderAvatar,
+}: UserTextMessageProps) {
   return (
     <div className="flex w-full gap-3 justify-end">
       <div className="w-full flex-col gap-1 md:max-w-[70%]">
@@ -21,6 +26,7 @@ export default function UserTextMessage({ displayText, sentAt }: UserTextMessage
           </span>
         )}
       </div>
+      {senderAvatar && <div className="flex items-end">{senderAvatar}</div>}
     </div>
   );
 }

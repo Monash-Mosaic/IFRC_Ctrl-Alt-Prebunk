@@ -32,6 +32,27 @@ export function isPersistedGameCompleted() {
   return saved?.state?.gameCompleted === true;
 }
 
+/**
+ * Read-only snapshot of the persisted game progress, for screens outside the feed
+ * (e.g. Profile) that must show the score without creating their own game store.
+ */
+export function getStoredGameProgress(): { correctAnswers: number; gameCompleted: boolean } {
+  try {
+    const stored = storage.getItem<{ state?: Partial<GameState> }>(STORAGE_KEYS.GAME_STATE);
+    const correctAnswers = stored?.state?.correctAnswers;
+    return {
+      correctAnswers:
+        typeof correctAnswers === 'number' && Number.isFinite(correctAnswers) && correctAnswers > 0
+          ? Math.floor(correctAnswers)
+          : 0,
+      gameCompleted: stored?.state?.gameCompleted === true,
+    };
+  } catch {
+    // Corrupt JSON in storage: treat as no progress rather than crashing the page.
+    return { correctAnswers: 0, gameCompleted: false };
+  }
+}
+
 const initialGameState = {
   answers: {},
   currentQuestionIndex: 0,
