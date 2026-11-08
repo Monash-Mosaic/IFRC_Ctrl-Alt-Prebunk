@@ -57,6 +57,19 @@ describe('shareLink', () => {
     expect(share).not.toHaveBeenCalled();
   });
 
+  it('falls back to the legacy copy when the Clipboard API is unavailable', async () => {
+    const execCommand = jest.fn(() => true);
+    Object.defineProperty(document, 'execCommand', { configurable: true, value: execCommand });
+    try {
+      await expect(shareLink(DATA)).resolves.toBe('copied');
+      expect(execCommand).toHaveBeenCalledWith('copy');
+      // The temporary textarea is cleaned up.
+      expect(document.querySelector('textarea')).toBeNull();
+    } finally {
+      Object.defineProperty(document, 'execCommand', { configurable: true, value: undefined });
+    }
+  });
+
   it('reports failure when neither sharing nor copying is possible', async () => {
     setNavigator({ clipboard: { writeText: jest.fn().mockRejectedValue(new Error('denied')) } });
 

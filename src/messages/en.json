@@ -87,7 +87,10 @@
       "cancelled": "Sharing cancelled",
       "downloaded": "Image downloaded",
       "failed": "Could not share. Please try again.",
-      "linkFailed": "Could not share automatically. Copy this link: {url}"
+      "linkFailed": "Could not share automatically. Use the link below.",
+      "copyLink": "Copy link",
+      "linkLabel": "Link to share",
+      "manualCopy": "Link selected. Press Ctrl+C (or long-press) to copy."
     }
   },
   "metadata": {

@@ -87,7 +87,10 @@
       "cancelled": "Se canceló el envío",
       "downloaded": "Imagen descargada",
       "failed": "No se pudo compartir. Inténtalo de nuevo.",
-      "linkFailed": "No se pudo compartir automáticamente. Copia este enlace: {url}"
+      "linkFailed": "No se pudo compartir automáticamente. Usa el enlace de abajo.",
+      "copyLink": "Copiar enlace",
+      "linkLabel": "Enlace para compartir",
+      "manualCopy": "Enlace seleccionado. Pulsa Ctrl+C (o mantén pulsado) para copiarlo."
     }
   },
   "metadata": {

@@ -32,10 +32,41 @@ export async function shareLink(data: ShareLinkData): Promise<ShareLinkResult> {
     }
   }
 
+  return (await copyText(data.url)) ? 'copied' : 'failed';
+}
+
+/**
+ * Copies text to the clipboard. Uses the async Clipboard API where available and
+ * falls back to the legacy selection-based copy, which still works in browsers or
+ * contexts (e.g. non-HTTPS previews, some in-app webviews) without the API.
+ */
+export async function copyText(text: string): Promise<boolean> {
   try {
-    await navigator.clipboard.writeText(data.url);
-    return 'copied';
+    if (typeof navigator !== 'undefined' && typeof navigator.clipboard?.writeText === 'function') {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
   } catch {
-    return 'failed';
+    // Permission denied or no user activation: try the legacy path below.
+  }
+  return legacyCopy(text);
+}
+
+function legacyCopy(text: string): boolean {
+  if (typeof document === 'undefined' || typeof document.execCommand !== 'function') return false;
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  try {
+    textarea.select();
+    return document.execCommand('copy');
+  } catch {
+    return false;
+  } finally {
+    textarea.remove();
   }
 }

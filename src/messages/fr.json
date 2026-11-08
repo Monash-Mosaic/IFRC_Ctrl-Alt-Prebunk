@@ -87,7 +87,10 @@
       "cancelled": "Partage annulé",
       "downloaded": "Image téléchargée",
       "failed": "Échec du partage. Veuillez réessayer.",
-      "linkFailed": "Partage automatique impossible. Copiez ce lien : {url}"
+      "linkFailed": "Partage automatique impossible. Utilisez le lien ci-dessous.",
+      "copyLink": "Copier le lien",
+      "linkLabel": "Lien à partager",
+      "manualCopy": "Lien sélectionné. Appuyez sur Ctrl+C (ou appui long) pour le copier."
     }
   },
   "metadata": {

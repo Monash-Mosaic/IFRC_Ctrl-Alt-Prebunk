@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import Modal from 'react-modal';
 import { useLocale, useTranslations } from 'next-intl';
-import { BookOpen, Gamepad2, GraduationCap, Share2, Trophy } from 'lucide-react';
+import { BookOpen, Copy, Gamepad2, GraduationCap, Share2, Trophy } from 'lucide-react';
 import CONTENTS from '@/contents';
 import ShareProgressModal from '@/components/share-progress-modal';
 import type { ShareProgressResult } from '@/components/share-progress';
@@ -12,6 +12,7 @@ import {
   GAME_URL,
   SOLFERINO_ACADEMY_URL,
   WORLD_DISASTERS_REPORT_URL,
+  copyText,
   shareLink,
   type ShareLinkResult,
 } from '@/lib/share-links';
@@ -49,6 +50,8 @@ export default function ShareContent() {
 
   const [isProgressModalOpen, setIsProgressModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  // The option whose share and automatic copy both failed: show its link inline to copy.
+  const [manualLinkKey, setManualLinkKey] = useState<LinkKey | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof Modal.setAppElement === 'function') {
@@ -64,10 +67,14 @@ export default function ShareContent() {
       text: t(`${key}.shareText`),
       url,
     });
-    setToastMessage(
-      result === 'failed' ? t('feedback.linkFailed', { url }) : t(`feedback.${result}`)
-    );
+    setManualLinkKey(result === 'failed' ? key : null);
+    setToastMessage(t(result === 'failed' ? 'feedback.linkFailed' : `feedback.${result}`));
   };
+
+  const handleManualCopy = useCallback(
+    (copied: boolean) => setToastMessage(t(copied ? 'feedback.copied' : 'feedback.manualCopy')),
+    [t]
+  );
 
   const handleProgressResult = useCallback(
     (result: ShareProgressResult) => setToastMessage(t(`feedback.${result}`)),
@@ -96,6 +103,14 @@ export default function ShareContent() {
                 <Share2 size={16} strokeWidth={2} aria-hidden="true" />
                 {t(`${key}.action`)}
               </button>
+              {manualLinkKey === key && (
+                <CopyLinkField
+                  url={url}
+                  label={t('feedback.linkLabel')}
+                  copyLabel={t('feedback.copyLink')}
+                  onCopy={handleManualCopy}
+                />
+              )}
             </ShareCard>
           </li>
         ))}
@@ -145,6 +160,68 @@ export default function ShareContent() {
         // Sit above the fixed mobile bottom nav (4rem).
         className="z-[110] max-md:bottom-20"
       />
+    </div>
+  );
+}
+
+interface CopyLinkFieldProps {
+  url: string;
+  label: string;
+  copyLabel: string;
+  onCopy: (copied: boolean) => void;
+}
+
+/**
+ * Fallback shown when neither native sharing nor automatic copying worked: the link
+ * in a read-only field (pre-selected, so Ctrl+C / long-press copies it) plus a retry button.
+ */
+function CopyLinkField({ url, label, copyLabel, onCopy }: CopyLinkFieldProps) {
+  const inputId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const selectLink = () => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  };
+
+  useEffect(selectLink, []);
+
+  const handleCopy = async () => {
+    const copied = await copyText(url);
+    // Leave the link selected so a manual copy is one keystroke away.
+    if (!copied) selectLink();
+    onCopy(copied);
+  };
+
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row">
+      <label htmlFor={inputId} className="sr-only">
+        {label}
+      </label>
+      <input
+        ref={inputRef}
+        id={inputId}
+        type="text"
+        readOnly
+        value={url}
+        dir="ltr"
+        onFocus={(event) => event.currentTarget.select()}
+        className={cn(
+          'min-h-11 min-w-0 flex-1 rounded-full border border-[#011E41]/30 bg-white px-4 text-sm text-[#011E41]',
+          focusRing
+        )}
+      />
+      <button
+        type="button"
+        onClick={handleCopy}
+        className={cn(
+          actionButtonClass,
+          'bg-[#011E41] text-white hover:bg-[#002552] sm:w-auto'
+        )}
+      >
+        <Copy size={16} strokeWidth={2} aria-hidden="true" />
+        {copyLabel}
+      </button>
     </div>
   );
 }

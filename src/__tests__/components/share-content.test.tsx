@@ -106,6 +106,60 @@ describe('ShareContent', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('feedback.linkFailed');
   });
 
+  it('offers a selected, copyable link when sharing and copying both fail', async () => {
+    const user = userEvent.setup();
+    const writeText = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('denied'))
+      .mockResolvedValueOnce(undefined);
+    setNavigator({ clipboard: { writeText } });
+    render(<ShareContent />);
+
+    await user.click(screen.getByRole('button', { name: 'report.action' }));
+
+    const field = await screen.findByRole('textbox', { name: 'feedback.linkLabel' });
+    expect(field).toHaveValue(WORLD_DISASTERS_REPORT_URL);
+    expect(field).toHaveAttribute('readonly');
+    expect(field).toHaveFocus();
+    // Only the failing option shows the field.
+    expect(screen.getAllByRole('textbox')).toHaveLength(1);
+
+    await user.click(screen.getByRole('button', { name: 'feedback.copyLink' }));
+
+    expect(writeText).toHaveBeenLastCalledWith(WORLD_DISASTERS_REPORT_URL);
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('feedback.copied'));
+  });
+
+  it('keeps the link selected and explains a manual copy when copying keeps failing', async () => {
+    const user = userEvent.setup();
+    setNavigator({ clipboard: { writeText: jest.fn().mockRejectedValue(new Error('denied')) } });
+    render(<ShareContent />);
+
+    await user.click(screen.getByRole('button', { name: 'game.action' }));
+    await user.click(await screen.findByRole('button', { name: 'feedback.copyLink' }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent('feedback.manualCopy')
+    );
+    expect(screen.getByRole('textbox', { name: 'feedback.linkLabel' })).toHaveFocus();
+  });
+
+  it('hides the copy field again once a later share succeeds', async () => {
+    const user = userEvent.setup();
+    const writeText = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('denied'))
+      .mockResolvedValue(undefined);
+    setNavigator({ clipboard: { writeText } });
+    render(<ShareContent />);
+
+    await user.click(screen.getByRole('button', { name: 'game.action' }));
+    await screen.findByRole('textbox');
+    await user.click(screen.getByRole('button', { name: 'game.action' }));
+
+    await waitFor(() => expect(screen.queryByRole('textbox')).not.toBeInTheDocument());
+  });
+
   it('keeps progress sharing unavailable until the simulation is complete', () => {
     localStorage.setItem(STORAGE_KEYS.GAME_STATE, gameState(2, false));
     render(<ShareContent />);

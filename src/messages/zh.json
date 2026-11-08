@@ -87,7 +87,10 @@
       "cancelled": "已取消分享",
       "downloaded": "图片已下载",
       "failed": "分享失败，请重试。",
-      "linkFailed": "无法自动分享。请复制此链接：{url}"
+      "linkFailed": "无法自动分享。请使用下方链接。",
+      "copyLink": "复制链接",
+      "linkLabel": "分享链接",
+      "manualCopy": "链接已选中。按 Ctrl+C（或长按）复制。"
     }
   },
   "metadata": {
