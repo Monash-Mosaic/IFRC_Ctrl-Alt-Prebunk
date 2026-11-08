@@ -22,10 +22,9 @@ const withBundleAnalyzer = createBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-
   transpilePackages: ['geist'],
   reactStrictMode: true,
-  
+
   output: 'standalone',
 
   images: {

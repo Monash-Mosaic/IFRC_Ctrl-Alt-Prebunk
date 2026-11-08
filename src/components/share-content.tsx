@@ -214,10 +214,7 @@ function CopyLinkField({ url, label, copyLabel, onCopy }: CopyLinkFieldProps) {
       <button
         type="button"
         onClick={handleCopy}
-        className={cn(
-          actionButtonClass,
-          'bg-[#011E41] text-white hover:bg-[#002552] sm:w-auto'
-        )}
+        className={cn(actionButtonClass, 'bg-[#011E41] text-white hover:bg-[#002552] sm:w-auto')}
       >
         <Copy size={16} strokeWidth={2} aria-hidden="true" />
         {copyLabel}

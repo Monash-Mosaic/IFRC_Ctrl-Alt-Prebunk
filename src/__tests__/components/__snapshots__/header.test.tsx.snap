@@ -35,8 +35,10 @@ exports[`Header matches snapshot 1`] = `
           href="/"
         >
           <svg
+            aria-label="CTRL + ALT + PREBUNK"
             fill="none"
             height="100%"
+            role="img"
             viewBox="0 0 278 13"
             width="100%"
             xmlns="http://www.w3.org/2000/svg"

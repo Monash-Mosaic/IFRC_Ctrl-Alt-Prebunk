@@ -49,6 +49,7 @@ export default function Toast({
     >
       <p className="text-sm text-[#011E41] font-medium flex-1">{message}</p>
       <button
+        type="button"
         onClick={onClose}
         className={cn(
           'shrink-0 p-1 rounded-full',

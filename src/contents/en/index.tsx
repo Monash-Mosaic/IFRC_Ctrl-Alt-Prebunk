@@ -1,5 +1,5 @@
-import EchoAvatar from "@/app/[locale]/chat/onboarding/_icons/echo-avatar";
-import PaulaAvatar from "@/app/[locale]/chat/onboarding/_icons/paula-avatar";
+import EchoAvatar from '@/app/[locale]/chat/onboarding/_icons/echo-avatar';
+import PaulaAvatar from '@/app/[locale]/chat/onboarding/_icons/paula-avatar';
 
 // MCQ content imports
 // import Mcq1Question from "./post/mcq-1-question.md";
@@ -8,17 +8,17 @@ import PaulaAvatar from "@/app/[locale]/chat/onboarding/_icons/paula-avatar";
 // import Mcq1WhyIncorrectTitle from "./post/mcq-1-why-incorrect-title.md";
 // import Mcq1WhyIncorrectContent from "./post/mcq-1-why-incorrect-content.md";
 
-import Mcq2Question from "./post/mcq-2-question.md";
-import Mcq2WhyCorrectTitle from "./post/mcq-2-why-correct-title.md";
-import Mcq2WhyCorrectContent from "./post/mcq-2-why-correct-content.md";
-import Mcq2WhyIncorrectTitle from "./post/mcq-2-why-incorrect-title.md";
-import Mcq2WhyIncorrectContent from "./post/mcq-2-why-incorrect-content.md";
+import Mcq2Question from './post/mcq-2-question.md';
+import Mcq2WhyCorrectTitle from './post/mcq-2-why-correct-title.md';
+import Mcq2WhyCorrectContent from './post/mcq-2-why-correct-content.md';
+import Mcq2WhyIncorrectTitle from './post/mcq-2-why-incorrect-title.md';
+import Mcq2WhyIncorrectContent from './post/mcq-2-why-incorrect-content.md';
 
-import Mcq3Question from "./post/mcq-3-question.md";
-import Mcq3WhyCorrectTitle from "./post/mcq-3-why-correct-title.md";
-import Mcq3WhyCorrectContent from "./post/mcq-3-why-correct-content.md";
-import Mcq3WhyIncorrectTitle from "./post/mcq-3-why-incorrect-title.md";
-import Mcq3WhyIncorrectContent from "./post/mcq-3-why-incorrect-content.md";
+import Mcq3Question from './post/mcq-3-question.md';
+import Mcq3WhyCorrectTitle from './post/mcq-3-why-correct-title.md';
+import Mcq3WhyCorrectContent from './post/mcq-3-why-correct-content.md';
+import Mcq3WhyIncorrectTitle from './post/mcq-3-why-incorrect-title.md';
+import Mcq3WhyIncorrectContent from './post/mcq-3-why-incorrect-content.md';
 
 // Post content imports
 // import Content1Post from "./post/content-1-post.md";
@@ -26,9 +26,9 @@ import Mcq3WhyIncorrectContent from "./post/mcq-3-why-incorrect-content.md";
 // import Content3Post from "./post/content-3-post.md";
 // import Content4Post from "./post/content-4-post.md";
 // import Content5Post from "./post/content-5-post.md";
-import Content6Post from "./post/content-6-post.md";
-import Content7Post from "./post/content-7-post.md";
-import Content8Post from "./post/content-8-post.md";
+import Content6Post from './post/content-6-post.md';
+import Content7Post from './post/content-7-post.md';
+import Content8Post from './post/content-8-post.md';
 
 // Explanation imports for content 1
 // import Content1WhyCorrectTitle from "./post/content-1-why-correct-title.md";
@@ -61,22 +61,22 @@ import Content8Post from "./post/content-8-post.md";
 // import Content5WhyIncorrectContent from "./post/content-5-why-incorrect-content.md";
 
 // Explanation imports for content 6
-import Content6WhyCorrectTitle from "./post/content-6-why-correct-title.md";
-import Content6WhyCorrectContent from "./post/content-6-why-correct-content.md";
-import Content6WhyIncorrectTitle from "./post/content-6-why-incorrect-title.md";
-import Content6WhyIncorrectContent from "./post/content-6-why-incorrect-content.md";
+import Content6WhyCorrectTitle from './post/content-6-why-correct-title.md';
+import Content6WhyCorrectContent from './post/content-6-why-correct-content.md';
+import Content6WhyIncorrectTitle from './post/content-6-why-incorrect-title.md';
+import Content6WhyIncorrectContent from './post/content-6-why-incorrect-content.md';
 
 // Explanation imports for content 7
-import Content7WhyCorrectTitle from "./post/content-7-why-correct-title.md";
-import Content7WhyCorrectContent from "./post/content-7-why-correct-content.md";
-import Content7WhyIncorrectTitle from "./post/content-7-why-incorrect-title.md";
-import Content7WhyIncorrectContent from "./post/content-7-why-incorrect-content.md";
+import Content7WhyCorrectTitle from './post/content-7-why-correct-title.md';
+import Content7WhyCorrectContent from './post/content-7-why-correct-content.md';
+import Content7WhyIncorrectTitle from './post/content-7-why-incorrect-title.md';
+import Content7WhyIncorrectContent from './post/content-7-why-incorrect-content.md';
 
 // Explanation imports for content 8
-import Content8WhyCorrectTitle from "./post/content-8-why-correct-title.md";
-import Content8WhyCorrectContent from "./post/content-8-why-correct-content.md";
-import Content8WhyIncorrectTitle from "./post/content-8-why-incorrect-title.md";
-import Content8WhyIncorrectContent from "./post/content-8-why-incorrect-content.md";
+import Content8WhyCorrectTitle from './post/content-8-why-correct-title.md';
+import Content8WhyCorrectContent from './post/content-8-why-correct-content.md';
+import Content8WhyIncorrectTitle from './post/content-8-why-incorrect-title.md';
+import Content8WhyIncorrectContent from './post/content-8-why-incorrect-content.md';
 
 export type User = {
   id: string;
@@ -84,7 +84,7 @@ export type User = {
   avatar: React.ReactNode;
   handle: string;
   isUser: boolean;
-}
+};
 
 export type Post = {
   id: string;
@@ -92,7 +92,7 @@ export type Post = {
   content: React.ReactNode;
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
-}
+};
 
 export type ContentId = string;
 
@@ -159,29 +159,28 @@ export type UserId = string;
 export type Content = LikeDislikeContent | ShareContent | MCQContent;
 
 export const users: Record<UserId, User> = {
-  'paula': {
+  paula: {
     id: 'paula',
     name: 'Paula',
     avatar: <PaulaAvatar />,
     handle: '@paula',
     isUser: false,
   },
-  'echo': {
+  echo: {
     id: 'echo',
     name: 'Echo',
     avatar: <EchoAvatar />,
     handle: '@echo',
     isUser: false,
   },
-  'user': {
+  user: {
     id: 'user',
     name: 'You',
     avatar: null,
     handle: '@user',
     isUser: true,
   },
-}
-
+};
 
 export const content: Record<ContentId, Content> = {
   // 'like-dislike-1': {
@@ -319,7 +318,7 @@ export const content: Record<ContentId, Content> = {
       mediaType: 'image',
     },
     options: [
-      { id: 'a', label: "Because climate change is fake" },
+      { id: 'a', label: 'Because climate change is fake' },
       { id: 'b', label: 'Because all science is political' },
       { id: 'c', label: 'Because debate exists within a broad scientific consensus' },
       { id: 'd', label: 'Because no data exists' },
@@ -385,7 +384,7 @@ export const content: Record<ContentId, Content> = {
       mediaType: 'image',
     },
     options: [
-      { id: 'a', label: "Share it because NASA is a trusted source" },
+      { id: 'a', label: 'Share it because NASA is a trusted source' },
       { id: 'b', label: 'Check whether NASA actually published this figure and in what context' },
       { id: 'c', label: 'Reject it because sea level rise is exaggerated' },
       { id: 'd', label: 'Assume it applies equally to all coastal regions' },
@@ -420,6 +419,6 @@ export const content: Record<ContentId, Content> = {
       content: <Content8WhyIncorrectContent />,
     },
   },
-}
+};
 
 export const contentList = Object.values(content);

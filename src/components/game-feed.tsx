@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { ChevronDown, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -159,6 +160,9 @@ export default function GameFeed({
 
   // Re-evaluate the hint whenever the current post, the unlocked set or the viewport changes.
   useEffect(() => {
+    if (postIds.length === 0) {
+      setShowScrollHint(false);
+    }
     updateScrollHint();
     const el = viewportRef.current;
     window.addEventListener('resize', updateScrollHint);
