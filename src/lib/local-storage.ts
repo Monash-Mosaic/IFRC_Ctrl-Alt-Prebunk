@@ -5,8 +5,25 @@ export const STORAGE_KEYS = {
   CHAT_ONBOARDING_STATE: 'chat_onboarding_state',
   ONBOARDING_COMPLETED: 'onboarding_completed',
   GAME_STATE: 'game_state',
+  ALEX_CHAT: 'alex_chat',
   PROFILE: 'profile_state',
 } as const;
+
+export type AlexReply = 'right' | 'wrong';
+
+/** Whether Alex's notification has fired, and which reply the player already sent. */
+export type AlexChatState = {
+  notified: boolean;
+  reply: AlexReply | null;
+  /** Bumped when the feed is finished and Alex still has no reply, so the notice reopens. */
+  remind?: number;
+};
+
+export const defaultAlexChatState: AlexChatState = {
+  notified: false,
+  reply: null,
+  remind: 0,
+};
 
 /**
  * Known storage keys used by the application.
@@ -27,6 +44,7 @@ export type StorageKey = string;
  */
 function getItem<T = unknown>(key: StorageKey): T | null;
 function getItem<T = unknown>(key: StorageKey, defaultValue: T): T;
+// biome-ignore lint/correctness/noUnusedVariables: referenced as storage.getItem
 function getItem<T = unknown>(key: StorageKey, defaultValue?: T): T | null {
   if (typeof window === 'undefined') return defaultValue ?? null;
 

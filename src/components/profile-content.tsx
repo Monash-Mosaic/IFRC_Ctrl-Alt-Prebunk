@@ -101,7 +101,11 @@ export default function ProfileContent() {
         <PlayerAvatar avatarId={avatarId} name={displayName} size={96} />
 
         {isEditing ? (
-          <form onSubmit={handleSubmit} noValidate className="flex w-full flex-col gap-2 text-start">
+          <form
+            onSubmit={handleSubmit}
+            noValidate
+            className="flex w-full flex-col gap-2 text-start"
+          >
             <label htmlFor={inputId} className="text-sm font-semibold text-[#011E41]">
               {t('usernameLabel')}
             </label>
@@ -223,7 +227,9 @@ export default function ProfileContent() {
                 className={cn(
                   'flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 p-2 transition-colors',
                   'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#011E41] has-[:focus-visible]:ring-offset-2',
-                  isSelected ? 'border-[#011E41] bg-[#E4EAF3]' : 'border-transparent hover:bg-[#E8E9ED]'
+                  isSelected
+                    ? 'border-[#011E41] bg-[#E4EAF3]'
+                    : 'border-transparent hover:bg-[#E8E9ED]'
                 )}
               >
                 <input

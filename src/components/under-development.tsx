@@ -1,5 +1,4 @@
 export default function UnderDevelopment({ title, message }: { title: string; message: string }) {
-
   return (
     <div className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center p-6">
       <div className="text-center">
@@ -15,14 +14,13 @@ export default function UnderDevelopment({ title, message }: { title: string; me
               strokeLinecap="round"
               strokeLinejoin="round"
               className="text-[#6B7280]"
+              aria-hidden="true"
             >
               <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
             </svg>
           </div>
         </div>
-        <h1 className="mb-4 font-mono text-2xl font-bold text-[#0D1B3E] md:text-3xl">
-          {title}
-        </h1>
+        <h1 className="mb-4 font-mono text-2xl font-bold text-[#0D1B3E] md:text-3xl">{title}</h1>
         <p className="text-lg text-[#6B7280]">{message}</p>
       </div>
     </div>

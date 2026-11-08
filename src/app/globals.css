@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -8,11 +8,11 @@
   --secondary: oklch(0.967 0.003 264.542);
   --muted: oklch(0.967 0.003 264.542);
   --muted-foreground: oklch(0.551 0.027 264.364);
-  --color-ifrc-blue: #011E41;
-  --color-ifrc-red: #EE2435;
-  --color-dunder-green: #00FF9C;
-  --color-dunder-red: #FF1E56;
-  --color-dunder-lightgrey: #E4EAF3;
+  --color-ifrc-blue: #011e41;
+  --color-ifrc-red: #ee2435;
+  --color-dunder-green: #00ff9c;
+  --color-dunder-red: #ff1e56;
+  --color-dunder-lightgrey: #e4eaf3;
   --light-black: #000;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -96,11 +96,7 @@ html {
 }
 
 body {
-  font-family:
-    var(--font-geist-sans),
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
 
 /* Safe area insets for mobile devices */
@@ -149,35 +145,35 @@ body {
 }
 
 /* RTL Support */
-[dir='rtl'] {
+[dir="rtl"] {
   direction: rtl;
   text-align: right;
 }
 
-[dir='ltr'] {
+[dir="ltr"] {
   direction: ltr;
   text-align: left;
 }
 
 /* RTL utilities - Tailwind automatically handles rtl: prefix when dir attribute is set */
 /* Custom RTL adjustments for specific components */
-[dir='rtl'] .ltr\:flex-row {
+[dir="rtl"] .ltr\:flex-row {
   flex-direction: row-reverse;
 }
 
 /* Ensure icons and logos maintain their appearance in RTL */
-[dir='rtl'] img,
-[dir='rtl'] svg {
+[dir="rtl"] img,
+[dir="rtl"] svg {
   transform: none;
 }
 
 /* RTL support for fixed positioning */
-[dir='rtl'] aside {
+[dir="rtl"] aside {
   left: auto;
   right: 0;
 }
 
-[dir='ltr'] aside {
+[dir="ltr"] aside {
   left: 0;
   right: auto;
 }
@@ -217,12 +213,24 @@ body {
 }
 
 @keyframes badge-earn {
-  0%   { translate: 0 0; }
-  25%  { translate: 0 -5px; }
-  50%  { translate: 0 0; }
-  70%  { translate: 0 -3px; }
-  85%  { translate: 0 1px; }
-  100% { translate: 0 0; }
+  0% {
+    translate: 0 0;
+  }
+  25% {
+    translate: 0 -5px;
+  }
+  50% {
+    translate: 0 0;
+  }
+  70% {
+    translate: 0 -3px;
+  }
+  85% {
+    translate: 0 1px;
+  }
+  100% {
+    translate: 0 0;
+  }
 }
 
 @layer base {

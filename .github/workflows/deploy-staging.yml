@@ -2,7 +2,7 @@ name: Deploy to Cloudflare (Staging)
 
 on:
   release:
-    types: [published]
+    types: [ published ]
 
 permissions:
   contents: write # Required to edit releases
@@ -67,7 +67,7 @@ jobs:
         run: |
           # Get the existing body of the release
           EXISTING_BODY=$(gh release view "$TAG" --repo="$GITHUB_REPOSITORY" --json body --jq .body)
-          
+
           # Combine existing and new notes
           UPDATED_BODY="$NEW_NOTES"$'\n\n'"$EXISTING_BODY"
           # Save metadata.json and upload it to the release
