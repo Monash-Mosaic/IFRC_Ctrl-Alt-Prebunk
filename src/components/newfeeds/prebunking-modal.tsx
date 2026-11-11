@@ -52,7 +52,10 @@ export default function PrebunkingModal({
       shouldCloseOnOverlayClick={true}
       shouldCloseOnEsc={true}
     >
-      <div className="relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" data-post-id={postId}>
+      <div
+        className="relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl"
+        data-post-id={postId}
+      >
         <div
           className={cn(
             'px-6 py-4 flex items-center gap-3',
@@ -62,18 +65,12 @@ export default function PrebunkingModal({
         >
           <div className="shrink-0" aria-hidden="true">
             <CornerUpLeft
-              className={cn(
-                isCorrect ? 'text-[color:var(--light-black,#000)]' : 'text-white'
-              )}
+              className={cn(isCorrect ? 'text-[color:var(--light-black,#000)]' : 'text-white')}
               size={24}
               strokeWidth={2.5}
             />
           </div>
-          <div
-            className={cn(
-              isCorrect ? 'text-[color:var(--light-black,#000)]' : 'text-white'
-            )}
-          >
+          <div className={cn(isCorrect ? 'text-[color:var(--light-black,#000)]' : 'text-white')}>
             {header}
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { render } from '@/test-utils/test-utils';
+import { render, screen } from '@/test-utils/test-utils';
 import BotTextMessage from '@/app/[locale]/chat/onboarding/_components/bot-text-message';
 
 describe('BotTextMessage', () => {
@@ -37,6 +37,14 @@ describe('BotTextMessage', () => {
   it('matches snapshot with empty message', () => {
     const { container } = render(<BotTextMessage {...defaultProps} displayText="" />);
     expect(container).toMatchSnapshot();
+  });
+
+  it('shows a reaction only when one is passed', () => {
+    const { rerender } = render(<BotTextMessage {...defaultProps} />);
+    expect(screen.queryByLabelText('Reaction')).not.toBeInTheDocument();
+
+    rerender(<BotTextMessage {...defaultProps} reaction />);
+    expect(screen.getByLabelText('Reaction')).toBeInTheDocument();
   });
 
   it('matches snapshot with long message', () => {

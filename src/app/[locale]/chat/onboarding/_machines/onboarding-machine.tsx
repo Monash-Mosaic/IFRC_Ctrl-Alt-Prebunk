@@ -28,7 +28,7 @@ export interface PostMessage extends BaseMessage {
 export interface TypingMessage extends BaseMessage {
   type: 'typing';
   typing: boolean;
-};
+}
 
 export type Message = TextMessage | PostMessage | TypingMessage;
 
@@ -191,7 +191,10 @@ export const useOnboardingMachine = (
             setContext((context: OnboardingContext) => {
               return {
                 ...context,
-                messages: [...context.messages.slice(0, -1), createMessage('paula', 'step1.greeting')],
+                messages: [
+                  ...context.messages.slice(0, -1),
+                  createMessage('paula', 'step1.greeting'),
+                ],
                 typing: false,
               };
             });
@@ -282,10 +285,7 @@ export const useOnboardingMachine = (
             const updated = appendUserSelection(context, event as OnboardingOptionEvent);
             return {
               ...updated,
-              messages: [
-                ...updated.messages,
-                createTypingMessage('paula'),
-              ],
+              messages: [...updated.messages, createTypingMessage('paula')],
               typing: true,
             };
           });
@@ -293,7 +293,8 @@ export const useOnboardingMachine = (
             setContext((context: OnboardingContext) => {
               return {
                 ...context,
-                messages: [...context.messages.slice(0, -1),
+                messages: [
+                  ...context.messages.slice(0, -1),
                   createMessage('paula', 'practice.explanation'),
                 ],
                 typing: false,

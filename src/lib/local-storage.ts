@@ -5,7 +5,24 @@ export const STORAGE_KEYS = {
   CHAT_ONBOARDING_STATE: 'chat_onboarding_state',
   ONBOARDING_COMPLETED: 'onboarding_completed',
   GAME_STATE: 'game_state',
+  ALEX_CHAT: 'alex_chat',
 } as const;
+
+export type AlexReply = 'right' | 'wrong';
+
+/** Whether Alex's notification has fired, and which reply the player already sent. */
+export type AlexChatState = {
+  notified: boolean;
+  reply: AlexReply | null;
+  /** Bumped when the feed is finished and Alex still has no reply, so the notice reopens. */
+  remind?: number;
+};
+
+export const defaultAlexChatState: AlexChatState = {
+  notified: false,
+  reply: null,
+  remind: 0,
+};
 
 /**
  * Known storage keys used by the application.

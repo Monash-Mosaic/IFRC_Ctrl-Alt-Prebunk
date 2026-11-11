@@ -1,5 +1,4 @@
 export default function UnderDevelopment({ title, message }: { title: string; message: string }) {
-
   return (
     <div className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center p-6">
       <div className="text-center">
@@ -21,9 +20,7 @@ export default function UnderDevelopment({ title, message }: { title: string; me
             </svg>
           </div>
         </div>
-        <h1 className="mb-4 font-mono text-2xl font-bold text-[#0D1B3E] md:text-3xl">
-          {title}
-        </h1>
+        <h1 className="mb-4 font-mono text-2xl font-bold text-[#0D1B3E] md:text-3xl">{title}</h1>
         <p className="text-lg text-[#6B7280]">{message}</p>
       </div>
     </div>

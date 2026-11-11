@@ -5,7 +5,11 @@ export function useMDXComponents(_components: MDXComponents): MDXComponents {
   return {
     // Only elements supported on social media platforms (Facebook, Instagram, X/Twitter, WhatsApp, Reddit)
     // Plain text paragraphs
-    p: ({ children, ...props }) => <p className="text-sm leading-relaxed" {...props}>{children}</p>,
+    p: ({ children, ...props }) => (
+      <p className="text-sm leading-relaxed" {...props}>
+        {children}
+      </p>
+    ),
     // Line breaks
     br: (props) => <br {...props} />,
     // Bold text (supported on most platforms)
@@ -49,12 +53,36 @@ export function useMDXComponents(_components: MDXComponents): MDXComponents {
       </a>
     ),
     // Headings
-    h1: ({ children, ...props }) => <h1 className="text-2xl font-bold" {...props}>{children}</h1>,
-    h2: ({ children, ...props }) => <h2 className="text-xl font-semibold" {...props}>{children}</h2>,
-    h3: ({ children, ...props }) => <h3 className="text-lg font-semibold" {...props}>{children}</h3>,
-    h4: ({ children, ...props }) => <h4 className="text-base font-semibold" {...props}>{children}</h4>,
-    h5: ({ children, ...props }) => <h5 className="text-sm font-semibold" {...props}>{children}</h5>,
-    h6: ({ children, ...props }) => <h6 className="text-xs font-semibold" {...props}>{children}</h6>,
+    h1: ({ children, ...props }) => (
+      <h1 className="text-2xl font-bold" {...props}>
+        {children}
+      </h1>
+    ),
+    h2: ({ children, ...props }) => (
+      <h2 className="text-xl font-semibold" {...props}>
+        {children}
+      </h2>
+    ),
+    h3: ({ children, ...props }) => (
+      <h3 className="text-lg font-semibold" {...props}>
+        {children}
+      </h3>
+    ),
+    h4: ({ children, ...props }) => (
+      <h4 className="text-base font-semibold" {...props}>
+        {children}
+      </h4>
+    ),
+    h5: ({ children, ...props }) => (
+      <h5 className="text-sm font-semibold" {...props}>
+        {children}
+      </h5>
+    ),
+    h6: ({ children, ...props }) => (
+      <h6 className="text-xs font-semibold" {...props}>
+        {children}
+      </h6>
+    ),
     // Lists
     ul: ({ children, ...props }) => (
       <ul className="list-disc space-y-1 pl-5 text-sm" {...props}>
@@ -104,11 +132,7 @@ export function useMDXComponents(_components: MDXComponents): MDXComponents {
         {children}
       </thead>
     ),
-    tbody: ({ children, ...props }) => (
-      <tbody {...props}>
-        {children}
-      </tbody>
-    ),
+    tbody: ({ children, ...props }) => <tbody {...props}>{children}</tbody>,
     tr: ({ children, ...props }) => (
       <tr className="border-b border-[#E8E9ED]" {...props}>
         {children}
