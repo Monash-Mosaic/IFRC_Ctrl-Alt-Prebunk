@@ -185,7 +185,7 @@ export default function OnboardingFlow() {
               (practiceItem as MCQContent).options.find((o) => o.id === exampleAnswer)?.label ?? '';
             return (
               <>
-                <UserTextMessage displayText={label} />
+                <UserTextMessage displayText={label} isIncorrect={!isCorrect} />
                 <BotTextMessage
                   senderName={CHAT_USERS.paula.name}
                   senderAvatar={CHAT_USERS.paula.avatar}
