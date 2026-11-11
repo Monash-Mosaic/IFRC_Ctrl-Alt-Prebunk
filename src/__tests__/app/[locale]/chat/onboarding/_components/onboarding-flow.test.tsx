@@ -220,6 +220,7 @@ describe('OnboardingFlow practice question', () => {
     expect(mockDecreaseCredibility).not.toHaveBeenCalled();
 
     expect(screen.getByText('Correct option')).toBeInTheDocument();
+    expect(screen.getByText('Correct option').closest('div')).toHaveClass('border-[#00FF9C]');
     expect(screen.getByText('Practice Correct Title')).toBeInTheDocument();
     expect(screen.getByText('Practice Correct Content')).toBeInTheDocument();
     expect(screen.getByText('step3.option1')).toBeInTheDocument();
@@ -237,6 +238,7 @@ describe('OnboardingFlow practice question', () => {
     expect(mockDecreaseCredibility).not.toHaveBeenCalled();
     expect(mockAddPoints).not.toHaveBeenCalled();
     expect(screen.getByText('Incorrect option')).toBeInTheDocument();
+    expect(screen.getByText('Incorrect option').closest('div')).toHaveClass('border-[#FF1E56]');
     expect(screen.getByText('Practice Incorrect Title')).toBeInTheDocument();
     expect(screen.getByText('Practice Incorrect Content')).toBeInTheDocument();
   });
