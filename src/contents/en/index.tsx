@@ -8,11 +8,18 @@ import PaulaAvatar from '@/app/[locale]/chat/onboarding/_icons/paula-avatar';
 // import Mcq1WhyIncorrectTitle from "./post/mcq-1-why-incorrect-title.md";
 // import Mcq1WhyIncorrectContent from "./post/mcq-1-why-incorrect-content.md";
 
-import Mcq2Question from './post/mcq-2-question.md';
-import Mcq2WhyCorrectTitle from './post/mcq-2-why-correct-title.md';
-import Mcq2WhyCorrectContent from './post/mcq-2-why-correct-content.md';
-import Mcq2WhyIncorrectTitle from './post/mcq-2-why-incorrect-title.md';
-import Mcq2WhyIncorrectContent from './post/mcq-2-why-incorrect-content.md';
+import ExampleQuestion from "./post/example-mcq-question.md";
+import ExampleWhyCorrectTitle from "./post/example-mcq-why-correct-title.md";
+import ExampleWhyCorrectContent from "./post/example-mcq-why-correct-content.md";
+import ExampleWhyIncorrectTitle from "./post/example-mcq-why-incorrect-title.md";
+import ExampleWhyIncorrectContent from "./post/example-mcq-why-incorrect-content.md";
+
+
+import Mcq2Question from "./post/mcq-2-question.md";
+import Mcq2WhyCorrectTitle from "./post/mcq-2-why-correct-title.md";
+import Mcq2WhyCorrectContent from "./post/mcq-2-why-correct-content.md";
+import Mcq2WhyIncorrectTitle from "./post/mcq-2-why-incorrect-title.md";
+import Mcq2WhyIncorrectContent from "./post/mcq-2-why-incorrect-content.md";
 
 import Mcq3Question from './post/mcq-3-question.md';
 import Mcq3WhyCorrectTitle from './post/mcq-3-why-correct-title.md';
@@ -179,6 +186,31 @@ export const users: Record<UserId, User> = {
     avatar: null,
     handle: '@user',
     isUser: true,
+  },
+}
+
+export const practiceContent: Record<ContentId, Content> = {
+  'example-mcq': {
+    id: 'example-mcq',
+    type: ContentType.MCQ,
+    post: {
+      id: 'example-mcq',
+      user: users['echo'],
+      content: <ExampleQuestion />,
+    },
+    options: [
+      { id: 'a', label: 'Share it—the timing makes the claim convincing.' },
+      { id: 'b', label: 'Check reliable sources before believing or sharing it.' },
+    ],
+    correctOptionId: 'b',
+    whyCorrectAnswer: {
+      title: <ExampleWhyCorrectTitle />,
+      content: <ExampleWhyCorrectContent />,
+    },
+    whyIncorrectAnswer: {
+      title: <ExampleWhyIncorrectTitle />,
+      content: <ExampleWhyIncorrectContent />,
+    },
   },
 };
 

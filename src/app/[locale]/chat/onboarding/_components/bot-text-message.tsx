@@ -3,7 +3,7 @@ import { ThumbsUp } from 'lucide-react';
 interface BotTextMessageProps {
   senderAvatar?: React.ReactNode;
   senderName: string;
-  displayText: string;
+  displayText: React.ReactNode;
   reaction?: boolean;
 }
 
@@ -21,7 +21,7 @@ export default function BotTextMessage({
         {reaction ? (
           <div className="relative w-fit max-w-full">
             <div className="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black">
-              <p className="whitespace-pre-wrap text-sm leading-relaxed">{displayText}</p>
+              <div className="whitespace-pre-wrap text-sm leading-relaxed">{displayText}</div>
             </div>
             <span
               role="img"
@@ -33,7 +33,7 @@ export default function BotTextMessage({
           </div>
         ) : (
           <div className="flex px-4 py-3 rounded-r-2xl rounded-tl-2xl border border-[#2979FF] bg-[#2979FF]/10 text-black">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed">{displayText}</p>
+            <div className="whitespace-pre-wrap text-sm leading-relaxed">{displayText}</div>
           </div>
         )}
         <span className="text-xs font-medium text-[#2979FF]">{senderName}</span>

@@ -135,8 +135,18 @@ describe('onboardingMachine', () => {
       })
     );
     const normalized3 = normalizeForSnapshot(result.current[0]);
-    expect(normalized3).toMatchSnapshot('after practice answered (completed state)');
+    expect(normalized3).toMatchSnapshot('after practice answered (example-handoff state)');
+    expect(result.current[0].value).toBe('example-handoff');
+
+    act(() =>
+      result.current[1]({
+        type: 'option1-step3',
+        optionText: 'Okay, entering the feed now!',
+      } as OnboardingOptionEvent)
+    );
+    expect(result.current[0].value).toBe('completed');
   });
+
 
   it('routes option3-step1 into practice for the example path', () => {
     const { result } = renderHook(() => useOnboardingMachine());

@@ -417,7 +417,7 @@ exports[`onboardingMachine matches snapshot following step1 -> step2 -> step3 pa
 }
 `;
 
-exports[`onboardingMachine matches snapshot going through practice and completing when the question is answered: after practice answered (completed state) 1`] = `
+exports[`onboardingMachine matches snapshot going through practice and completing when the question is answered: after practice answered (example-handoff state) 1`] = `
 {
   "context": {
     "messages": [
@@ -494,9 +494,13 @@ exports[`onboardingMachine matches snapshot going through practice and completin
   "event": {
     "type": "PRACTICE_ANSWERED",
   },
-  "nextEvents": [],
-  "nextEventsT": [],
-  "value": "completed",
+  "nextEvents": [
+    "option1-step3",
+  ],
+  "nextEventsT": [
+    "option1-step3",
+  ],
+  "value": "example-handoff",
 }
 `;
 
