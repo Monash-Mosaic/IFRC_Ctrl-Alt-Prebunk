@@ -107,20 +107,6 @@ jest.mock('@/components/newfeeds/mcq-post-message', () => {
   };
 });
 
-// jest.mock('@/components/newfeeds/prebunking-modal', () => {
-//   return function MockPrebunkingModal({ isOpen, onClose, onContinue, postId, header, content }: any) {
-//     if (!isOpen) return null;
-//     return (
-//       <div data-testid={`practice-modal-${postId}`}>
-//         <div data-testid={`practice-modal-header-${postId}`}>{header}</div>
-//         <div data-testid={`practice-modal-content-${postId}`}>{content}</div>
-//         <button data-testid={`practice-modal-close-${postId}`} onClick={onClose}>Close</button>
-//         <button data-testid={`practice-modal-continue-${postId}`} onClick={onContinue}>Continue</button>
-//       </div>
-//     );
-//   };
-// });
-
 const mockAddPoints = jest.fn();
 const mockIncreaseCredibility = jest.fn();
 const mockDecreaseCredibility = jest.fn();
@@ -185,25 +171,6 @@ describe('OnboardingFlow practice question', () => {
     expect(screen.queryByTestId('practice-mcq-post-live-q1')).not.toBeInTheDocument();
   });
 
-
-  // it('does not fall through to Like/Report for an unsupported practice post', () => {
-  //   const originalItem = CONTENTS.en.contentList[0];
-  //   CONTENTS.en.contentList[0] = {
-  //     id: 'unsupported-share',
-  //     type: ContentType.SHARE,
-  //     correctAnswer: 'share',
-  //     whyCorrectAnswer: { title: null, content: null },
-  //     whyIncorrectAnswer: { title: null, content: null },
-  //   };
-  //   try {
-  //     advanceToPractice();
-  //     expect(screen.queryByRole('article')).not.toBeInTheDocument();
-  //     expect(screen.queryByRole('button', { name: /like|report|dislike/i })).not.toBeInTheDocument();
-  //     expect(mockSetAnswer).not.toHaveBeenCalled();
-  //   } finally {
-  //     CONTENTS.en.contentList[0] = originalItem;
-  //   }
-  // });
 
   it('keeps the example answer off the scored game and still shows the feedback modal', () => {
     advanceToPractice();

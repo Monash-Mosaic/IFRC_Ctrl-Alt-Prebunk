@@ -18,9 +18,8 @@ import TypingMessage from './typing-message';
 import { CHAT_USERS } from '../../_constants/users';
 import { useRouter } from '@/i18n/routing';
 import CONTENTS from '@/contents';
-import { ContentType, type LikeDislikeContent, type MCQContent } from '@/contents/en';
+import { type MCQContent } from '@/contents/en';
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
-import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 interface StoredOnboardingState {
   context: OnboardingContext | undefined;
   state: string | undefined;
@@ -230,31 +229,6 @@ export default function OnboardingFlow() {
           </div>
         </div>
       )}
-
-      {/* Practice question feedback modal — same component the real feed uses */}
-      {/* {showPracticeModal && (() => {
-        const isCorrect = practiceItem.type === ContentType.MCQ
-          ? exampleAnswer === (practiceItem as MCQContent).correctOptionId
-          : exampleAnswer === (practiceItem as LikeDislikeContent).correctAnswer;
-        const reasonContent = isCorrect
-          ? practiceItem.whyCorrectAnswer.content
-          : practiceItem.whyIncorrectAnswer.content;
-        const reasonHeader = isCorrect
-          ? practiceItem.whyCorrectAnswer.title
-          : practiceItem.whyIncorrectAnswer.title;
-
-        return (
-          <PrebunkingModal
-            isOpen={true}
-            onClose={handlePracticeModalDone}
-            onContinue={handlePracticeModalDone}
-            postId={practiceItem.id}
-            content={reasonContent}
-            header={reasonHeader}
-            isCorrect={isCorrect}
-          />
-        );
-      })()} */}
     </div>
   );
 }
