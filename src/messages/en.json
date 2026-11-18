@@ -113,6 +113,10 @@
     }
   },
   "feed": {
+    "viewResults": "View results",
+    "feedComplete": "You’ve completed all five feed questions.",
+    "openAlexMessage": "Open Alex’s message",
+    "alexUnavailable": "Alex’s question is unavailable.",
     "scrollHint": "Scroll to see more",
     "lockedHint": "Answer this post to unlock the next one",
     "blockedScroll": "Answer this post first to keep scrolling",
