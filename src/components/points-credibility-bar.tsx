@@ -1,17 +1,24 @@
 'use client';
 
 import { useCredibilityStore } from '@/lib/use-credibility-store';
+import { useAlexChat } from '@/lib/use-alex-chat';
+import { getQuizScore, useFeedCorrectAnswers } from '@/lib/use-game-store';
 import { useTranslations, useLocale } from 'next-intl';
 import CONTENTS from '@/contents';
 
 export default function PointsCredibilityBar() {
   const t = useTranslations('header');
   const locale = useLocale();
-  const { points, credibility, initialCredibility } = useCredibilityStore((state) => state);
+  const { credibility, initialCredibility } = useCredibilityStore((state) => state);
+  const [alexChat] = useAlexChat();
+  const feedCorrectAnswers = useFeedCorrectAnswers();
 
   const credibilityPercentage = (credibility / Math.max(initialCredibility, 1)) * 100;
-  const correctAnswers = points / 5;
-  const totalQuestions = CONTENTS[locale as keyof typeof CONTENTS].contentList.length + 1;
+  const { correctAnswers, totalQuestions } = getQuizScore(
+    feedCorrectAnswers,
+    CONTENTS[locale as keyof typeof CONTENTS].contentList.length,
+    alexChat.reply
+  );
 
   return (
     <div className="flex justify-between fixed top-14 left-0 right-0 z-40 flex h-10 items-center gap-4 border-t border-white/50 bg-[#E8E9ED] px-4 md:px-6">

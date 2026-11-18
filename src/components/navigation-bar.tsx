@@ -1,24 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { type Ref, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, type routing, usePathname } from '@/i18n/routing';
 import { Home, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
 import { useAlexChat } from '@/lib/use-alex-chat';
+import { useGameCompleted } from '@/lib/use-game-store';
 
 function AlexNotice({
   variant,
   message,
   closeLabel,
   onClose,
+  noticeRef,
 }: {
   variant: 'side' | 'above';
   message: string;
   closeLabel: string;
   onClose: () => void;
+  noticeRef?: Ref<HTMLDivElement>;
 }) {
   return (
     <div
+      ref={noticeRef}
       className={
         variant === 'side'
           ? 'absolute top-1/2 z-50 w-max max-w-[14rem] -translate-y-1/2 ltr:left-full ltr:ml-3 rtl:right-full rtl:mr-3'
@@ -69,23 +73,48 @@ export default function Navigation() {
   const alexT = useTranslations('chat.alex');
   const pathname = usePathname();
   const [alexChat] = useAlexChat();
+  const gameCompleted = useGameCompleted();
+  const mobileNavRef = useRef<HTMLElement>(null);
+  const mobileNoticeRef = useRef<HTMLDivElement>(null);
   const [noticeDismissed, setNoticeDismissed] = useState(false);
   const [wasNotified, setWasNotified] = useState(alexChat.notified);
-  const remind = alexChat.remind ?? 0;
-  const [seenRemind, setSeenRemind] = useState(remind);
 
   if (alexChat.notified !== wasNotified) {
     setWasNotified(alexChat.notified);
     if (!alexChat.notified) setNoticeDismissed(false);
   }
 
-  if (remind !== seenRemind) {
-    setSeenRemind(remind);
-    setNoticeDismissed(false);
-  }
-
   const showAlexNotice =
-    alexChat.notified && !alexChat.reply && !noticeDismissed && !pathname.startsWith('/chat');
+    !gameCompleted &&
+    alexChat.notified &&
+    !alexChat.reply &&
+    !noticeDismissed &&
+    !pathname.startsWith('/chat');
+
+  useLayoutEffect(() => {
+    const nav = mobileNavRef.current;
+    if (!nav) return;
+    const notice = showAlexNotice ? mobileNoticeRef.current : null;
+    const root = document.documentElement;
+
+    // Give the feed enough scroll space to clear the fixed nav and notice on mobile.
+    const updateFeedInset = () => {
+      const bounds = nav.getBoundingClientRect();
+      const top = Math.min(bounds.top, notice?.getBoundingClientRect().top ?? bounds.top);
+      root.style.setProperty('--mobile-feed-bottom', `${Math.ceil(bounds.bottom - top)}px`);
+    };
+
+    updateFeedInset();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(updateFeedInset);
+    observer?.observe(nav);
+    if (notice) observer?.observe(notice);
+    window.addEventListener('resize', updateFeedInset);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', updateFeedInset);
+      root.style.removeProperty('--mobile-feed-bottom');
+    };
+  }, [showAlexNotice]);
 
   const navItems: NavItem[] = [
     {
@@ -159,7 +188,10 @@ export default function Navigation() {
       </aside>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E8E9ED] bg-white md:hidden">
+      <nav
+        ref={mobileNavRef}
+        className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E8E9ED] bg-white md:hidden"
+      >
         <div className="flex h-16 items-center justify-around px-2">
           {navItems.map((item) => {
             const isActive =
@@ -183,6 +215,7 @@ export default function Navigation() {
                 {showAlexNotice && item.href === '/chat' && (
                   <AlexNotice
                     variant="above"
+                    noticeRef={mobileNoticeRef}
                     message={alexT('notification')}
                     closeLabel="Close notification"
                     onClose={() => setNoticeDismissed(true)}
