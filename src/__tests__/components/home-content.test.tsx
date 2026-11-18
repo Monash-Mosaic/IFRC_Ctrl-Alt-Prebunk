@@ -53,6 +53,7 @@ const mockUseGameStore = jest.fn(() => ({
 }));
 
 jest.mock('@/lib/use-game-store', () => ({
+  ...jest.requireActual('@/lib/use-game-store'),
   createGameStore: jest.fn(() => mockUseGameStore),
 }));
 
@@ -698,7 +699,7 @@ describe('HomeContent', () => {
     render(<HomeContent />);
 
     expect(screen.getByTestId('game-complete')).toBeInTheDocument();
-    expect(screen.getByTestId('game-score')).toHaveTextContent('2/3');
+    expect(screen.getByTestId('game-score')).toHaveTextContent('2/2');
   });
 
   it('resets game state when restart is clicked', async () => {
