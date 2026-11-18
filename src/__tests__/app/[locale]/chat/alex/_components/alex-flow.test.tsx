@@ -2,10 +2,16 @@ import React from 'react';
 import { act, fireEvent, render, renderHook, screen } from '@/test-utils/test-utils';
 import { useTranslations } from 'next-intl';
 import en from '@/messages/en.json';
+import { contentList } from '@/contents/en';
 import AlexFlow from '@/app/[locale]/chat/alex/_components/alex-flow';
-import { defaultAlexChatState, type AlexChatState } from '@/lib/local-storage';
+import { defaultAlexChatState, type AlexChatState, storage, STORAGE_KEYS } from '@/lib/local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
+
+jest.mock('next-intl', () => ({
+  useTranslations: jest.fn(),
+  useLocale: () => 'en',
+}));
 
 jest.mock('react-modal', () => {
   function Modal({ isOpen, children }: { isOpen: boolean; children: React.ReactNode }) {
@@ -51,6 +57,13 @@ function showReplyButtons() {
   });
 }
 
+function completeFeed() {
+  storage.setItem(STORAGE_KEYS.GAME_STATE, {
+    state: { answers: Object.fromEntries(contentList.map(({ id }) => [id, 'attempted'])) },
+    version: 0,
+  });
+}
+
 describe('AlexFlow', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -58,7 +71,7 @@ describe('AlexFlow', () => {
     router.replace.mockClear();
     (global as unknown as { mockUseRouter: jest.Mock }).mockUseRouter.mockReturnValue(router);
     (useTranslations as jest.Mock).mockImplementation((namespace?: string) => translate(namespace));
-    setAlex(defaultAlexChatState);
+    setAlex({ ...defaultAlexChatState, notified: true });
     useCredibilityStore.setState({
       points: 0,
       credibility: 5,
@@ -90,6 +103,7 @@ describe('AlexFlow', () => {
     expect(useCredibilityStore.getState().credibility).toBe(6);
     expect(screen.getAllByLabelText('Reaction')).toHaveLength(1);
     expect(screen.getAllByText(/\d{1,2}:\d{2}(AM|PM)/)).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Back to the feed' })).toBeInTheDocument();
   });
 
   it('shows the Not quite popup for the wrong reply and does not add points', () => {
@@ -116,14 +130,43 @@ describe('AlexFlow', () => {
     expect(router.replace).toHaveBeenCalledWith('/');
   });
 
-  it('hides the replies after the simulation ends and does not score them', () => {
+  it('lets the player return to the completed feed without submitting an Alex answer', () => {
+    completeFeed();
+    render(<AlexFlow />);
+    fireEvent.click(screen.getByRole('button', { name: 'Back to the feed' }));
+    expect(router.replace).toHaveBeenCalledWith('/');
+    expect(useCredibilityStore.getState().points).toBe(0);
+  });
+
+  it.each([
+    [/Wait Alex, that sounds like/, 'right'],
+    [/That's huge if true/, 'wrong'],
+  ] as const)('offers results after feedback on the %s reply when the feed is complete', (answer, reply) => {
+    completeFeed();
+    showReplyButtons();
+    fireEvent.click(screen.getByRole('button', { name: answer }));
+    expect(screen.queryByRole('button', { name: 'View results' })).not.toBeInTheDocument();
+
+    if (reply === 'right') {
+      act(() => jest.advanceTimersByTime(1000));
+    } else {
+      fireEvent.click(screen.getByRole('button', { name: 'Got it! Continue' }));
+    }
+
+    expect(screen.queryByRole('button', { name: 'Back to the feed' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'View results' }));
+    expect(router.replace).toHaveBeenCalledWith('/');
+  });
+
+  it('closes the unanswered question after results and offers a route back', () => {
     localStorage.setItem(
       'game_state',
       JSON.stringify({ state: { gameCompleted: true }, version: 0 })
     );
     showReplyButtons();
 
-    expect(screen.getByText('Here! https://link.com')).toBeInTheDocument();
+    expect(screen.getByText('Alex’s question is unavailable.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Back to the feed' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Wait Alex, that sounds like/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /That's huge if true/ })).not.toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(0);
