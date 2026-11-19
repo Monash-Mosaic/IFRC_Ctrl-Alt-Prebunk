@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, render, renderHook, screen } from '@/test-utils/test-utils';
+import { act, fireEvent, render, renderHook, screen, within } from '@/test-utils/test-utils';
 import HomeContent from '@/components/home-content';
 import Navigation from '@/components/navigation-bar';
 import ChatPage from '@/app/[locale]/chat/page';
@@ -31,6 +31,7 @@ jest.mock('@/lib/use-local-storage', () => ({
 }));
 
 jest.mock('@/lib/use-game-store', () => ({
+  ...jest.requireActual('@/lib/use-game-store'),
   createGameStore: jest.fn(() => () => ({
     getAnswer: (id: string) => answers[id] ?? null,
     setAnswer: (id: string, answer: string) => {
@@ -69,7 +70,7 @@ jest.mock('@/contents', () => ({
   default: {
     en: {
       content: {},
-      contentList: [post('other'), post('like-dislike-7'), post('end')],
+      contentList: [post('first'), post('second'), post('third'), post('end')],
     },
   },
 }));
@@ -155,16 +156,18 @@ describe('Alex notification', () => {
 
     expect(noticeLinks()).toHaveLength(0);
 
-    dismissPost('other');
+    dismissPost('first');
+    dismissPost('second');
     expect(noticeLinks()).toHaveLength(0);
 
-    dismissPost('like-dislike-7');
+    dismissPost('third');
     expect(noticeLinks()).toHaveLength(2);
   });
 
   it('does not send the notification again once Alex has already written', () => {
     setAlex({ notified: true, reply: null });
-    answers.other = 'dislike';
+    answers.first = 'dislike';
+    answers.second = 'dislike';
     render(
       <>
         <Navigation />
@@ -176,7 +179,7 @@ describe('Alex notification', () => {
 
     const setItem = jest.spyOn(Storage.prototype, 'setItem');
     setItem.mockClear();
-    dismissPost('like-dislike-7');
+    dismissPost('third');
     expect(setItem.mock.calls.filter((call) => call[0] === 'alex_chat')).toHaveLength(0);
     expect(noticeLinks()).toHaveLength(2);
     setItem.mockRestore();
@@ -211,10 +214,49 @@ describe('Alex notification', () => {
     expect(noticeLinks()).toHaveLength(0);
   });
 
-  it('shows the notice again when the feed ends without a reply', () => {
-    setAlex({ notified: true, reply: null, remind: 0 });
-    answers.other = 'dislike';
-    answers['like-dislike-7'] = 'dislike';
+  it('keeps the mobile notice visible and adds scroll clearance for the completed feed actions', () => {
+    setAlex({ notified: true, reply: null });
+    answers.first = 'dislike';
+    answers.second = 'dislike';
+    answers.third = 'dislike';
+    render(
+      <>
+        <Navigation />
+        <HomeContent />
+      </>
+    );
+
+    dismissPost('end');
+    const mobileNav = screen
+      .getAllByRole('navigation')
+      .find((nav) => nav.classList.contains('md:hidden'))!;
+    const mobileNoticeLink = within(mobileNav).getByRole('link', { name: 'Alex sent you a message' });
+    const mobileNotice = mobileNoticeLink.parentElement!.parentElement!;
+    jest
+      .spyOn(mobileNav, 'getBoundingClientRect')
+      .mockReturnValue({ top: 575, bottom: 640 } as DOMRect);
+    jest.spyOn(mobileNotice, 'getBoundingClientRect').mockReturnValue({ top: 515 } as DOMRect);
+    fireEvent(window, new Event('resize'));
+
+    const feedBottom = () => document.documentElement.style.getPropertyValue('--mobile-feed-bottom');
+    expect(feedBottom()).toBe('125px');
+    expect(mobileNoticeLink).toHaveAttribute('href', '/chat/alex');
+    const results = screen.getByRole('button', { name: 'View results' });
+    expect(results.closest('section')?.parentElement).toHaveClass(
+      'gap-3',
+      'max-md:pb-[max(0px,calc(var(--mobile-feed-bottom,4rem)-4.5rem))]'
+    );
+    expect(screen.getByRole('link', { name: 'Open Alex’s message' })).toBeInTheDocument();
+
+    fireEvent.click(within(mobileNav).getByRole('button', { name: 'Close notification' }));
+    expect(feedBottom()).toBe('65px');
+  });
+
+  it('offers a direct route to Alex alongside results when the feed ends without a reply', () => {
+    setAlex({ notified: true, reply: null });
+    answers.first = 'dislike';
+    answers.second = 'dislike';
+    answers.third = 'dislike';
     render(
       <>
         <Navigation />
@@ -226,7 +268,11 @@ describe('Alex notification', () => {
     expect(noticeLinks()).toHaveLength(0);
 
     dismissPost('end');
-    expect(noticeLinks()).toHaveLength(2);
+    expect(screen.getByRole('link', { name: 'Open Alex’s message' })).toHaveAttribute(
+      'href',
+      '/chat/alex'
+    );
+    expect(screen.getByRole('button', { name: 'View results' })).toBeInTheDocument();
   });
 
   it('keeps Alex busy until the notification exists', () => {
