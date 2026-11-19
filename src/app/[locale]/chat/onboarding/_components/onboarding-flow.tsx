@@ -22,6 +22,8 @@ import { ContentType, type LikeDislikeContent, type MCQContent } from '@/content
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
+import PlayerAvatar from '@/components/player-avatar';
+import { useProfileStore } from '@/lib/use-profile-store';
 
 interface StoredOnboardingState {
   context: OnboardingContext | undefined;
@@ -33,6 +35,9 @@ const VALID_ONBOARDING_STATES = ['initial', 'step2', 'step3', 'practice', 'compl
 export default function OnboardingFlow() {
   const locale = useLocale();
   const t = useTranslations('chat.onboarding');
+  const profileT = useTranslations('profile');
+  const { username, avatarId } = useProfileStore();
+  const playerName = username || profileT('defaultUsername');
   const storage = getStorage<StoredOnboardingState>(STORAGE_KEYS.CHAT_ONBOARDING_STATE);
   const persisted = storage.getItem({
     context: initialContextValue,
@@ -130,7 +135,11 @@ export default function OnboardingFlow() {
           switch (message.type) {
             case 'text':
               return message.sender === 'user' ? (
-                <UserTextMessage key={message.id} displayText={t(message.text)} />
+                <UserTextMessage
+                  key={message.id}
+                  displayText={t(message.text)}
+                  senderAvatar={<PlayerAvatar avatarId={avatarId} name={playerName} size={40} />}
+                />
               ) : (
                 <BotTextMessage
                   key={message.id}

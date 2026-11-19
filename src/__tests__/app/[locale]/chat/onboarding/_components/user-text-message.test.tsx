@@ -35,6 +35,17 @@ describe('UserTextMessage', () => {
     expect(screen.getByText('Hello, this is a test message')).toBeInTheDocument();
   });
 
+  it('renders the player avatar after the message when provided', () => {
+    render(
+      <UserTextMessage
+        displayText="Hi"
+        senderAvatar={<span data-testid="player-avatar">A</span>}
+      />
+    );
+
+    expect(screen.getByTestId('player-avatar')).toBeInTheDocument();
+  });
+
   it('shows ticks and a time only when a sent time is passed', () => {
     const { rerender } = render(<UserTextMessage displayText="Hello" />);
     expect(screen.queryByText('3:00PM')).not.toBeInTheDocument();
