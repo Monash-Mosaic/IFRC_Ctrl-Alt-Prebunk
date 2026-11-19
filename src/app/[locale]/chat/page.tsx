@@ -6,6 +6,7 @@ import AlexAvatar from './onboarding/_icons/alex-avatar';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/routing';
 import { useAlexChat } from '@/lib/use-alex-chat';
+import { useGameCompleted } from '@/lib/use-game-store';
 
 interface ChatListItemProps {
   name: string;
@@ -52,6 +53,7 @@ function ChatListItem({
 export default function ChatPage() {
   const t = useTranslations('chat.list');
   const [alexChat] = useAlexChat();
+  const gameCompleted = useGameCompleted();
   const alexOpen = alexChat.notified || alexChat.reply !== null;
 
   return (
@@ -68,14 +70,16 @@ export default function ChatPage() {
             hasSubText={true}
             href="/chat/onboarding"
           />
-          <ChatListItem
-            name={t('alex')}
-            avatar={<AlexAvatar />}
-            subText={alexOpen ? t('newMessage') : t('busy')}
-            hasSubText={!alexChat.reply}
-            isDisabled={!alexOpen}
-            href="/chat/alex"
-          />
+          {(!gameCompleted || alexChat.reply) && (
+            <ChatListItem
+              name={t('alex')}
+              avatar={<AlexAvatar />}
+              subText={alexOpen ? t('newMessage') : t('busy')}
+              hasSubText={!alexChat.reply}
+              isDisabled={!alexOpen}
+              href="/chat/alex"
+            />
+          )}
         </div>
       </div>
     </div>

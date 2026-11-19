@@ -1,6 +1,7 @@
 import { render, screen } from '@/test-utils/test-utils';
 import PointsCredibilityBar from '@/components/points-credibility-bar';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
+import { createGameStore } from '@/lib/use-game-store';
 
 // Create a shared state object that can be modified
 const createMockState = () => ({
@@ -40,6 +41,7 @@ jest.mock('@/contents', () => ({
 
 describe('PointsCredibilityBar', () => {
   beforeEach(() => {
+    localStorage.clear();
     // Reset to default values before each test
     currentMockState = createMockState();
     // Update the mock implementation to use the new state
@@ -61,16 +63,15 @@ describe('PointsCredibilityBar', () => {
     render(<PointsCredibilityBar />);
     // Translation returns the key, so we check for "score"
     expect(screen.getByText(/score/i)).toBeInTheDocument();
-    // 0 points / 5 = 0 correct answers, out of 2 feed posts plus Alex
     const scoreSpan = screen.getByText(/score/i);
-    expect(scoreSpan.textContent).toContain('0/3');
+    expect(scoreSpan).toHaveTextContent('0/2');
   });
 
-  it('displays custom score value derived from points', () => {
-    // 150 points / 5 = 30 correct answers
-    currentMockState.points = 150;
+  it('excludes non-answer points from the quiz score', () => {
+    currentMockState.points = 2;
+    createGameStore().getState().incrCorrectAnswers();
     render(<PointsCredibilityBar />);
-    expect(screen.getByText(/30\/3/)).toBeInTheDocument();
+    expect(screen.getByText('score: 1/2')).toBeInTheDocument();
   });
 
   it('displays credibility label', () => {
@@ -109,11 +110,12 @@ describe('PointsCredibilityBar', () => {
   });
 
   it('displays score and credibility correctly together', () => {
-    currentMockState.points = 10; // 2 correct answers
+    const game = createGameStore({ correctAnswers: 1 });
+    game.getState().incrCorrectAnswers();
     currentMockState.credibility = 4;
     currentMockState.initialCredibility = 5;
     render(<PointsCredibilityBar />);
-    expect(screen.getByText(/2\/3/)).toBeInTheDocument();
+    expect(screen.getByText('score: 2/2')).toBeInTheDocument();
     expect(screen.getByText(/credibility/i)).toBeInTheDocument();
 
     const progressBar = screen.getByText(/credibility/i).nextElementSibling?.querySelector('div');

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEffect, useRef, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import BotTextMessage from '../../onboarding/_components/bot-text-message';
 import UserTextMessage from '../../onboarding/_components/user-text-message';
 import TypingMessage from '../../onboarding/_components/typing-message';
@@ -12,7 +12,8 @@ import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import type { AlexReply } from '@/lib/local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
 import { useRouter } from '@/i18n/routing';
-import { isPersistedGameCompleted } from '@/lib/use-game-store';
+import { isPersistedGameCompleted, useFeedCompleted, useGameCompleted } from '@/lib/use-game-store';
+import CONTENTS from '@/contents';
 
 const TYPING_MS = 1000;
 
@@ -25,6 +26,8 @@ function formatSentAt(date: Date) {
 
 export default function AlexFlow() {
   const t = useTranslations('chat.alex');
+  const feedT = useTranslations('feed');
+  const locale = useLocale() as keyof typeof CONTENTS;
   const router = useRouter();
   const [alexChat, setAlexChat, ready] = useAlexChat();
   const reply = alexChat.reply;
@@ -36,20 +39,18 @@ export default function AlexFlow() {
   const [sentAt, setSentAt] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const { addPoints, increaseCredibility, decreaseCredibility } = useCredibilityStore();
-  const gameOver = useSyncExternalStore(
-    () => () => {},
-    isPersistedGameCompleted,
-    () => false
-  );
+  const gameOver = useGameCompleted();
+  const feedCompleted = useFeedCompleted(CONTENTS[locale].contentList);
+  const canReply = alexChat.notified && !gameOver && !reply;
   const alex = CHAT_USERS.alex;
 
   useEffect(() => {
-    if (!ready || reply) return;
+    if (!ready || !canReply) return;
     // typing, opening, player's line, typing, link, typing, question
     const delays = [1000, 1600, 2200, 3200, 3800, 4800];
     const timers = delays.map((ms, index) => setTimeout(() => setIntroStep(index + 1), ms));
     return () => timers.forEach(clearTimeout);
-  }, [ready, reply]);
+  }, [ready, canReply]);
 
   useEffect(() => {
     if (!ready || reply !== 'right' || !justReplied) return;
@@ -65,10 +66,10 @@ export default function AlexFlow() {
   }, [introStep, outcomeReady, reply]);
 
   const choose = (next: AlexReply) => {
-    if (reply || scored.current || gameOver) return;
+    if (!canReply || scored.current || isPersistedGameCompleted()) return;
     scored.current = true;
     setJustReplied(true);
-    setAlexChat({ notified: true, reply: next, remind: alexChat.remind });
+    setAlexChat({ notified: true, reply: next });
     if (next === 'right') {
       increaseCredibility();
       addPoints(5);
@@ -87,10 +88,21 @@ export default function AlexFlow() {
   const showAsk = introStep >= 6 || reply !== null;
   const showRightOutcome = reply === 'right' && (seenBefore || outcomeReady);
   const showBack =
-    showRightOutcome || (reply === 'wrong' && !wrongPopupOpen && (seenBefore || justReplied));
+    canReply ||
+    showRightOutcome ||
+    (reply === 'wrong' && !wrongPopupOpen && (seenBefore || justReplied));
 
   if (showSendAgain && sentAt === null) {
     setSentAt(formatSentAt(new Date()));
+  }
+
+  if (ready && !canReply && !reply) {
+    return (
+      <div className="w-full space-y-4 p-4 text-center">
+        <p>{feedT('alexUnavailable')}</p>
+        <OptionButton id="alex-back" displayText={t('back')} onClick={() => router.replace('/')} />
+      </div>
+    );
   }
 
   return (
@@ -151,10 +163,10 @@ export default function AlexFlow() {
         )}
         <div ref={endRef} />
       </div>
-      {((ready && !reply && introStep >= 6) || showBack) && (
+      {showBack && (
         <div className="border-t border-[#E8E9ED] bg-white px-4 py-4 md:pb-4">
           <div className="mx-auto flex max-w-2xl flex-col gap-3">
-            {ready && !reply && introStep >= 6 && !gameOver && (
+            {ready && canReply && introStep >= 6 && (
               <>
                 <OptionButton
                   id="alex-reply-wrong"
@@ -168,9 +180,11 @@ export default function AlexFlow() {
                 />
               </>
             )}
-            {showBack && (
-              <OptionButton id="alex-back" displayText={t('back')} onClick={() => router.replace('/')} />
-            )}
+            <OptionButton
+              id="alex-back"
+              displayText={reply && feedCompleted ? feedT('viewResults') : t('back')}
+              onClick={() => router.replace('/')}
+            />
           </div>
         </div>
       )}

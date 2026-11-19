@@ -10,9 +10,10 @@ import { useAlexChat } from '@/lib/use-alex-chat';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
 import { type Content, ContentType, type LikeDislikeContent, type MCQContent } from '@/contents/en';
-import { createGameStore } from '@/lib/use-game-store';
+import { createGameStore, getQuizScore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import GameComplete from '@/components/game-complete';
+import { Link } from '@/i18n/routing';
 
 import Modal from 'react-modal';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -44,9 +45,7 @@ export default function HomeContent() {
     if (alexChat.notified || alexChat.reply) alexNoticeSent.current = true;
   }, [alexChat]);
 
-  // Lazily created once: createGameStore() builds a brand-new Zustand store each call,
-  // and gameCompleted/correctAnswers aren't persisted, so recreating it on every render
-  // (e.g. from the state updates below) would silently reset them.
+  // Keep the feed store stable across renders and let it restore any saved session.
   const [useGameStore] = useState(() =>
     createGameStore({
       answers: {},
@@ -61,6 +60,7 @@ export default function HomeContent() {
   const {
     getAnswer,
     moveToNextQuestion,
+    finishGame,
     setAnswer,
     isAnswered,
     isPostDisabled,
@@ -70,8 +70,6 @@ export default function HomeContent() {
     getNumQuestions,
     resetGame,
   } = useGameStore();
-  const answers = useGameStore((state) => state.answers);
-  const gameCompleted = useGameStore((state) => state.gameCompleted);
   const { addPoints, increaseCredibility, decreaseCredibility, initCredibility, resetCredibility } =
     useCredibilityStore();
 
@@ -93,6 +91,15 @@ export default function HomeContent() {
   );
   const unlockedPostIds = useMemo(() => unlockedPosts.map((item) => item.id), [unlockedPosts]);
   const isFeedLocked = firstUnansweredIndex !== -1;
+  const feedFinished = contentList.length > 0 && !isFeedLocked;
+  const readyForResults = feedFinished && !modalPostId;
+  const alexPending = alexChat.reply === null;
+  const gameCompleted = isGameCompleted();
+  const shouldFinishGame = readyForResults && !alexPending && !gameCompleted;
+
+  useEffect(() => {
+    if (onboardingCompleted && shouldFinishGame) finishGame();
+  }, [onboardingCompleted, shouldFinishGame, finishGame]);
 
   const showFeedToast = useCallback((message: string) => {
     setToastMessage(message);
@@ -121,10 +128,10 @@ export default function HomeContent() {
   const prevEnabled = canGoPrev;
 
   const maybeNotifyAlex = (postId: string) => {
-    if (postId !== 'like-dislike-7') return;
+    if (postId !== contentList[2]?.id) return;
     if (alexNoticeSent.current || alexChat.notified || alexChat.reply) return;
     alexNoticeSent.current = true;
-    setAlexChat({ notified: true, reply: null, remind: alexChat.remind ?? 0 });
+    setAlexChat({ notified: true, reply: null });
   };
 
   const handleOnCloseModal = () => {
@@ -136,29 +143,21 @@ export default function HomeContent() {
     if (!isAnswered(postId)) return;
 
     const nextIndex = contentList.findIndex((item) => item.id === postId) + 1;
-    const isLast = nextIndex >= contentList.length;
-    if (isLast && !alexChat.reply) {
-      alexNoticeSent.current = true;
-      setAlexChat({
-        notified: true,
-        reply: null,
-        remind: (alexChat.remind ?? 0) + 1,
-      });
-      return;
-    }
+    if (nextIndex >= contentList.length) return;
 
     moveToNextQuestion();
-    if (!isLast) {
-      // The next post is rendered by now (it unlocked when the answer was stored).
-      feedRef.current?.scrollToPost(nextIndex);
-    }
+    // The next post is rendered by now (it unlocked when the answer was stored).
+    feedRef.current?.scrollToPost(nextIndex);
   };
 
-  useEffect(() => {
-    if (!alexChat.reply || gameCompleted || modalPostId) return;
-    if (!contentList.every((item) => item.id in answers)) return;
-    moveToNextQuestion();
-  }, [alexChat.reply, gameCompleted, modalPostId, answers, contentList, moveToNextQuestion]);
+  const handleViewResults = () => {
+    if (finishGame() && alexPending) setAlexChat(defaultAlexChatState);
+  };
+
+  const handleOpenAlex = () => {
+    // Older saved sessions can reach the end without dismissing the third post's feedback.
+    if (!alexChat.notified) setAlexChat({ notified: true, reply: null });
+  };
 
   const handleOnAnswer = (postId: string, answer: string) => {
     // Only allow answer if post is not already answered and is not disabled
@@ -235,12 +234,11 @@ export default function HomeContent() {
     );
   }
 
-  if (isGameCompleted()) {
+  if (gameCompleted || shouldFinishGame) {
     return (
       <div className="flex min-h-[calc(100dvh-10rem)] flex-col items-center justify-center p-4 md:min-h-[calc(100vh-6rem)]">
         <GameComplete
-          correctAnswers={getCorrectAnswers() + (alexChat.reply === 'right' ? 1 : 0)}
-          totalQuestions={getNumQuestions() + 1}
+          {...getQuizScore(getCorrectAnswers(), getNumQuestions(), alexChat.reply)}
           restartGame={handleRestartSimulation}
         />
       </div>
@@ -292,6 +290,28 @@ export default function HomeContent() {
     return null;
   };
 
+  const completionActions = readyForResults && alexPending && (
+    <section
+      aria-label={feedT('feedComplete')}
+      className="mx-auto grid w-full max-w-sm grid-cols-2 gap-3 text-center text-sm"
+    >
+      <button
+        type="button"
+        onClick={handleViewResults}
+        className="min-h-11 rounded-full bg-[#011E41] px-3 py-2 font-semibold text-white transition-colors hover:bg-[#002552] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#011E41]"
+      >
+        {feedT('viewResults')}
+      </button>
+      <Link
+        href="/chat/alex"
+        onClick={handleOpenAlex}
+        className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#011E41] px-3 py-2 font-semibold text-[#011E41] transition-colors hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#011E41]"
+      >
+        {feedT('openAlexMessage')}
+      </Link>
+    </section>
+  );
+
   return (
     <div
       className={cn(
@@ -323,7 +343,17 @@ export default function HomeContent() {
               // Returning players (persisted answers) land on their current question.
               initialIndex={isFeedLocked ? firstUnansweredIndex : unlockedPosts.length - 1}
               postIds={unlockedPostIds}
-              renderPost={renderPost}
+              renderPost={(postId, index) => {
+                const post = renderPost(postId, index);
+                if (!completionActions) return post;
+
+                return (
+                  <div className="my-auto flex shrink-0 flex-col gap-3 max-md:pb-[max(0px,calc(var(--mobile-feed-bottom,4rem)-4.5rem))]">
+                    {post}
+                    {completionActions}
+                  </div>
+                );
+              }}
               isLocked={isFeedLocked}
               labels={{
                 scrollHint: feedT('scrollHint'),
