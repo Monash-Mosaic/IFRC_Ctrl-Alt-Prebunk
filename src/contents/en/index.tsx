@@ -1,5 +1,6 @@
 import EchoAvatar from '@/app/[locale]/chat/onboarding/_icons/echo-avatar';
 import PaulaAvatar from '@/app/[locale]/chat/onboarding/_icons/paula-avatar';
+import EchoColdSnapPost from '../../app/[locale]/chat/onboarding/_posts/en/EchoPost.md';
 
 // MCQ content imports
 // import Mcq1Question from "./post/mcq-1-question.md";
@@ -99,6 +100,7 @@ export type Post = {
   content: React.ReactNode;
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
+  mediaAlt?: string;
 };
 
 export type ContentId = string;
@@ -107,6 +109,7 @@ export enum ContentType {
   LIKE_DISLIKE = 'like_dislike',
   SHARE = 'share',
   MCQ = 'mcq',
+  COMMENT = 'comment',
 }
 
 export interface ContentBase {
@@ -150,6 +153,7 @@ export interface MCQContent extends ContentBase {
 
 export interface ShareContent extends ContentBase {
   type: ContentType.SHARE;
+  post: Post;
   correctAnswer: 'share' | 'skip';
   whyCorrectAnswer: {
     title: React.ReactNode;
@@ -161,9 +165,19 @@ export interface ShareContent extends ContentBase {
   };
 }
 
+export interface CommentContent extends ContentBase {
+  type: ContentType.COMMENT;
+  post: Post;
+  comment: { author: User; text: string };
+  options: MCQOption[];
+  correctOptionId: string;
+  whyCorrectAnswer: MCQContent['whyCorrectAnswer'];
+  whyIncorrectAnswer: MCQContent['whyIncorrectAnswer'];
+}
+
 export type UserId = string;
 
-export type Content = LikeDislikeContent | ShareContent | MCQContent;
+export type Content = LikeDislikeContent | ShareContent | MCQContent | CommentContent;
 
 export const users: Record<UserId, User> = {
   paula: {
@@ -450,6 +464,72 @@ export const content: Record<ContentId, Content> = {
       title: <Content8WhyIncorrectTitle />,
       content: <Content8WhyIncorrectContent />,
     },
+  },
+};
+
+const checkSource = (
+  <p>
+    Echo’s post claims the UN made this announcement. Before sharing a claim like this on social
+    media, check who posted it and look for the original announcement on the UN’s official website.
+  </p>
+);
+
+content['share-un-source'] = {
+  id: 'share-un-source',
+  type: ContentType.SHARE,
+  post: {
+    id: 'share-un-source',
+    user: { ...users.echo, handle: '@climate_truth_warrior' },
+    content: (
+      <p>
+        🚨 ALERT! 🚨 The UN has just revealed that global carbon emissions have reached 59.3
+        gigatonnes in 2025 — the highest ever recorded. Immediate action is needed! Share this with
+        all your friends to help stop climate disaster 🌍💚
+      </p>
+    ),
+    mediaUrl: '/images/posts/ifrc/question-04.webp',
+    mediaType: 'image',
+    mediaAlt: 'Red emergency warning light',
+  },
+  correctAnswer: 'skip',
+  whyCorrectAnswer: { title: 'Exactly!', content: checkSource },
+  whyIncorrectAnswer: { title: 'Not quite!', content: checkSource },
+};
+
+// Keep the existing ID so saved answers still resolve after this content update.
+content['comment-victoria-cold-snap'] = {
+  id: 'comment-victoria-cold-snap',
+  type: ContentType.COMMENT,
+  post: {
+    id: 'comment-victoria-cold-snap',
+    user: { ...users.echo, handle: '@climate_truth_warrior' },
+    content: <EchoColdSnapPost />,
+    mediaUrl: '/images/example/echo-post-img.jpg',
+    mediaType: 'image',
+    mediaAlt: 'Snow-covered trees beside a frozen lake',
+  },
+  comment: {
+    author: users.echo,
+    text: 'Victoria just broke a cold-weather record. That proves global warming has stopped.',
+  },
+  options: [
+    { id: 'a', label: 'Agreed. A record cold day is enough to show that global warming has stopped.' },
+    {
+      id: 'b',
+      label:
+        'That record tells us about one place on one day. We’d need long-term temperature records from many places to check whether the planet is warming.',
+    },
+  ],
+  correctOptionId: 'b',
+  whyCorrectAnswer: {
+    title: 'Good catch!',
+    content:
+      'You spotted the cherry-picking. One local cold record can’t tell us how temperatures are changing around the world over time.',
+  },
+  whyIncorrectAnswer: {
+    title: 'Watch out for cherry-picking.',
+    content:
+      'The commenter used one local record to make a claim about the whole planet. Look at temperature records from many places over many years.',
   },
 };
 
