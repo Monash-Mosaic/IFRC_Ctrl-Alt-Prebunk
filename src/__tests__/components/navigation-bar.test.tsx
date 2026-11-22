@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils/test-utils';
+import { act, render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import Navigation from '@/components/navigation-bar';
 import { STORAGE_KEYS, storage } from '@/lib/local-storage';
@@ -183,6 +183,82 @@ describe('Navigation', () => {
       await user.click(homeLinks[0]);
 
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Active-quiz navigation lock', () => {
+    const saveGame = (answers: Record<string, string>, gameCompleted = false) =>
+      storage.setItem(STORAGE_KEYS.GAME_STATE, {
+        state: { answers, currentQuestionIndex: 0, gameCompleted, correctAnswers: 0 },
+        version: 0,
+      });
+
+    afterEach(() => {
+      storage.removeItem(STORAGE_KEYS.GAME_STATE);
+    });
+
+    it('keeps Profile closed while a quiz is in progress and explains why', async () => {
+      saveGame({ '1': 'like' });
+      const user = userEvent.setup();
+      render(<Navigation />);
+
+      const profileLinks = screen.getAllByRole('link', { name: /profile/i });
+      expect(profileLinks).toHaveLength(2); // desktop sidebar + mobile bar
+      for (const link of profileLinks) {
+        expect(link).toHaveAttribute('aria-disabled', 'true');
+      }
+
+      // A cancelled click event means the router never navigates away.
+      const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+      profileLinks[0].dispatchEvent(clickEvent);
+      expect(clickEvent.defaultPrevented).toBe(true);
+
+      // Keyboard activation is blocked the same way.
+      profileLinks[1].focus();
+      await user.keyboard('{Enter}');
+      expect(await screen.findByRole('alert')).toHaveTextContent('lockedDuringQuiz');
+    });
+
+    it('leaves the other destinations open during the quiz', () => {
+      saveGame({ '1': 'like' });
+      render(<Navigation />);
+
+      for (const name of [/home/i, /chat/i, /share/i]) {
+        for (const link of screen.getAllByRole('link', { name })) {
+          expect(link).not.toHaveAttribute('aria-disabled');
+        }
+      }
+    });
+
+    it.each([
+      ['before the first answer', {}, false],
+      ['once results are shown', { '1': 'like' }, true],
+    ])('opens Profile normally %s', (_, answers, gameCompleted) => {
+      saveGame(answers, gameCompleted);
+      render(<Navigation />);
+
+      for (const link of screen.getAllByRole('link', { name: /profile/i })) {
+        expect(link).not.toHaveAttribute('aria-disabled');
+        expect(link).toHaveAttribute('href', expect.stringContaining('/profile'));
+      }
+    });
+
+    it('unlocks Profile as soon as the game is completed', () => {
+      saveGame({ '1': 'like' });
+      render(<Navigation />);
+      expect(screen.getAllByRole('link', { name: /profile/i })[0]).toHaveAttribute(
+        'aria-disabled',
+        'true'
+      );
+
+      act(() => {
+        saveGame({ '1': 'like' }, true);
+        window.dispatchEvent(new Event('prebunk:game-state-changed'));
+      });
+
+      expect(screen.getAllByRole('link', { name: /profile/i })[0]).not.toHaveAttribute(
+        'aria-disabled'
+      );
     });
   });
 });

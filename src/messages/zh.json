@@ -4,7 +4,8 @@
     "chat": "聊天",
     "analytics": "分析",
     "share": "分享",
-    "profile": "个人资料"
+    "profile": "个人资料",
+    "lockedDuringQuiz": "请先完成当前模拟，再打开个人资料。"
   },
   "header": {
     "score": "得分",

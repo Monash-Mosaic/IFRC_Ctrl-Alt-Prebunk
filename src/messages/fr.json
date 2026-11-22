@@ -4,7 +4,8 @@
     "chat": "Chat",
     "analytics": "Analytique",
     "share": "Partager",
-    "profile": "Profil"
+    "profile": "Profil",
+    "lockedDuringQuiz": "Terminez la simulation en cours pour ouvrir votre profil."
   },
   "header": {
     "score": "Score",

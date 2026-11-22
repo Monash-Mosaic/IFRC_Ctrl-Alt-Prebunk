@@ -31,7 +31,12 @@ interface GameStore extends GameState {
 const GAME_STATE_CHANGED = 'prebunk:game-state-changed';
 
 function readSavedProgress() {
-  return storage.getItem<{ state?: Partial<GameState> }>(STORAGE_KEYS.GAME_STATE)?.state;
+  try {
+    return storage.getItem<{ state?: Partial<GameState> }>(STORAGE_KEYS.GAME_STATE)?.state;
+  } catch {
+    // Corrupt JSON in storage: treat as no progress rather than crashing the page.
+    return undefined;
+  }
 }
 
 export function isPersistedGameCompleted() {
@@ -66,6 +71,20 @@ export function useFeedCompleted(posts: readonly Pick<ContentBase, 'id'>[]) {
   );
 }
 
+/**
+ * True while a simulation is under way: at least one feed question has been
+ * answered and the results screen has not been reached yet. Used to keep the
+ * player on their current question (e.g. Profile is locked in the navigation).
+ */
+export function isQuizInProgress() {
+  const saved = readSavedProgress();
+  return saved?.gameCompleted !== true && Object.keys(saved?.answers ?? {}).length > 0;
+}
+
+export function useQuizInProgress() {
+  return useSyncExternalStore(subscribeToSavedProgress, isQuizInProgress, () => false);
+}
+
 export function useFeedCorrectAnswers() {
   return useSyncExternalStore(
     subscribeToSavedProgress,
@@ -79,26 +98,6 @@ export function getQuizScore(feedCorrect: number, feedTotal: number, alexReply: 
     correctAnswers: feedCorrect + (alexReply === 'right' ? 1 : 0),
     totalQuestions: feedTotal + (alexReply === null ? 0 : 1),
   };
-}
-
-/**
- * Read-only snapshot of the persisted game progress, for screens outside the feed
- * (e.g. Profile) that must show the score without creating their own game store.
- */
-export function getStoredGameProgress(): { correctAnswers: number } {
-  try {
-    const stored = storage.getItem<{ state?: Partial<GameState> }>(STORAGE_KEYS.GAME_STATE);
-    const correctAnswers = stored?.state?.correctAnswers;
-    return {
-      correctAnswers:
-        typeof correctAnswers === 'number' && Number.isFinite(correctAnswers) && correctAnswers > 0
-          ? Math.floor(correctAnswers)
-          : 0,
-    };
-  } catch {
-    // Corrupt JSON in storage: treat as no progress rather than crashing the page.
-    return { correctAnswers: 0 };
-  }
 }
 
 const initialGameState = {

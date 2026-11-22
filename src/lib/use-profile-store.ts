@@ -26,18 +26,25 @@ interface ProfileStore extends ProfileState {
   setUsername: (raw: string) => boolean;
   /** Returns false (and stores nothing) for an id that is not a preset avatar. */
   setAvatar: (avatarId: string) => boolean;
+  /** Back to the default username and avatar; part of Restart simulation (FR9). */
+  resetProfile: () => void;
 }
+
+const initialProfileState: ProfileState = {
+  username: '',
+  avatarId: DEFAULT_AVATAR_ID,
+};
 
 /**
  * Player identity. Kept apart from the game and credibility stores so editing a
- * profile can never touch score, credibility or quiz progress, and so the
- * restart action (which resets those stores) leaves the identity in place.
+ * profile can never touch score, credibility or quiz progress. Restart
+ * simulation resets it together with those stores, as specified in FR9.
  */
 export const useProfileStore = create<ProfileStore>()(
   persist(
     (set) => ({
-      username: '',
-      avatarId: DEFAULT_AVATAR_ID,
+      ...initialProfileState,
+      resetProfile: () => set(initialProfileState),
       setUsername: (raw) => {
         const username = normalizeUsername(raw);
         if (!username) return false;

@@ -6,8 +6,9 @@ import { Check, Pencil } from 'lucide-react';
 import CONTENTS from '@/contents';
 import PlayerAvatar from '@/components/player-avatar';
 import { PROFILE_AVATARS } from '@/lib/profile-avatars';
+import { useAlexChat } from '@/lib/use-alex-chat';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
-import { getStoredGameProgress } from '@/lib/use-game-store';
+import { getQuizScore, useFeedCorrectAnswers } from '@/lib/use-game-store';
 import { USERNAME_MAX_LENGTH, useProfileStore } from '@/lib/use-profile-store';
 import { cn } from '@/lib/utils';
 
@@ -25,10 +26,16 @@ export default function ProfileContent() {
   const locale = useLocale();
   const { username, avatarId, setUsername, setAvatar } = useProfileStore();
   const { credibility, initialCredibility } = useCredibilityStore();
-  // Progress cannot change while this page is open, so a single read is enough.
-  const [{ correctAnswers }] = useState(getStoredGameProgress);
+  const [alexChat] = useAlexChat();
+  const feedCorrectAnswers = useFeedCorrectAnswers();
 
-  const totalQuestions = CONTENTS[locale as keyof typeof CONTENTS].contentList.length;
+  // Same calculation as the score bar and results screen: Alex's DM only counts
+  // (and adds to the total) once the player has answered it.
+  const { correctAnswers, totalQuestions } = getQuizScore(
+    feedCorrectAnswers,
+    CONTENTS[locale as keyof typeof CONTENTS].contentList.length,
+    alexChat.reply
+  );
   const credibilityPercentage = (credibility / Math.max(initialCredibility, 1)) * 100;
   const displayName = username || t('defaultUsername');
 

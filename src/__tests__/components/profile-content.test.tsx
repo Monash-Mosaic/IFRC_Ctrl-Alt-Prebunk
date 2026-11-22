@@ -1,8 +1,9 @@
 import React from 'react';
-import { act, render, screen } from '@/test-utils/test-utils';
+import { act, render, renderHook, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import ProfileContent from '@/components/profile-content';
-import { STORAGE_KEYS } from '@/lib/local-storage';
+import { type AlexChatState, defaultAlexChatState, STORAGE_KEYS } from '@/lib/local-storage';
+import { useAlexChat } from '@/lib/use-alex-chat';
 import { DEFAULT_AVATAR_ID, PROFILE_AVATARS } from '@/lib/profile-avatars';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import { useProfileStore } from '@/lib/use-profile-store';
@@ -24,9 +25,19 @@ const GAME_STATE = JSON.stringify({
   version: 0,
 });
 
+// useAlexChat caches its state in memory, so set it through its own updater.
+function setAlexChat(next: AlexChatState) {
+  const hook = renderHook(() => useAlexChat());
+  act(() => {
+    hook.result.current[1](next);
+  });
+  hook.unmount();
+}
+
 describe('ProfileContent', () => {
   beforeEach(() => {
     localStorage.clear();
+    setAlexChat(defaultAlexChatState);
     localStorage.setItem(STORAGE_KEYS.GAME_STATE, GAME_STATE);
     act(() => {
       useProfileStore.setState({ username: '', avatarId: DEFAULT_AVATAR_ID });
@@ -140,6 +151,17 @@ describe('ProfileContent', () => {
     expect(credibilityAfter.credibility).toBe(credibilityBefore.credibility);
     expect(credibilityAfter.initialCredibility).toBe(credibilityBefore.initialCredibility);
     expect(screen.getByTestId('profile-score')).toHaveTextContent('2/5');
+  });
+
+  it.each([
+    ['notified but not opened', { notified: true, reply: null }, '2/5'],
+    ['answered correctly', { notified: true, reply: 'right' }, '3/6'],
+    ['answered incorrectly', { notified: true, reply: 'wrong' }, '2/6'],
+  ] as const)('counts Alex the same way as the score bar when %s', (_, alexChat, score) => {
+    setAlexChat(alexChat);
+    render(<ProfileContent />);
+
+    expect(screen.getByTestId('profile-score')).toHaveTextContent(score);
   });
 
   it('shows a zero score when no game has been played or storage is corrupt', () => {
