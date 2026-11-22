@@ -53,12 +53,12 @@ export default function PrebunkingModal({
       shouldCloseOnEsc={true}
     >
       <div
-        className="relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl"
+        className="relative flex max-h-full w-full max-w-md flex-col overflow-hidden rounded-2xl shadow-2xl"
         data-post-id={postId}
       >
         <div
           className={cn(
-            'px-6 py-4 flex items-center gap-3',
+            'flex shrink-0 items-center gap-3 px-6 py-4',
             isCorrect ? 'bg-(--color-dunder-green)' : 'bg-(--color-dunder-red)'
           )}
           data-result={isCorrect ? 'correct' : 'incorrect'}
@@ -76,13 +76,13 @@ export default function PrebunkingModal({
         </div>
 
         {/* White Body Section */}
-        <div className="bg-white px-6 py-5 space-y-4">
-          <div className="space-y-4 [&_a]:!text-(--color-dunder-red) [&_a:hover]:opacity-80">
+        <div className="flex min-h-0 flex-col gap-8 bg-white px-6 py-5">
+          <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain [&_a]:!text-(--color-dunder-red) [&_a:hover]:opacity-80">
             {content}
           </div>
 
           {/* Continue Button */}
-          <div className="pt-4">
+          <div className="shrink-0">
             <button
               type="button"
               onClick={handleContinue}
