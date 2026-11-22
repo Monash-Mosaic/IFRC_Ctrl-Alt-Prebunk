@@ -7,6 +7,11 @@ import { STORAGE_KEYS, storage } from '@/lib/local-storage';
 const mockUsePathname = global.mockUsePathname as unknown as jest.Mock;
 
 describe('Navigation', () => {
+  beforeAll(() => {
+    const root = document.createElement('main');
+    root.id = 'root';
+    document.body.appendChild(root);
+  });
   beforeEach(() => {
     mockUsePathname.mockReturnValue('/');
   });
@@ -103,6 +108,35 @@ describe('Navigation', () => {
         const svg = link.querySelector('svg');
         expect(svg).toBeInTheDocument();
       });
+    });
+
+    it('shows Contact Us after Profile in the desktop sidebar only', () => {
+      render(<Navigation />);
+      const sidebar = screen
+        .getAllByRole('complementary')
+        .find((el) => el.classList.contains('md:flex')) as HTMLElement;
+      const mobileNav = screen
+        .getAllByRole('navigation')
+        .find((nav) => nav.classList.contains('md:hidden')) as HTMLElement;
+      const contactButton = screen.getByRole('button', { name: 'contactUs' });
+
+      expect(sidebar).toContainElement(contactButton);
+      expect(mobileNav).not.toContainElement(contactButton);
+      const profileLink = screen.getAllByRole('link', { name: /profile/i })[0];
+      expect(
+        profileLink.compareDocumentPosition(contactButton) & Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy();
+    });
+
+    it('opens the contact modal without changing the route', async () => {
+      const user = userEvent.setup();
+      render(<Navigation />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'contactUs' }));
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(global.mockUseRouter().push).not.toHaveBeenCalled();
     });
   });
 
