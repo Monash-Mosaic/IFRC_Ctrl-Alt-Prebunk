@@ -138,6 +138,10 @@
     }
   },
   "feed": {
+    "viewResults": "Voir les résultats",
+    "feedComplete": "Vous avez répondu aux cinq questions du fil.",
+    "openAlexMessage": "Ouvrir le message d’Alex",
+    "alexUnavailable": "La question d’Alex n’est pas disponible.",
     "scrollHint": "Faites défiler pour voir plus",
     "lockedHint": "Répondez à cette publication pour débloquer la suivante",
     "blockedScroll": "Répondez d'abord à cette publication pour continuer à faire défiler",

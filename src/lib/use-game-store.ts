@@ -1,6 +1,7 @@
+import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { STORAGE_KEYS, storage } from './local-storage';
+import { type AlexReply, STORAGE_KEYS, storage } from './local-storage';
 import type { ContentBase, ContentId } from '@/contents/en';
 
 interface GameState {
@@ -19,6 +20,7 @@ interface GameStore extends GameState {
   isCurrentQuestionAnswered: () => boolean;
   isPostDisabled: (postId: string) => boolean;
   moveToNextQuestion: () => void;
+  finishGame: () => boolean;
   isGameCompleted: () => boolean;
   getCorrectAnswers: () => number;
   incrCorrectAnswers: () => void;
@@ -26,10 +28,57 @@ interface GameStore extends GameState {
   resetGame: () => void;
 }
 
-/** True once the results screen has been reached. Read from the feed's saved session. */
+const GAME_STATE_CHANGED = 'prebunk:game-state-changed';
+
+function readSavedProgress() {
+  return storage.getItem<{ state?: Partial<GameState> }>(STORAGE_KEYS.GAME_STATE)?.state;
+}
+
 export function isPersistedGameCompleted() {
-  const saved = storage.getItem<{ state?: { gameCompleted?: boolean } }>(STORAGE_KEYS.GAME_STATE);
-  return saved?.state?.gameCompleted === true;
+  return readSavedProgress()?.gameCompleted === true;
+}
+
+function subscribeToSavedProgress(listener: () => void) {
+  function handleStorage(event: StorageEvent) {
+    if (event.key === STORAGE_KEYS.GAME_STATE || event.key === null) listener();
+  }
+
+  window.addEventListener(GAME_STATE_CHANGED, listener);
+  window.addEventListener('storage', handleStorage);
+  return () => {
+    window.removeEventListener(GAME_STATE_CHANGED, listener);
+    window.removeEventListener('storage', handleStorage);
+  };
+}
+
+export function useGameCompleted() {
+  return useSyncExternalStore(subscribeToSavedProgress, isPersistedGameCompleted, () => false);
+}
+
+export function useFeedCompleted(posts: readonly Pick<ContentBase, 'id'>[]) {
+  return useSyncExternalStore(
+    subscribeToSavedProgress,
+    () => {
+      const answers = readSavedProgress()?.answers;
+      return !!answers && posts.length > 0 && posts.every(({ id }) => id in answers);
+    },
+    () => false
+  );
+}
+
+export function useFeedCorrectAnswers() {
+  return useSyncExternalStore(
+    subscribeToSavedProgress,
+    () => readSavedProgress()?.correctAnswers ?? 0,
+    () => 0
+  );
+}
+
+export function getQuizScore(feedCorrect: number, feedTotal: number, alexReply: AlexReply | null) {
+  return {
+    correctAnswers: feedCorrect + (alexReply === 'right' ? 1 : 0),
+    totalQuestions: feedTotal + (alexReply === null ? 0 : 1),
+  };
 }
 
 /**
@@ -114,11 +163,15 @@ export const createGameStore = (initialState?: Partial<GameState>) =>
                 currentQuestionIndex: nextIndex,
               });
             } else {
-              set({
-                gameCompleted: true,
-              });
+              state.finishGame();
             }
           }
+        },
+        finishGame: () => {
+          const { gameCompleted, questions, isAnswered } = get();
+          if (gameCompleted || questions.length === 0 || !questions.every(isAnswered)) return false;
+          set({ gameCompleted: true });
+          return true;
         },
         isGameCompleted: () => {
           const state = get();
@@ -144,7 +197,20 @@ export const createGameStore = (initialState?: Partial<GameState>) =>
       }),
       {
         name: STORAGE_KEYS.GAME_STATE,
-        storage: createJSONStorage(() => localStorage),
+        storage: createJSONStorage(() => {
+          const local = window.localStorage;
+          return {
+            getItem: (key) => local.getItem(key),
+            setItem: (key, value) => {
+              local.setItem(key, value);
+              window.dispatchEvent(new Event(GAME_STATE_CHANGED));
+            },
+            removeItem: (key) => {
+              local.removeItem(key);
+              window.dispatchEvent(new Event(GAME_STATE_CHANGED));
+            },
+          };
+        }),
         partialize: (state) => ({
           answers: state.answers,
           currentQuestionIndex: state.currentQuestionIndex,
