@@ -82,8 +82,8 @@ export function CommentQuestionDialog({
       isOpen
       onRequestClose={onClose}
       contentLabel={t('comments')}
-      overlayClassName="fixed inset-0 z-[100] bg-[#011E41]/25 lg:bg-transparent"
-      className="fixed inset-x-0 bottom-16 top-24 z-[100] mx-auto flex flex-col overflow-hidden bg-white outline-none md:bottom-4 md:top-28 md:max-w-md md:rounded-2xl lg:inset-x-auto lg:bottom-auto lg:start-[calc(50vw+3.5rem)] lg:max-h-[calc(100dvh-8rem)] lg:w-[22rem] lg:bg-[#E4EAF3]"
+      overlayClassName="fixed inset-0 z-[100] bg-[#011E41]/25 max-md:grid max-md:grid-rows-[minmax(0,1fr)] max-md:place-items-center max-md:px-4 max-md:pt-28 max-md:pb-20 lg:bg-transparent"
+      className="z-[100] mx-auto flex max-h-full w-full flex-col overflow-hidden rounded-2xl bg-white outline-none max-md:shadow-xl md:fixed md:inset-x-0 md:bottom-4 md:top-28 md:max-w-md lg:inset-x-auto lg:bottom-auto lg:start-[calc(50vw+3.5rem)] lg:max-h-[calc(100dvh-8rem)] lg:w-[22rem] lg:bg-[#E4EAF3]"
     >
       <header className="flex shrink-0 items-center gap-2 px-4 py-2 text-[#011E41] max-lg:border-b max-lg:border-slate-200 lg:justify-between lg:px-5 lg:pt-3">
         <button

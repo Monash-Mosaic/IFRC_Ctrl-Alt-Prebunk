@@ -57,7 +57,11 @@ export default function ShareQuestionPost({
   );
 }
 
-function VerificationBadgeExample() {
+/**
+ * Shows a sample verified account in the Share question feedback to help players recognise
+ * verification cues when checking a source.
+ */
+function VerificationBadge() {
   const t = useTranslations('shareQuestion');
 
   return (
@@ -113,7 +117,7 @@ export function ShareQuestionFeedback({
         )}
         {explanation}
       </div>
-      <VerificationBadgeExample />
+      <VerificationBadge />
     </>
   );
 }
