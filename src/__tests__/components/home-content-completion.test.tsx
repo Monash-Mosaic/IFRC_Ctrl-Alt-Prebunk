@@ -6,8 +6,11 @@ import React from 'react';
 import { act, render, renderHook, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import HomeContent from '@/components/home-content';
-import { defaultAlexChatState, type AlexChatState } from '@/lib/local-storage';
+import PointsCredibilityBar from '@/components/points-credibility-bar';
+import { defaultAlexChatState, type AlexChatState, STORAGE_KEYS, storage } from '@/lib/local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
+import { DEFAULT_AVATAR_ID, PROFILE_AVATARS } from '@/lib/profile-avatars';
+import { useProfileStore } from '@/lib/use-profile-store';
 
 jest.mock('next-intl', () => ({
   useTranslations: jest.fn(() => (key: string) => key),
@@ -89,8 +92,10 @@ jest.mock('@/contents', () => ({
   },
 }));
 
+const mockPostRendered = jest.fn();
 jest.mock('@/components/newfeeds/like-dislike-post-message', () => {
   return function MockLikeDislikePostMessage({ postId, onLike, onDislike }: any) {
+    mockPostRendered(postId);
     return (
       <div data-testid={`post-${postId}`}>
         <button data-testid={`like-${postId}`} onClick={() => onLike?.(postId)}>
@@ -125,12 +130,15 @@ jest.mock('@/components/newfeeds/prebunking-modal', () => {
 
 jest.mock('@/components/chat-content', () => () => <div data-testid="chat-content" />);
 jest.mock('@/components/game-complete', () => {
-  return function MockGameComplete({ correctAnswers, totalQuestions }: any) {
+  return function MockGameComplete({ correctAnswers, totalQuestions, restartGame }: any) {
     return (
       <div data-testid="game-complete">
         <span data-testid="game-score">
           {correctAnswers}/{totalQuestions}
         </span>
+        <button type="button" onClick={restartGame}>
+          restart
+        </button>
       </div>
     );
   };
@@ -168,41 +176,100 @@ describe('HomeContent game completion (real game store)', () => {
     await user.click(screen.getByTestId('like-1'));
     await user.click(await screen.findByTestId('continue-modal-1'));
     await user.click(screen.getByTestId('dislike-2'));
+    expect(screen.queryByTestId('game-complete')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'viewResults' })).not.toBeInTheDocument();
     await user.click(await screen.findByTestId('continue-modal-2'));
   }
 
-  it('stays on the feed when every post is answered and Alex has no reply', async () => {
-    render(<HomeContent />);
+  function renderGame() {
+    return render(
+      <>
+        <PointsCredibilityBar />
+        <HomeContent />
+      </>
+    );
+  }
+
+  it('lets the player view feed-only results and clears the pending Alex message', async () => {
+    setAlex({ notified: true, reply: null });
+    renderGame();
+    expect(screen.getByText('score: 0/2')).toBeInTheDocument();
+
     await answerFeed();
     expect(screen.queryByTestId('game-complete')).not.toBeInTheDocument();
+    expect(screen.getByRole('feed')).toBeInTheDocument();
+    const completionActions = screen.getByRole('region', { name: 'feedComplete' });
+    expect(completionActions.previousElementSibling).toBe(screen.getByTestId('post-2'));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'openAlexMessage' })).toHaveAttribute(
+      'href',
+      '/chat/alex'
+    );
+    expect(screen.getByText('score: 2/2')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'viewResults' }));
+    expect(await screen.findByTestId('game-complete')).toBeInTheDocument();
+    expect(screen.getByTestId('game-score')).toHaveTextContent('2/2');
+    expect(storage.getItem(STORAGE_KEYS.ALEX_CHAT)).toEqual(defaultAlexChatState);
   });
 
-  it('ends on the right Alex reply and counts it in the score', async () => {
-    render(<HomeContent />);
+  it.each([
+    ['right', '3/3'],
+    ['wrong', '2/3'],
+  ] as const)('shows results without rendering the feed on return from a %s Alex reply', async (reply, score) => {
+    const { unmount } = renderGame();
     await answerFeed();
+    await userEvent.click(screen.getByRole('link', { name: 'openAlexMessage' }));
+    expect(storage.getItem(STORAGE_KEYS.ALEX_CHAT)).toEqual({ notified: true, reply: null });
+    unmount();
+    setAlex({ notified: true, reply });
+    mockPostRendered.mockClear();
+    renderGame();
 
-    setAlex({ notified: true, reply: 'right', remind: 1 });
-
-    expect(await screen.findByTestId('game-complete')).toBeInTheDocument();
-    expect(screen.getByTestId('game-score')).toHaveTextContent('3/3');
+    expect(screen.getByTestId('game-complete')).toBeInTheDocument();
+    expect(mockPostRendered).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: 'viewResults' })).not.toBeInTheDocument();
+    expect(screen.getByText('score: ' + score)).toBeInTheDocument();
+    expect(screen.getByTestId('game-score')).toHaveTextContent(score);
   });
 
-  it('ends on a wrong Alex reply without giving that point', async () => {
-    render(<HomeContent />);
+  it('restores the choice after refreshing a session left at the end of the feed', async () => {
+    setAlex({ notified: true, reply: null });
+    const { unmount } = renderGame();
+    await answerFeed();
+    unmount();
+    renderGame();
+
+    expect(screen.getByRole('link', { name: 'openAlexMessage' })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'viewResults' }));
+    expect(screen.getByTestId('game-score')).toHaveTextContent('2/2');
+  });
+
+  it('shows results automatically after the final feed feedback when Alex was already answered', async () => {
+    setAlex({ notified: true, reply: 'wrong' });
+    renderGame();
     await answerFeed();
 
-    setAlex({ notified: true, reply: 'wrong', remind: 1 });
-
     expect(await screen.findByTestId('game-complete')).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'feedComplete' })).not.toBeInTheDocument();
     expect(screen.getByTestId('game-score')).toHaveTextContent('2/3');
   });
 
-  it('ends immediately on the last post when Alex was already answered', async () => {
-    setAlex({ notified: true, reply: 'wrong', remind: 0 });
-    render(<HomeContent />);
+  it('resets the username and avatar along with the game on Restart simulation (FR9)', async () => {
+    act(() => {
+      useProfileStore.setState({ username: 'Sam', avatarId: PROFILE_AVATARS[3].id });
+    });
+    setAlex({ notified: true, reply: 'right' });
+    renderGame();
     await answerFeed();
 
-    expect(await screen.findByTestId('game-complete')).toBeInTheDocument();
-    expect(screen.getByTestId('game-score')).toHaveTextContent('2/3');
+    await userEvent.click(await screen.findByRole('button', { name: 'restart' }));
+
+    expect(useProfileStore.getState()).toMatchObject({ username: '', avatarId: DEFAULT_AVATAR_ID });
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEYS.PROFILE) ?? '{}').state).toEqual({
+      username: '',
+      avatarId: DEFAULT_AVATAR_ID,
+    });
+    expect(storage.getItem(STORAGE_KEYS.ALEX_CHAT)).toEqual(defaultAlexChatState);
+    expect(mockSetOnboardingCompleted).toHaveBeenCalledWith(false);
   });
 });

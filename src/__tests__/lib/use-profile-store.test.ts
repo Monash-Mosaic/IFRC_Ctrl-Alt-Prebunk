@@ -103,6 +103,23 @@ describe('useProfileStore', () => {
     expect(avatarId).toBe(DEFAULT_AVATAR_ID);
   });
 
+  it('resets to the default username and avatar and persists that', () => {
+    act(() => {
+      useProfileStore.getState().setUsername('Sam');
+      useProfileStore.getState().setAvatar(PROFILE_AVATARS[2].id);
+    });
+
+    act(() => {
+      useProfileStore.getState().resetProfile();
+    });
+
+    expect(useProfileStore.getState()).toMatchObject({ username: '', avatarId: DEFAULT_AVATAR_ID });
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEYS.PROFILE) ?? '{}').state).toEqual({
+      username: '',
+      avatarId: DEFAULT_AVATAR_ID,
+    });
+  });
+
   it('does not write to the game or credibility storage keys', () => {
     act(() => {
       useProfileStore.getState().setUsername('Alex');

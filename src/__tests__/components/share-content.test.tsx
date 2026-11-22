@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen, waitFor, within } from '@/test-utils/test-utils';
+import { act, render, renderHook, screen, waitFor, within } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import ShareContent from '@/components/share-content';
-import { STORAGE_KEYS } from '@/lib/local-storage';
+import { type AlexChatState, defaultAlexChatState, STORAGE_KEYS } from '@/lib/local-storage';
+import { useAlexChat } from '@/lib/use-alex-chat';
 import { GAME_URL, SOLFERINO_ACADEMY_URL, WORLD_DISASTERS_REPORT_URL } from '@/lib/share-links';
 
 jest.mock('next-intl', () => ({
@@ -42,9 +43,19 @@ function setNavigator(props: Partial<Record<'share' | 'canShare' | 'clipboard', 
   }
 }
 
+// useAlexChat caches its state in memory, so set it through its own updater.
+function setAlexChat(next: AlexChatState) {
+  const hook = renderHook(() => useAlexChat());
+  act(() => {
+    hook.result.current[1](next);
+  });
+  hook.unmount();
+}
+
 describe('ShareContent', () => {
   beforeEach(() => {
     localStorage.clear();
+    setAlexChat(defaultAlexChatState);
     setNavigator({});
   });
 
@@ -192,6 +203,42 @@ describe('ShareContent', () => {
     expect(share.mock.calls[0][0]).toMatchObject({ title: 'Prebunker' });
     expect(share.mock.calls[0][0].text).toContain('3/5');
     expect(await screen.findByRole('alert')).toHaveTextContent('feedback.shared');
+  });
+
+  it.each([
+    ['skipped', defaultAlexChatState, '5/5'],
+    ['answered incorrectly', { notified: true, reply: 'wrong' }, '5/6'],
+    ['answered correctly', { notified: true, reply: 'right' }, '6/6'],
+  ] as const)('includes Alex in the shared score when Alex is %s', async (_, alexChat, score) => {
+    localStorage.setItem(STORAGE_KEYS.GAME_STATE, gameState(5, true));
+    setAlexChat(alexChat);
+    const share = jest.fn().mockResolvedValue(undefined);
+    setNavigator({ share, canShare: jest.fn(() => true) });
+    mockToBlob.mockResolvedValue(new Blob(['image'], { type: 'image/png' }));
+    const user = userEvent.setup();
+    render(<ShareContent />);
+
+    expect(screen.getByText(`progress.result`)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'progress.action' }));
+    const modal = await screen.findByTestId('react-modal');
+    expect(within(modal).getByText(score)).toBeInTheDocument();
+
+    await user.click(within(modal).getByRole('button', { name: /^share$/i }));
+    await waitFor(() => expect(share).toHaveBeenCalled());
+    expect(share.mock.calls[0][0].text).toContain(score);
+  });
+
+  it('unlocks progress sharing as soon as the results screen is reached', () => {
+    localStorage.setItem(STORAGE_KEYS.GAME_STATE, gameState(2, false));
+    render(<ShareContent />);
+    expect(screen.getByRole('button', { name: 'progress.action' })).toBeDisabled();
+
+    act(() => {
+      localStorage.setItem(STORAGE_KEYS.GAME_STATE, gameState(2, true));
+      window.dispatchEvent(new Event('prebunk:game-state-changed'));
+    });
+
+    expect(screen.getByRole('button', { name: 'progress.action' })).toBeEnabled();
   });
 
   it('never changes stored game state when sharing', async () => {

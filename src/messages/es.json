@@ -4,7 +4,8 @@
     "chat": "Chat",
     "analytics": "Analítica",
     "share": "Compartir",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "lockedDuringQuiz": "Termina la simulación actual para abrir {page}."
   },
   "header": {
     "score": "Puntuación",
@@ -180,6 +181,10 @@
     }
   },
   "feed": {
+    "viewResults": "Ver resultados",
+    "feedComplete": "Has completado las cinco preguntas del muro.",
+    "openAlexMessage": "Abrir el mensaje de Alex",
+    "alexUnavailable": "La pregunta de Alex no está disponible.",
     "scrollHint": "Desliza para ver más",
     "lockedHint": "Responde a esta publicación para desbloquear la siguiente",
     "blockedScroll": "Responde primero a esta publicación para seguir desplazándote",

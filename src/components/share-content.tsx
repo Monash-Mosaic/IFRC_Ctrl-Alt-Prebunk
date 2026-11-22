@@ -16,7 +16,8 @@ import {
   shareLink,
   type ShareLinkResult,
 } from '@/lib/share-links';
-import { getStoredGameProgress } from '@/lib/use-game-store';
+import { useAlexChat } from '@/lib/use-alex-chat';
+import { getQuizScore, useFeedCorrectAnswers, useGameCompleted } from '@/lib/use-game-store';
 import { cn } from '@/lib/utils';
 
 const focusRing =
@@ -44,9 +45,16 @@ const LINK_OPTIONS: { key: LinkKey; url: string; icon: React.ReactNode }[] = [
 export default function ShareContent() {
   const t = useTranslations('sharePage');
   const locale = useLocale();
-  // Progress cannot change while this page is open, so a single read is enough.
-  const [{ correctAnswers, gameCompleted }] = useState(getStoredGameProgress);
-  const totalQuestions = CONTENTS[locale as keyof typeof CONTENTS].contentList.length;
+  const gameCompleted = useGameCompleted();
+  const [alexChat] = useAlexChat();
+  const feedCorrectAnswers = useFeedCorrectAnswers();
+  // Same calculation as the score bar and results screen: Alex's DM only counts
+  // (and adds to the total) once the player has answered it.
+  const { correctAnswers, totalQuestions } = getQuizScore(
+    feedCorrectAnswers,
+    CONTENTS[locale as keyof typeof CONTENTS].contentList.length,
+    alexChat.reply
+  );
 
   const [isProgressModalOpen, setIsProgressModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
