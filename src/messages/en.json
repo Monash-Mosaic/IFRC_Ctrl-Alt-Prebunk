@@ -115,14 +115,34 @@
   },
   "feed": {
     "viewResults": "View results",
-    "feedComplete": "You’ve completed all five feed questions.",
+    "feedComplete": "You’ve completed all the feed questions.",
     "openAlexMessage": "Open Alex’s message",
     "alexUnavailable": "Alex’s question is unavailable.",
     "scrollHint": "Scroll to see more",
     "lockedHint": "Answer this post to unlock the next one",
+    "finishFeedHint": "Answer to finish the feed",
     "blockedScroll": "Answer this post first to keep scrolling",
     "answerToContinue": "Please engage with this post before moving to the next one",
     "alreadyLast": "You're already on the last post",
     "alreadyFirst": "You're already on the first post"
+  },
+  "shareQuestion": {
+    "prompt": "Will you share or scroll?",
+    "share": "Share",
+    "skip": "Scroll past",
+    "sharedPost": "You shared a post with {friend}",
+    "friendReplied": "{friend} replied",
+    "badgeExample": "Verification badge example",
+    "exampleAccount": "Example organisation",
+    "exampleHandle": "@example_org",
+    "verifiedBadge": "Verification badge"
+  },
+  "commentQuestion": {
+    "comments": "Comments",
+    "readAndReply": "Read the comments and decide how you’d respond.",
+    "close": "Back to the feed",
+    "prompt": "Which reply would you post?",
+    "yourReply": "Your reply",
+    "feedback": "Game feedback"
   }
 }
