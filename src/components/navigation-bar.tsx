@@ -3,9 +3,10 @@
 import { type Ref, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, type routing, usePathname } from '@/i18n/routing';
-import { Home, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
+import { Home, Mail, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
 import { useAlexChat } from '@/lib/use-alex-chat';
 import { useGameCompleted } from '@/lib/use-game-store';
+import ContactUsModal from '@/components/contact-us-modal';
 
 function AlexNotice({
   variant,
@@ -77,6 +78,7 @@ export default function Navigation() {
   const mobileNavRef = useRef<HTMLElement>(null);
   const mobileNoticeRef = useRef<HTMLDivElement>(null);
   const [noticeDismissed, setNoticeDismissed] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
   const [wasNotified, setWasNotified] = useState(alexChat.notified);
 
   if (alexChat.notified !== wasNotified) {
@@ -184,8 +186,20 @@ export default function Navigation() {
               </div>
             );
           })}
+          <button
+            type="button"
+            onClick={() => setIsContactOpen(true)}
+            aria-haspopup="dialog"
+            className="group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 text-(--color-ifrc-blue) transition-colors hover:text-(--color-ifrc-red)"
+          >
+            <span className="transition-transform group-hover:scale-110">
+              <Mail size={24} strokeWidth={2} />
+            </span>
+            <span className="text-[11px] font-medium">{t('contactUs')}</span>
+          </button>
         </nav>
       </aside>
+      <ContactUsModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
 
       {/* Mobile Bottom Navigation */}
       <nav
