@@ -110,7 +110,7 @@ describe('Navigation', () => {
       });
     });
 
-    it('shows Contact Us after Profile in the desktop sidebar only', () => {
+    it('shows Contact Us after Profile in the desktop sidebar', () => {
       render(<Navigation />);
       const sidebar = screen
         .getAllByRole('complementary')
