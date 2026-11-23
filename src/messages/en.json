@@ -59,22 +59,19 @@
       "title": "Share the game",
       "description": "Invite friends to test their prebunking skills.",
       "action": "Share the game",
-      "shareTitle": "CTRL + ALT + PREBUNK",
-      "shareText": "Can you spot misinformation before it spreads? Try CTRL + ALT + PREBUNK."
+      "shareTitle": "CTRL + ALT + PREBUNK"
     },
     "report": {
       "title": "Share the World Disasters Report",
       "description": "The IFRC report behind the facts in this simulation.",
       "action": "Share the report",
-      "shareTitle": "World Disasters Report",
-      "shareText": "Read the IFRC World Disasters Report."
+      "shareTitle": "World Disasters Report"
     },
     "academy": {
       "title": "Share Solferino Academy resources",
       "description": "Learning resources from the IFRC Solferino Academy.",
       "action": "Share Solferino Academy",
-      "shareTitle": "IFRC Solferino Academy",
-      "shareText": "Explore learning resources from the IFRC Solferino Academy."
+      "shareTitle": "IFRC Solferino Academy"
     },
     "progress": {
       "title": "Share my progress",

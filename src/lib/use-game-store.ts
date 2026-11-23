@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { type AlexReply, STORAGE_KEYS, storage } from './local-storage';
+import { type AlexReply, STORAGE_KEYS, storage, subscribeToStorageKeys } from './local-storage';
 import type { ContentBase, ContentId } from '@/contents/en';
 
 interface GameState {
@@ -71,18 +71,37 @@ export function useFeedCompleted(posts: readonly Pick<ContentBase, 'id'>[]) {
   );
 }
 
+function isOnboardingCompleted() {
+  try {
+    return storage.getItem<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED) === true;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * True while a simulation is under way: at least one feed question has been
- * answered and the results screen has not been reached yet. Used to keep the
+ * True while a simulation is under way: from the moment Q1 is shown (onboarding
+ * finished or skipped) until the results screen is reached. Used to keep the
  * player on their current question (Profile and Share are locked in the navigation).
  */
 export function isQuizInProgress() {
-  const saved = readSavedProgress();
-  return saved?.gameCompleted !== true && Object.keys(saved?.answers ?? {}).length > 0;
+  return isOnboardingCompleted() && readSavedProgress()?.gameCompleted !== true;
+}
+
+function subscribeToQuizProgress(listener: () => void) {
+  const unsubscribeGame = subscribeToSavedProgress(listener);
+  const unsubscribeOnboarding = subscribeToStorageKeys(
+    [STORAGE_KEYS.ONBOARDING_COMPLETED],
+    listener
+  );
+  return () => {
+    unsubscribeGame();
+    unsubscribeOnboarding();
+  };
 }
 
 export function useQuizInProgress() {
-  return useSyncExternalStore(subscribeToSavedProgress, isQuizInProgress, () => false);
+  return useSyncExternalStore(subscribeToQuizProgress, isQuizInProgress, () => false);
 }
 
 export function useFeedCorrectAnswers() {

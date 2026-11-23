@@ -33,6 +33,36 @@ export type KnownStorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
  */
 export type StorageKey = string;
 
+/** Fired on window after `storage` writes, so screens can react within the same tab. */
+export const STORAGE_CHANGED = 'prebunk:storage-changed';
+
+function notifyStorageChanged(key: StorageKey | null) {
+  window.dispatchEvent(
+    new CustomEvent<{ key: StorageKey | null }>(STORAGE_CHANGED, { detail: { key } })
+  );
+}
+
+/**
+ * Calls `listener` whenever one of `keys` changes, from this tab (via `storage`) or another tab.
+ * Returns an unsubscribe function.
+ */
+export function subscribeToStorageKeys(keys: readonly StorageKey[], listener: () => void) {
+  const matches = (key: StorageKey | null) => key === null || keys.includes(key);
+  const handleLocal = (event: Event) => {
+    if (matches((event as CustomEvent<{ key: StorageKey | null }>).detail?.key ?? null)) listener();
+  };
+  const handleOtherTab = (event: StorageEvent) => {
+    if (matches(event.key)) listener();
+  };
+
+  window.addEventListener(STORAGE_CHANGED, handleLocal);
+  window.addEventListener('storage', handleOtherTab);
+  return () => {
+    window.removeEventListener(STORAGE_CHANGED, handleLocal);
+    window.removeEventListener('storage', handleOtherTab);
+  };
+}
+
 /**
  * Get an item from localStorage
  * @param key - The storage key
@@ -67,6 +97,7 @@ export const storage = {
     if (typeof window === 'undefined' || value === undefined) return;
 
     localStorage.setItem(key, JSON.stringify(value));
+    notifyStorageChanged(key);
   },
 
   /**
@@ -77,6 +108,7 @@ export const storage = {
     if (typeof window === 'undefined') return;
 
     localStorage.removeItem(key);
+    notifyStorageChanged(key);
   },
 
   /**
@@ -86,6 +118,7 @@ export const storage = {
     if (typeof window === 'undefined') return;
 
     localStorage.clear();
+    notifyStorageChanged(null);
   },
 
   /**

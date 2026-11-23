@@ -59,22 +59,19 @@
       "title": "Partager le jeu",
       "description": "Invitez vos proches à tester leurs compétences en prebunking.",
       "action": "Partager le jeu",
-      "shareTitle": "CTRL + ALT + PREBUNK",
-      "shareText": "Saurez-vous repérer la désinformation avant qu’elle se propage ? Essayez CTRL + ALT + PREBUNK."
+      "shareTitle": "CTRL + ALT + PREBUNK"
     },
     "report": {
       "title": "Partager le Rapport sur les catastrophes dans le monde",
       "description": "Le rapport de la FICR derrière les faits de cette simulation.",
       "action": "Partager le rapport",
-      "shareTitle": "Rapport sur les catastrophes dans le monde",
-      "shareText": "Lisez le Rapport sur les catastrophes dans le monde de la FICR."
+      "shareTitle": "Rapport sur les catastrophes dans le monde"
     },
     "academy": {
       "title": "Partager les ressources de la Solferino Academy",
       "description": "Ressources d’apprentissage de la Solferino Academy de la FICR.",
       "action": "Partager la Solferino Academy",
-      "shareTitle": "IFRC Solferino Academy",
-      "shareText": "Découvrez les ressources d’apprentissage de la Solferino Academy de la FICR."
+      "shareTitle": "IFRC Solferino Academy"
     },
     "progress": {
       "title": "Partager ma progression",

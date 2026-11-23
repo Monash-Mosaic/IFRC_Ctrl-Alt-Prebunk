@@ -80,11 +80,8 @@ describe('ShareContent', () => {
 
     await user.click(screen.getByRole('button', { name: action }));
 
-    expect(share).toHaveBeenCalledWith({
-      title: `${key}.shareTitle`,
-      text: `${key}.shareText`,
-      url,
-    });
+    // Exactly the title and the link: no extra text that a "Copy" target would glue onto the URL.
+    expect(share).toHaveBeenCalledWith({ title: `${key}.shareTitle`, url });
     expect(await screen.findByRole('alert')).toHaveTextContent('feedback.shared');
   });
 

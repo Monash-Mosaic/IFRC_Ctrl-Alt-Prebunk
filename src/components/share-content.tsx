@@ -70,11 +70,7 @@ export default function ShareContent() {
   const handleCloseToast = useCallback(() => setToastMessage(null), []);
 
   const handleShareLink = async (key: LinkKey, url: string) => {
-    const result: ShareLinkResult = await shareLink({
-      title: t(`${key}.shareTitle`),
-      text: t(`${key}.shareText`),
-      url,
-    });
+    const result: ShareLinkResult = await shareLink({ title: t(`${key}.shareTitle`), url });
     setManualLinkKey(result === 'failed' ? key : null);
     setToastMessage(t(result === 'failed' ? 'feedback.linkFailed' : `feedback.${result}`));
   };

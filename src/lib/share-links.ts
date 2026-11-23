@@ -8,9 +8,13 @@ export const SOLFERINO_ACADEMY_URL = 'https://solferinoacademy.com/';
 
 export type ShareLinkResult = 'shared' | 'copied' | 'cancelled' | 'failed';
 
+/**
+ * Only a title and the URL: no `text`. Share targets such as "Copy" in the
+ * Windows/macOS share sheet join `text` and `url` into one string, which breaks
+ * the link when it is pasted. Link previews come from the destination page itself.
+ */
 interface ShareLinkData {
   title: string;
-  text: string;
   url: string;
 }
 
@@ -20,10 +24,12 @@ interface ShareLinkData {
  */
 export async function shareLink(data: ShareLinkData): Promise<ShareLinkResult> {
   if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
-    const canShare = typeof navigator.canShare !== 'function' || navigator.canShare(data);
+    // Pass exactly title + url, even if a caller's object carries more fields.
+    const shareData: ShareData = { title: data.title, url: data.url };
+    const canShare = typeof navigator.canShare !== 'function' || navigator.canShare(shareData);
     if (canShare) {
       try {
-        await navigator.share(data);
+        await navigator.share(shareData);
         return 'shared';
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') return 'cancelled';

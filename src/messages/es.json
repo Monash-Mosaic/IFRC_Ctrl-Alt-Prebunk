@@ -59,22 +59,19 @@
       "title": "Compartir el juego",
       "description": "Invita a tus amistades a poner a prueba su capacidad de prebunking.",
       "action": "Compartir el juego",
-      "shareTitle": "CTRL + ALT + PREBUNK",
-      "shareText": "¿Puedes detectar la desinformación antes de que se propague? Prueba CTRL + ALT + PREBUNK."
+      "shareTitle": "CTRL + ALT + PREBUNK"
     },
     "report": {
       "title": "Compartir el Informe Mundial sobre Desastres",
       "description": "El informe de la IFRC detrás de los datos de esta simulación.",
       "action": "Compartir el informe",
-      "shareTitle": "Informe Mundial sobre Desastres",
-      "shareText": "Lee el Informe Mundial sobre Desastres de la IFRC."
+      "shareTitle": "Informe Mundial sobre Desastres"
     },
     "academy": {
       "title": "Compartir recursos de la Solferino Academy",
       "description": "Recursos de aprendizaje de la IFRC Solferino Academy.",
       "action": "Compartir Solferino Academy",
-      "shareTitle": "IFRC Solferino Academy",
-      "shareText": "Explora los recursos de aprendizaje de la IFRC Solferino Academy."
+      "shareTitle": "IFRC Solferino Academy"
     },
     "progress": {
       "title": "Compartir mi progreso",

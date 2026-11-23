@@ -1,6 +1,6 @@
 import { shareLink } from '@/lib/share-links';
 
-const DATA = { title: 'Title', text: 'Text', url: 'https://example.org/' };
+const DATA = { title: 'Title', url: 'https://example.org/' };
 
 function setNavigator(props: Partial<Record<'share' | 'canShare' | 'clipboard', unknown>>) {
   for (const key of ['share', 'canShare', 'clipboard'] as const) {
@@ -68,6 +68,19 @@ describe('shareLink', () => {
     } finally {
       Object.defineProperty(document, 'execCommand', { configurable: true, value: undefined });
     }
+  });
+
+  it('never sends text alongside the link, so a "Copy" share target yields just the URL', async () => {
+    const share = jest.fn().mockResolvedValue(undefined);
+    const canShare = jest.fn(() => true);
+    setNavigator({ share, canShare });
+
+    // Even if a caller passes extra fields, only title + url reach the share sheet.
+    await shareLink({ ...DATA, text: 'Can you spot misinformation?' } as typeof DATA);
+
+    expect(canShare).toHaveBeenCalledWith(DATA);
+    expect(share).toHaveBeenCalledWith(DATA);
+    expect(share.mock.calls[0][0]).not.toHaveProperty('text');
   });
 
   it('reports failure when neither sharing nor copying is possible', async () => {

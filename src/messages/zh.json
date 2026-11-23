@@ -59,22 +59,19 @@
       "title": "分享游戏",
       "description": "邀请朋友测试他们的预防性辟谣能力。",
       "action": "分享游戏",
-      "shareTitle": "CTRL + ALT + PREBUNK",
-      "shareText": "你能在虚假信息传播前识别它吗？来试试 CTRL + ALT + PREBUNK。"
+      "shareTitle": "CTRL + ALT + PREBUNK"
     },
     "report": {
       "title": "分享《世界灾害报告》",
       "description": "本模拟中事实依据所来自的红十字与红新月联会报告。",
       "action": "分享报告",
-      "shareTitle": "世界灾害报告",
-      "shareText": "阅读红十字与红新月联会的《世界灾害报告》。"
+      "shareTitle": "世界灾害报告"
     },
     "academy": {
       "title": "分享 Solferino Academy 资源",
       "description": "来自红十字与红新月联会 Solferino Academy 的学习资源。",
       "action": "分享 Solferino Academy",
-      "shareTitle": "IFRC Solferino Academy",
-      "shareText": "探索红十字与红新月联会 Solferino Academy 的学习资源。"
+      "shareTitle": "IFRC Solferino Academy"
     },
     "progress": {
       "title": "分享我的进度",

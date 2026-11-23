@@ -59,22 +59,19 @@
       "title": "Поделиться игрой",
       "description": "Пригласите друзей проверить свои навыки пребанкинга.",
       "action": "Поделиться игрой",
-      "shareTitle": "CTRL + ALT + PREBUNK",
-      "shareText": "Сможете распознать дезинформацию до того, как она распространится? Попробуйте CTRL + ALT + PREBUNK."
+      "shareTitle": "CTRL + ALT + PREBUNK"
     },
     "report": {
       "title": "Поделиться Докладом о бедствиях в мире",
       "description": "Доклад МФОКК, на котором основаны факты этой симуляции.",
       "action": "Поделиться докладом",
-      "shareTitle": "Доклад о бедствиях в мире",
-      "shareText": "Прочитайте Доклад МФОКК о бедствиях в мире."
+      "shareTitle": "Доклад о бедствиях в мире"
     },
     "academy": {
       "title": "Поделиться ресурсами Solferino Academy",
       "description": "Учебные материалы IFRC Solferino Academy.",
       "action": "Поделиться Solferino Academy",
-      "shareTitle": "IFRC Solferino Academy",
-      "shareText": "Изучите учебные материалы IFRC Solferino Academy."
+      "shareTitle": "IFRC Solferino Academy"
     },
     "progress": {
       "title": "Поделиться прогрессом",
