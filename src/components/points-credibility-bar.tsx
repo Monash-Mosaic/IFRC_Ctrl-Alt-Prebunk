@@ -2,7 +2,7 @@
 
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import { useAlexChat } from '@/lib/use-alex-chat';
-import { getQuizScore, useFeedCorrectAnswers } from '@/lib/use-game-store';
+import { getQuizScore, useCompletedFeedTotal, useFeedCorrectAnswers } from '@/lib/use-game-store';
 import { useTranslations, useLocale } from 'next-intl';
 import CONTENTS from '@/contents';
 
@@ -12,11 +12,12 @@ export default function PointsCredibilityBar() {
   const { credibility, initialCredibility } = useCredibilityStore((state) => state);
   const [alexChat] = useAlexChat();
   const feedCorrectAnswers = useFeedCorrectAnswers();
+  const completedFeedTotal = useCompletedFeedTotal();
 
   const credibilityPercentage = (credibility / Math.max(initialCredibility, 1)) * 100;
   const { correctAnswers, totalQuestions } = getQuizScore(
     feedCorrectAnswers,
-    CONTENTS[locale as keyof typeof CONTENTS].contentList.length,
+    completedFeedTotal ?? CONTENTS[locale as keyof typeof CONTENTS].contentList.length,
     alexChat.reply
   );
 

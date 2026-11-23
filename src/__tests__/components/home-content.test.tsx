@@ -201,6 +201,11 @@ jest.mock('@/contents', () => ({
         {
           id: 'share-1',
           type: 'share',
+          post: {
+            id: 'share-1',
+            user: { id: 'echo', name: 'Echo', handle: '@echo', avatar: null, isUser: false },
+            content: <div>Share content</div>,
+          },
           correctAnswer: 'share' as const,
           whyCorrectAnswer: {
             title: <div>Share Correct Title</div>,
@@ -368,11 +373,13 @@ describe('HomeContent', () => {
     expect(screen.queryByTestId('post-2')).not.toBeInTheDocument();
   });
 
-  it('does not route dormant Share content to Like/Report', () => {
+  it('renders Share and Scroll choices instead of Like/Report for Share content', () => {
     mockIsAnswered.mockReturnValue(true);
     render(<HomeContent />);
 
     expect(screen.queryByTestId('post-share-1')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'share' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'skip' })).toBeInTheDocument();
     expect(screen.getByTestId('mcq-post-mcq-1')).toBeInTheDocument();
     expect(screen.getByTestId('post-1')).toBeInTheDocument();
     expect(screen.getByTestId('post-2')).toBeInTheDocument();
