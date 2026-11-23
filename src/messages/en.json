@@ -5,7 +5,17 @@
     "analytics": "Analytics",
     "share": "Share",
     "profile": "Profile",
+    "contactUs": "Contact Us",
     "lockedDuringQuiz": "Finish the current simulation to open {page}."
+  },
+  "contact": {
+    "title": "Contact us about training",
+    "description": "Interested in using Prebunk for training?",
+    "instruction": "Email the IFRC Solferino Academy at the\naddress below.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyFailed": "Couldn't copy automatically. Please select the address and copy it manually.",
+    "close": "Close"
   },
   "header": {
     "score": "Score",

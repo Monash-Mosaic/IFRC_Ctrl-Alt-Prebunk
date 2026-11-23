@@ -3,7 +3,8 @@
 import { type Ref, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, type routing, usePathname } from '@/i18n/routing';
-import { Home, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
+import { Home, Mail, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
+import ContactUsModal from '@/components/contact-us-modal';
 import Toast from '@/components/toast';
 import { useAlexChat } from '@/lib/use-alex-chat';
 import { useGameCompleted, useQuizInProgress } from '@/lib/use-game-store';
@@ -30,7 +31,7 @@ function AlexNotice({
       className={
         variant === 'side'
           ? 'absolute top-1/2 z-50 w-max max-w-[14rem] -translate-y-1/2 ltr:left-full ltr:ml-3 rtl:right-full rtl:mr-3'
-          : 'absolute bottom-full left-1/2 z-50 mb-3 w-max max-w-[14rem] -translate-x-1/2'
+          : 'absolute bottom-full left-1/2 z-50 mb-3 w-max max-w-[min(14rem,calc(50vw-1rem))] -translate-x-1/2'
       }
     >
       <div className="relative">
@@ -72,6 +73,42 @@ interface NavItem {
   activeIcon: React.ReactNode;
 }
 
+const mobileItemClass =
+  'group flex h-full w-full min-w-0 flex-col items-center gap-1 rounded-lg px-0.5 pt-2.5 transition-colors';
+const mobileLabelClass =
+  'w-full text-center text-[10px] leading-[13px] font-medium wrap-anywhere min-[360px]:text-[11px]';
+
+function ContactUsButton({
+  label,
+  mobile,
+  onOpen,
+}: {
+  label: string;
+  mobile?: boolean;
+  onOpen: () => void;
+}) {
+  const layoutClass = mobile
+    ? mobileItemClass
+    : 'group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors';
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-haspopup="dialog"
+      className={`${layoutClass} text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)`}
+    >
+      <Mail
+        size={24}
+        strokeWidth={2}
+        className="shrink-0 transition-transform group-hover:scale-110"
+        aria-hidden
+      />
+      <span className={mobile ? mobileLabelClass : 'text-[11px] font-medium'}>{label}</span>
+    </button>
+  );
+}
+
 export default function Navigation() {
   const t = useTranslations('nav');
   const alexT = useTranslations('chat.alex');
@@ -81,6 +118,7 @@ export default function Navigation() {
   const mobileNavRef = useRef<HTMLElement>(null);
   const mobileNoticeRef = useRef<HTMLDivElement>(null);
   const [noticeDismissed, setNoticeDismissed] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
   const [wasNotified, setWasNotified] = useState(alexChat.notified);
   const quizInProgress = useQuizInProgress();
   const [lockedMessage, setLockedMessage] = useState<string | null>(null);
@@ -209,6 +247,7 @@ export default function Navigation() {
               </div>
             );
           })}
+          <ContactUsButton label={t('contactUs')} onOpen={() => setIsContactOpen(true)} />
         </nav>
       </aside>
 
@@ -217,17 +256,18 @@ export default function Navigation() {
         ref={mobileNavRef}
         className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E8E9ED] bg-white md:hidden"
       >
-        <div className="flex h-16 items-center justify-around px-2">
+        {/* Offset the row toward its start to balance the wider Contact Us label. */}
+        <div className="grid h-16 grid-cols-6 pe-3.5 min-[360px]:ps-[5px] min-[360px]:pe-[19px]">
           {navItems.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
 
             return (
-              <div key={item.href} className="relative">
+              <div key={item.href} className="relative min-w-0">
                 <Link
                   href={item.href}
                   {...lockedLinkProps(item)}
-                  className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
+                  className={`${mobileItemClass} ${
                     isLocked(item.href)
                       ? 'cursor-not-allowed text-(--color-ifrc-blue) opacity-40'
                       : isActive
@@ -235,10 +275,10 @@ export default function Navigation() {
                         : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
                   }`}
                 >
-                  <span className="transition-transform group-hover:scale-110">
+                  <span className="shrink-0 transition-transform group-hover:scale-110">
                     {isActive ? item.activeIcon : item.icon}
                   </span>
-                  <span className="text-[11px] font-medium">{t(item.labelKey)}</span>
+                  <span className={mobileLabelClass}>{t(item.labelKey)}</span>
                 </Link>
                 {showAlexNotice && item.href === '/chat' && (
                   <AlexNotice
@@ -252,10 +292,12 @@ export default function Navigation() {
               </div>
             );
           })}
+          <ContactUsButton mobile label={t('contactUs')} onOpen={() => setIsContactOpen(true)} />
         </div>
         {/* Safe area for devices with home indicator */}
         <div className="h-safe-area bg-white" />
       </nav>
+      <ContactUsModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
 
       <Toast
         message={lockedMessage ?? ''}
