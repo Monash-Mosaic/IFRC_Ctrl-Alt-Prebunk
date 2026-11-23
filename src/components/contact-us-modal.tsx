@@ -57,6 +57,7 @@ export default function ContactUsModal({ isOpen, onClose }: ContactUsModalProps)
           <div>
             <h2 className="text-xl font-semibold text-[#011E41]">{t('title')}</h2>
             <p className="mt-1 text-sm leading-6 text-slate-600">{t('description')}</p>
+            <p className="text-sm leading-6 text-slate-600">{t('instruction')}</p>
           </div>
           <button
             type="button"

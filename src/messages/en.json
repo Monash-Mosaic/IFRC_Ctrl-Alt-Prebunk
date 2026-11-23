@@ -9,7 +9,8 @@
   },
   "contact": {
     "title": "Contact us about training",
-    "description": "Interested in using Prebunk for training? Email the IFRC Solferino Academy at the address below.",
+    "description": "Interested in using Prebunk for training?",
+    "instruction": "Email the IFRC Solferino Academy at the address below.",
     "copy": "Copy",
     "copied": "Copied",
     "copyFailed": "Couldn't copy automatically. Please select the address and copy it manually.",
