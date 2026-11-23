@@ -9,17 +9,11 @@
   },
   "contact": {
     "title": "Contact us about training",
-    "description": "Interested in using Prebunk for training? Send us your details and we'll get back to you.",
-    "email": "Email",
-    "name": "Name",
-    "country": "Country",
-    "message": "Message",
-    "characterCount": "{count}/{max}",
-    "submit": "Submit",
-    "submitting": "Sending...",
-    "close": "Close",
-    "success": "Thanks! Your enquiry has been sent.",
-    "error": "Sorry, your enquiry couldn't be sent. Please try again later."
+    "description": "Interested in using Prebunk for training? Email the IFRC Solferino Academy at the address below.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyFailed": "Couldn't copy automatically. Please select the address and copy it manually.",
+    "close": "Close"
   },
   "header": {
     "score": "Score",
