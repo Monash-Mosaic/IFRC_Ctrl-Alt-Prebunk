@@ -1,12 +1,16 @@
 'use client';
 
-import { type Ref, useLayoutEffect, useRef, useState } from 'react';
+import { type Ref, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, type routing, usePathname } from '@/i18n/routing';
 import { Home, Mail, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
-import { useAlexChat } from '@/lib/use-alex-chat';
-import { useGameCompleted } from '@/lib/use-game-store';
 import ContactUsModal from '@/components/contact-us-modal';
+import Toast from '@/components/toast';
+import { useAlexChat } from '@/lib/use-alex-chat';
+import { useGameCompleted, useQuizInProgress } from '@/lib/use-game-store';
+
+/** Destinations that cannot be opened while a quiz question is in progress. */
+const QUIZ_LOCKED_ROUTES: readonly string[] = ['/profile', '/share'];
 
 function AlexNotice({
   variant,
@@ -116,6 +120,24 @@ export default function Navigation() {
   const [noticeDismissed, setNoticeDismissed] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [wasNotified, setWasNotified] = useState(alexChat.notified);
+  const quizInProgress = useQuizInProgress();
+  const [lockedMessage, setLockedMessage] = useState<string | null>(null);
+  const closeLockedMessage = useCallback(() => setLockedMessage(null), []);
+
+  // While a question is under way these destinations stay closed, so the player
+  // remains on their current question (the link is kept focusable and explains why).
+  const isLocked = (href: NavItem['href']) => quizInProgress && QUIZ_LOCKED_ROUTES.includes(href);
+
+  const lockedLinkProps = (item: NavItem) =>
+    isLocked(item.href)
+      ? {
+          'aria-disabled': true,
+          onClick: (event: React.MouseEvent) => {
+            event.preventDefault();
+            setLockedMessage(t('lockedDuringQuiz', { page: t(item.labelKey) }));
+          },
+        }
+      : {};
 
   if (alexChat.notified !== wasNotified) {
     setWasNotified(alexChat.notified);
@@ -200,10 +222,13 @@ export default function Navigation() {
               <div key={item.href} className="relative">
                 <Link
                   href={item.href}
+                  {...lockedLinkProps(item)}
                   className={`group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 transition-colors ${
-                    isActive
-                      ? 'text-(--color-ifrc-red)'
-                      : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
+                    isLocked(item.href)
+                      ? 'cursor-not-allowed text-(--color-ifrc-blue) opacity-40'
+                      : isActive
+                        ? 'text-(--color-ifrc-red)'
+                        : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
                   }`}
                 >
                   <span className="transition-transform group-hover:scale-110">
@@ -241,10 +266,13 @@ export default function Navigation() {
               <div key={item.href} className="relative min-w-0">
                 <Link
                   href={item.href}
+                  {...lockedLinkProps(item)}
                   className={`${mobileItemClass} ${
-                    isActive
-                      ? 'text-(--color-ifrc-red)'
-                      : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
+                    isLocked(item.href)
+                      ? 'cursor-not-allowed text-(--color-ifrc-blue) opacity-40'
+                      : isActive
+                        ? 'text-(--color-ifrc-red)'
+                        : 'text-(--color-ifrc-blue) hover:text-(--color-ifrc-red)'
                   }`}
                 >
                   <span className="shrink-0 transition-transform group-hover:scale-110">
@@ -270,6 +298,14 @@ export default function Navigation() {
         <div className="h-safe-area bg-white" />
       </nav>
       <ContactUsModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
+
+      <Toast
+        message={lockedMessage ?? ''}
+        isVisible={lockedMessage !== null}
+        onClose={closeLockedMessage}
+        // Sit above the fixed mobile bottom nav (4rem).
+        className="z-[110] max-md:bottom-20"
+      />
     </>
   );
 }

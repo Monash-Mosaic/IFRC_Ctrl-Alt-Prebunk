@@ -64,6 +64,24 @@ describe('useGameStore', () => {
     expect(result.current.answers['post-1']).toBe('like');
   });
 
+  it('preserves a completed score when more feed questions have been added', () => {
+    storage.setItem(STORAGE_KEYS.GAME_STATE, {
+      version: 0,
+      state: {
+        answers: { 'post-1': 'like', 'post-2': 'dislike' },
+        correctAnswers: 2,
+        currentQuestionIndex: 1,
+        gameCompleted: true,
+      },
+    });
+    const game = createGameStore({ questions: ['post-1', 'post-2', 'post-3'] }).getState();
+
+    expect(game.getNumQuestions()).toBe(2);
+    expect(game.setAnswer('post-3', 'like')).toBe(false);
+    game.resetGame();
+    expect(game.getNumQuestions()).toBe(3);
+  });
+
   it('should not overwrite existing answers (immutability)', () => {
     const { result } = renderHook(() => useGameStore());
 

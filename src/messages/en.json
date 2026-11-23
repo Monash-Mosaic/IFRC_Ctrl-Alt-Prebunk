@@ -5,7 +5,8 @@
     "analytics": "Analytics",
     "share": "Share",
     "profile": "Profile",
-    "contactUs": "Contact Us"
+    "contactUs": "Contact Us",
+    "lockedDuringQuiz": "Finish the current simulation to open {page}."
   },
   "contact": {
     "title": "Contact us about training",
@@ -35,6 +36,70 @@
   "underDevelopment": {
     "title": "Under Development",
     "message": "This page is currently under development. Please check back soon!"
+  },
+  "profile": {
+    "title": "Profile",
+    "identityHeading": "Your player profile",
+    "usernameLabel": "Username",
+    "defaultUsername": "Player",
+    "editUsername": "Edit username",
+    "usernameHint": "Up to {max} characters",
+    "usernameRequired": "Please enter a username",
+    "usernameSaved": "Username saved",
+    "save": "Save",
+    "cancel": "Cancel",
+    "avatarLabel": "Choose your avatar",
+    "avatarSaved": "Avatar updated",
+    "score": "Score",
+    "credibility": "Credibility",
+    "progressNote": "Changing your profile does not affect your score, credibility or progress.",
+    "avatars": {
+      "green": "Green",
+      "blue": "Blue",
+      "navy": "Navy",
+      "red": "Red",
+      "yellow": "Yellow",
+      "purple": "Purple"
+    }
+  },
+  "sharePage": {
+    "title": "Share",
+    "subtitle": "Help others slow down before they share. Pass on the game, the evidence and your result.",
+    "game": {
+      "title": "Share the game",
+      "description": "Invite friends to test their prebunking skills.",
+      "action": "Share the game",
+      "shareTitle": "CTRL + ALT + PREBUNK"
+    },
+    "report": {
+      "title": "Share the World Disasters Report",
+      "description": "The IFRC report behind the facts in this simulation.",
+      "action": "Share the report",
+      "shareTitle": "World Disasters Report"
+    },
+    "academy": {
+      "title": "Share Solferino Academy resources",
+      "description": "Learning resources from the IFRC Solferino Academy.",
+      "action": "Share Solferino Academy",
+      "shareTitle": "IFRC Solferino Academy"
+    },
+    "progress": {
+      "title": "Share my progress",
+      "action": "Share my progress",
+      "result": "Your result: {score}",
+      "locked": "Finish the simulation to share your result."
+    },
+    "feedback": {
+      "shared": "Shared successfully",
+      "copied": "Link copied to clipboard",
+      "cancelled": "Sharing cancelled",
+      "downloaded": "Image downloaded",
+      "failed": "Could not share. Please try again.",
+      "linkFailed": "Could not share automatically. Use the link below.",
+      "copyLink": "Copy link",
+      "linkLabel": "Link to share",
+      "manualCopy": "Link selected. Press Ctrl+C (or long-press) to copy."
+    }
   },
   "metadata": {
     "title": "CTRL + ALT + PREBUNK",
@@ -125,14 +190,34 @@
   },
   "feed": {
     "viewResults": "View results",
-    "feedComplete": "You’ve completed all five feed questions.",
+    "feedComplete": "You’ve completed all the feed questions.",
     "openAlexMessage": "Open Alex’s message",
     "alexUnavailable": "Alex’s question is unavailable.",
     "scrollHint": "Scroll to see more",
     "lockedHint": "Answer this post to unlock the next one",
+    "finishFeedHint": "Answer to finish the feed",
     "blockedScroll": "Answer this post first to keep scrolling",
     "answerToContinue": "Please engage with this post before moving to the next one",
     "alreadyLast": "You're already on the last post",
     "alreadyFirst": "You're already on the first post"
+  },
+  "shareQuestion": {
+    "prompt": "Will you share or scroll?",
+    "share": "Share",
+    "skip": "Scroll past",
+    "sharedPost": "You shared a post with {friend}",
+    "friendReplied": "{friend} replied",
+    "badgeExample": "Verification badge example",
+    "exampleAccount": "Example organisation",
+    "exampleHandle": "@example_org",
+    "verifiedBadge": "Verification badge"
+  },
+  "commentQuestion": {
+    "comments": "Comments",
+    "readAndReply": "Read the comments and decide how you’d respond.",
+    "close": "Back to the feed",
+    "prompt": "Which reply would you post?",
+    "yourReply": "Your reply",
+    "feedback": "Game feedback"
   }
 }

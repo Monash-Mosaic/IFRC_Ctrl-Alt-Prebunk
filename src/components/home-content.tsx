@@ -9,9 +9,10 @@ import { useLocalStorage } from '@/lib/use-local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import CONTENTS from '@/contents';
-import { type Content, ContentType, type LikeDislikeContent, type MCQContent } from '@/contents/en';
+import { type Content, ContentType } from '@/contents/en';
 import { createGameStore, getQuizScore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
+import { useProfileStore } from '@/lib/use-profile-store';
 import GameComplete from '@/components/game-complete';
 import { Link } from '@/i18n/routing';
 
@@ -20,8 +21,18 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import GameFeed, { type GameFeedHandle } from '@/components/game-feed';
 import LikeDislikePostMessage from '@/components/newfeeds/like-dislike-post-message';
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
+import ShareQuestionPost, { ShareQuestionFeedback } from '@/components/newfeeds/share-question-post';
+import { CommentQuestionDialog, CommentQuestionPost } from '@/components/newfeeds/comment-question';
 import { cn } from '@/lib/utils';
 import Toast from '@/components/toast';
+
+function isCorrectAnswer(question: Content, answer: string) {
+  if (question.type === ContentType.MCQ || question.type === ContentType.COMMENT) {
+    return answer === question.correctOptionId;
+  }
+
+  return answer === question.correctAnswer;
+}
 
 export default function HomeContent() {
   const locale = useLocale();
@@ -39,6 +50,7 @@ export default function HomeContent() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [alexChat, setAlexChat] = useAlexChat();
+  const resetProfile = useProfileStore((state) => state.resetProfile);
   const alexNoticeSent = useRef(false);
 
   useEffect(() => {
@@ -91,6 +103,9 @@ export default function HomeContent() {
   );
   const unlockedPostIds = useMemo(() => unlockedPosts.map((item) => item.id), [unlockedPosts]);
   const isFeedLocked = firstUnansweredIndex !== -1;
+  const isFinalCommentQuestion =
+    firstUnansweredIndex === contentList.length - 1 &&
+    contentList[firstUnansweredIndex]?.type === ContentType.COMMENT;
   const feedFinished = contentList.length > 0 && !isFeedLocked;
   const readyForResults = feedFinished && !modalPostId;
   const alexPending = alexChat.reply === null;
@@ -160,35 +175,26 @@ export default function HomeContent() {
   };
 
   const handleOnAnswer = (postId: string, answer: string) => {
-    // Only allow answer if post is not already answered and is not disabled
-    if (!isAnswered(postId) && !isPostDisabled(postId)) {
-      setAnswer(postId, answer);
+    const question: Content | undefined = contentList.find((item) => item.id === postId);
+    if (!question || isAnswered(postId) || isPostDisabled(postId)) return;
+    if (setAnswer(postId, answer) === false) return;
 
-      // Find the content item to check correctness
-      const contentItem = contentList.find((item) => item.id === postId) as Content | undefined;
-      if (!contentItem) return;
-
-      const isCorrect =
-        contentItem.type === ContentType.MCQ
-          ? answer === (contentItem as MCQContent).correctOptionId
-          : answer === (contentItem as LikeDislikeContent).correctAnswer;
-
-      if (isCorrect) {
-        increaseCredibility();
-        addPoints(5);
-        incrCorrectAnswers();
-      } else {
-        decreaseCredibility();
-      }
-
-      // Show modal after answer is set
-      setModalPostId(postId);
+    if (isCorrectAnswer(question, answer)) {
+      increaseCredibility();
+      addPoints(5);
+      incrCorrectAnswers();
+    } else {
+      decreaseCredibility();
     }
+
+    setModalPostId(postId);
   };
 
   const handleRestartSimulation = () => {
     resetGame();
     resetCredibility(contentList.length);
+    // FR9: Restart simulation also returns the player to the default username and avatar.
+    resetProfile();
     setOnboardingCompleted(false);
     alexNoticeSent.current = false;
     setAlexChat(defaultAlexChatState);
@@ -246,13 +252,13 @@ export default function HomeContent() {
   }
 
   const renderPost = (_postId: string, index: number) => {
-    const contentItem = unlockedPosts[index] as Content | undefined;
+    const contentItem: Content | undefined = unlockedPosts[index];
     if (!contentItem) return null;
     const answer = getAnswer(contentItem.id);
     const isDisabled = isPostDisabled(contentItem.id);
 
     if (contentItem.type === ContentType.MCQ) {
-      const mcq = contentItem as MCQContent;
+      const mcq = contentItem;
       return (
         <MCQPostMessage
           postId={mcq.id}
@@ -270,7 +276,7 @@ export default function HomeContent() {
     }
 
     if (contentItem.type === ContentType.LIKE_DISLIKE) {
-      const likeDislike = contentItem as LikeDislikeContent;
+      const likeDislike = contentItem;
       return (
         <LikeDislikePostMessage
           postId={likeDislike.id}
@@ -287,8 +293,38 @@ export default function HomeContent() {
       );
     }
 
+    if (contentItem.type === ContentType.SHARE) {
+      return (
+        <ShareQuestionPost
+          question={contentItem}
+          answer={answer}
+          disabled={isDisabled}
+          onAnswer={handleOnAnswer}
+        />
+      );
+    }
+
+    if (contentItem.type === ContentType.COMMENT) {
+      return (
+        <CommentQuestionPost
+          question={contentItem}
+          answered={answer !== null}
+          disabled={isDisabled}
+          onOpen={() => setModalPostId(contentItem.id)}
+        />
+      );
+    }
+
     return null;
   };
+
+  const modalQuestion: Content | undefined = contentList.find((item) => item.id === modalPostId);
+  const modalAnswer = modalQuestion ? getAnswer(modalQuestion.id) : null;
+  const isModalAnswerCorrect =
+    modalQuestion && modalAnswer ? isCorrectAnswer(modalQuestion, modalAnswer) : null;
+  const modalFeedback = isModalAnswerCorrect
+    ? modalQuestion?.whyCorrectAnswer
+    : modalQuestion?.whyIncorrectAnswer;
 
   const completionActions = readyForResults && alexPending && (
     <section
@@ -333,7 +369,9 @@ export default function HomeContent() {
         <div
           className={cn(
             'flex h-full min-h-0 w-full flex-1 flex-col',
-            'md:w-auto md:flex-row md:items-stretch md:justify-center md:gap-4'
+            'md:w-auto md:flex-row md:items-stretch md:justify-center md:gap-4',
+            modalQuestion?.type === ContentType.COMMENT &&
+              'lg:ltr:-translate-x-[11.5rem] lg:rtl:translate-x-[11.5rem]'
           )}
         >
           {/* Feed column; the toast is anchored here so it is centred under the post, not the viewport */}
@@ -345,7 +383,7 @@ export default function HomeContent() {
               postIds={unlockedPostIds}
               renderPost={(postId, index) => {
                 const post = renderPost(postId, index);
-                if (!completionActions) return post;
+                if (!completionActions || index !== contentList.length - 1) return post;
 
                 return (
                   <div className="my-auto flex shrink-0 flex-col gap-3 max-md:pb-[max(0px,calc(var(--mobile-feed-bottom,4rem)-4.5rem))]">
@@ -357,7 +395,7 @@ export default function HomeContent() {
               isLocked={isFeedLocked}
               labels={{
                 scrollHint: feedT('scrollHint'),
-                lockedHint: feedT('lockedHint'),
+                lockedHint: feedT(isFinalCommentQuestion ? 'finishFeedHint' : 'lockedHint'),
               }}
               onActiveIndexChange={handleActiveIndexChange}
               onBlockedScrollAttempt={handleBlockedScrollAttempt}
@@ -371,8 +409,13 @@ export default function HomeContent() {
             />
           </div>
 
-          {/* Desktop only — stays visible behind modal; overlay (z-[100]) blocks interaction */}
-          <div className="relative z-10 hidden h-full shrink-0 flex-col items-center justify-center gap-4 md:flex md:py-2 md:pl-1">
+          {/* On wide screens the comments panel occupies the space beside the post. */}
+          <div
+            className={cn(
+              'relative z-10 hidden h-full shrink-0 flex-col items-center justify-center gap-4 md:flex md:py-2 md:pl-1',
+              modalQuestion?.type === ContentType.COMMENT && 'lg:hidden'
+            )}
+          >
             {/* Up arrow (Previous post) */}
             <button
               type="button"
@@ -415,40 +458,38 @@ export default function HomeContent() {
         </div>
       </div>
 
-      {/* Modal - shown when a post is answered */}
-      {modalPostId &&
-        (() => {
-          const contentItem = contentList.find((item) => item.id === modalPostId) as
-            | Content
-            | undefined;
-          if (!contentItem) return null;
-
-          const modalAnswer = getAnswer(modalPostId);
-          if (!modalAnswer) return null;
-
-          const isCorrect =
-            contentItem.type === ContentType.MCQ
-              ? modalAnswer === (contentItem as MCQContent).correctOptionId
-              : modalAnswer === (contentItem as LikeDislikeContent).correctAnswer;
-          const reasonContent = isCorrect
-            ? contentItem.whyCorrectAnswer.content
-            : contentItem.whyIncorrectAnswer.content;
-          const reasonHeader = isCorrect
-            ? contentItem.whyCorrectAnswer.title
-            : contentItem.whyIncorrectAnswer.title;
-
-          return (
-            <PrebunkingModal
-              isOpen={true}
-              onClose={handleOnCloseModal}
-              onContinue={() => handleOnContinueModal(modalPostId)}
-              postId={modalPostId}
-              content={reasonContent}
-              header={reasonHeader}
-              isCorrect={isCorrect}
-            />
-          );
-        })()}
+      {modalQuestion?.type === ContentType.COMMENT ? (
+        <CommentQuestionDialog
+          question={modalQuestion}
+          answer={modalAnswer}
+          onAnswer={handleOnAnswer}
+          onClose={handleOnCloseModal}
+          onContinue={() => {
+            handleOnContinueModal(modalQuestion.id);
+            handleOnCloseModal();
+          }}
+        />
+      ) : modalQuestion && modalFeedback && isModalAnswerCorrect !== null ? (
+        <PrebunkingModal
+          isOpen
+          onClose={handleOnCloseModal}
+          onContinue={() => handleOnContinueModal(modalQuestion.id)}
+          postId={modalQuestion.id}
+          content={
+            modalQuestion.type === ContentType.SHARE ? (
+              <ShareQuestionFeedback
+                question={modalQuestion}
+                shared={modalAnswer === 'share'}
+                explanation={modalFeedback.content}
+              />
+            ) : (
+              modalFeedback.content
+            )
+          }
+          header={modalFeedback.title}
+          isCorrect={isModalAnswerCorrect}
+        />
+      ) : null}
     </div>
   );
 }
