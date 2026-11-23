@@ -71,7 +71,8 @@ interface NavItem {
 
 const mobileItemClass =
   'group flex h-full w-full min-w-0 flex-col items-center gap-1 rounded-lg px-0.5 pt-2.5 transition-colors';
-const mobileLabelClass = 'w-full text-center text-[11px] leading-[13px] font-medium wrap-anywhere';
+const mobileLabelClass =
+  'w-full text-center text-[10px] leading-[13px] font-medium wrap-anywhere min-[360px]:text-[11px]';
 
 function ContactUsButton({
   label,
@@ -230,7 +231,7 @@ export default function Navigation() {
         ref={mobileNavRef}
         className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E8E9ED] bg-white md:hidden"
       >
-        <div className="grid h-16 grid-cols-6">
+        <div className="grid h-16 grid-cols-6 px-1 min-[360px]:px-3">
           {navItems.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));

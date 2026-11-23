@@ -45,51 +45,50 @@ export default function ContactUsModal({ isOpen, onClose }: ContactUsModalProps)
     <Modal
       isOpen={isOpen}
       onRequestClose={handleClose}
-      className="fixed inset-0 z-100 flex items-start justify-center overflow-y-auto p-2 pt-20 pb-24 outline-none sm:items-center sm:px-4 sm:py-4"
-      overlayClassName="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
+      className="my-auto w-full max-w-lg rounded-3xl bg-white p-5 shadow-2xl outline-none sm:p-6"
+      overlayClassName="fixed inset-0 z-[100] flex justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm"
       contentLabel={t('title')}
       shouldCloseOnOverlayClick={true}
       shouldCloseOnEsc={true}
     >
-      <div className="relative w-full max-w-lg rounded-[1.5rem] bg-white p-4 shadow-2xl sm:rounded-[2rem] sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-semibold text-[#011E41]">{t('title')}</h2>
-            <p className="mt-1 text-sm leading-6 text-slate-600">{t('description')}</p>
-            <p className="text-sm leading-6 text-slate-600">{t('instruction')}</p>
-          </div>
-          <button
-            type="button"
-            onClick={handleClose}
-            aria-label={t('close')}
-            className="rounded-full p-2 text-slate-700 transition hover:bg-slate-100"
-          >
-            <X size={20} aria-hidden />
-          </button>
-        </div>
-
-        <div className="mt-5 flex flex-col gap-3 rounded-lg border border-[#E8E9ED] p-3 sm:flex-row sm:items-center sm:justify-between">
-          <a
-            href={`mailto:${CONTACT_EMAIL}`}
-            className="break-all text-base font-medium text-(--color-ifrc-blue) underline-offset-2 hover:underline"
-          >
-            {CONTACT_EMAIL}
-          </a>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-(--color-ifrc-red) px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-          >
-            {copyStatus === 'copied' ? <Check size={16} aria-hidden /> : <Copy size={16} aria-hidden />}
-            {copyStatus === 'copied' ? t('copied') : t('copy')}
-          </button>
-        </div>
-
-        <p role="status" className="mt-2 min-h-5 text-sm text-slate-600">
-          {copyStatus === 'copied' && <span className="sr-only">{t('copied')}</span>}
-          {copyStatus === 'failed' && t('copyFailed')}
-        </p>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-xl leading-6 font-semibold text-(--color-ifrc-blue)">{t('title')}</h2>
+        <button
+          type="button"
+          onClick={handleClose}
+          aria-label={t('close')}
+          className="-me-2.5 flex size-11 shrink-0 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100"
+        >
+          <X size={20} aria-hidden />
+        </button>
       </div>
+
+      <div className="mt-1 space-y-1 text-sm leading-5 text-slate-600">
+        <p>{t('description')}</p>
+        <p>{t('instruction')}</p>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <a
+          href={`mailto:${CONTACT_EMAIL}`}
+          className="text-base font-medium wrap-anywhere text-(--color-ifrc-blue) underline-offset-2 hover:underline"
+        >
+          {CONTACT_EMAIL}
+        </a>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-(--color-ifrc-red) px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+        >
+          {copyStatus === 'copied' ? <Check size={16} aria-hidden /> : <Copy size={16} aria-hidden />}
+          {copyStatus === 'copied' ? t('copied') : t('copy')}
+        </button>
+      </div>
+
+      <p role="status" className={copyStatus === 'failed' ? 'mt-2 text-sm text-slate-600' : 'sr-only'}>
+        {copyStatus === 'copied' && t('copied')}
+        {copyStatus === 'failed' && t('copyFailed')}
+      </p>
     </Modal>
   );
 }
