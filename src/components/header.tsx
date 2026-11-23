@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import { ContactUsButton } from './contact-us-modal';
 import Title from './title';
 
 export default async function Header() {
@@ -9,7 +8,7 @@ export default async function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white">
-      <div className="grid h-full grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center px-2 md:flex md:justify-between md:px-6">
+      <div className="flex h-full items-center justify-center md:justify-between md:px-6">
         {/* Left: IFRC Logo (hidden on mobile) */}
         <div className="hidden items-center gap-2 md:flex">
           <div className="flex items-center gap-1">
@@ -26,7 +25,7 @@ export default async function Header() {
         </div>
 
         {/* Center: Title */}
-        <div className="col-start-2 flex min-w-0 items-center gap-2 max-md:mx-auto max-md:w-full max-md:max-w-[278px]">
+        <div className="flex items-center gap-2">
           <Link href="/" className="w-full">
             <Title width={'100%'} height={'100%'} />
           </Link>
@@ -47,7 +46,6 @@ export default async function Header() {
             />
           </Link>
         </div>
-        <ContactUsButton variant="header" />
       </div>
     </header>
   );
