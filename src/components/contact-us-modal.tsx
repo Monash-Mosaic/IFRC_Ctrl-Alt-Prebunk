@@ -65,7 +65,7 @@ export default function ContactUsModal({ isOpen, onClose }: ContactUsModalProps)
 
       <div className="mt-1 space-y-1 text-sm leading-5 text-slate-600">
         <p>{t('description')}</p>
-        <p>{t('instruction')}</p>
+        <p className="max-sm:whitespace-pre-line">{t('instruction')}</p>
       </div>
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

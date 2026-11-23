@@ -231,7 +231,8 @@ export default function Navigation() {
         ref={mobileNavRef}
         className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E8E9ED] bg-white md:hidden"
       >
-        <div className="grid h-16 grid-cols-6 px-1 min-[360px]:px-3">
+        {/* Offset the row toward its start to balance the wider Contact Us label. */}
+        <div className="grid h-16 grid-cols-6 pe-3.5 min-[360px]:ps-[5px] min-[360px]:pe-[19px]">
           {navItems.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
