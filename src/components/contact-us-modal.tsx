@@ -63,7 +63,7 @@ export default function ContactUsModal({ isOpen, onClose }: ContactUsModalProps)
         </button>
       </div>
 
-      <div className="mt-1 space-y-1 text-sm leading-5 text-slate-600">
+      <div className="mt-1 text-sm leading-6 text-slate-600">
         <p>{t('description')}</p>
         <p className="max-sm:whitespace-pre-line">{t('instruction')}</p>
       </div>
