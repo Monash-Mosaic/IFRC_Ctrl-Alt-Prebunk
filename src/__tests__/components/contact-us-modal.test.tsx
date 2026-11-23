@@ -2,11 +2,10 @@ import { render, screen, waitFor } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import ContactUsModal from '@/components/contact-us-modal';
 
-const MESSAGE_LIMIT = 500;
+const CONTACT_EMAIL = 'solferino.academy@ifrc.org';
 
 describe('ContactUsModal', () => {
   const onClose = jest.fn();
-  const fetchMock = jest.fn();
 
   beforeAll(() => {
     const root = document.createElement('main');
@@ -15,16 +14,14 @@ describe('ContactUsModal', () => {
   });
 
   beforeEach(() => {
-    fetchMock.mockReset();
     onClose.mockReset();
-    global.fetch = fetchMock as unknown as typeof fetch;
   });
 
-  const fillForm = async (user: ReturnType<typeof userEvent.setup>, message = 'Hello') => {
-    await user.type(screen.getByLabelText('email'), 'visitor@example.org');
-    await user.type(screen.getByLabelText('name'), 'Visitor');
-    await user.type(screen.getByLabelText('country'), 'Australia');
-    await user.type(screen.getByLabelText('message'), message);
+  const mockClipboard = (writeText: jest.Mock) => {
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
   };
 
   it('renders nothing when closed', () => {
@@ -32,66 +29,47 @@ describe('ContactUsModal', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('renders the four required fields and a submit button', () => {
+  it('displays the full IFRC Solferino Academy email address', () => {
     render(<ContactUsModal isOpen onClose={onClose} />);
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByLabelText('email')).toHaveAttribute('type', 'email');
-    for (const field of ['email', 'name', 'country', 'message']) {
-      expect(screen.getByLabelText(field)).toBeRequired();
-    }
-    expect(screen.getByRole('button', { name: 'submit' })).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: CONTACT_EMAIL });
+    expect(link).toHaveAttribute('href', `mailto:${CONTACT_EMAIL}`);
   });
 
-  it('accepts exactly 500 characters and blocks anything longer', async () => {
+  it('copies the full email address and confirms it', async () => {
     const user = userEvent.setup();
     render(<ContactUsModal isOpen onClose={onClose} />);
-    const message = screen.getByLabelText('message');
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    mockClipboard(writeText);
 
-    expect(message).toHaveAttribute('maxLength', String(MESSAGE_LIMIT));
+    await user.click(screen.getByRole('button', { name: 'copy' }));
 
-    await user.click(message);
-    await user.paste('a'.repeat(MESSAGE_LIMIT + 20));
-    expect(message).toHaveValue('a'.repeat(MESSAGE_LIMIT));
+    expect(writeText).toHaveBeenCalledWith(CONTACT_EMAIL);
+    expect(screen.getByRole('status')).toHaveTextContent('copied');
   });
 
-  it('posts the enquiry and shows a success message', async () => {
-    fetchMock.mockResolvedValue({ ok: true });
+  it('resets the copied confirmation after a short delay', async () => {
     const user = userEvent.setup();
     render(<ContactUsModal isOpen onClose={onClose} />);
+    mockClipboard(jest.fn().mockResolvedValue(undefined));
 
-    await fillForm(user);
-    await user.click(screen.getByRole('button', { name: 'submit' }));
+    await user.click(screen.getByRole('button', { name: 'copy' }));
+    expect(screen.getByRole('button', { name: 'copied' })).toBeInTheDocument();
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/contact', expect.objectContaining({ method: 'POST' }));
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
-      email: 'visitor@example.org',
-      name: 'Visitor',
-      country: 'Australia',
-      message: 'Hello',
+    await waitFor(() => expect(screen.getByRole('button', { name: 'copy' })).toBeInTheDocument(), {
+      timeout: 3000,
     });
-    expect(await screen.findByRole('status')).toHaveTextContent('success');
   });
 
-  it('keeps the entered details and shows an error when sending fails', async () => {
-    fetchMock.mockResolvedValue({ ok: false, status: 500 });
+  it('tells the visitor to copy manually when the clipboard is unavailable', async () => {
     const user = userEvent.setup();
     render(<ContactUsModal isOpen onClose={onClose} />);
+    mockClipboard(jest.fn().mockRejectedValue(new Error('denied')));
 
-    await fillForm(user);
-    await user.click(screen.getByRole('button', { name: 'submit' }));
+    await user.click(screen.getByRole('button', { name: 'copy' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('error');
-    expect(screen.getByLabelText('message')).toHaveValue('Hello');
-  });
-
-  it('does not submit when required fields are empty', async () => {
-    const user = userEvent.setup();
-    render(<ContactUsModal isOpen onClose={onClose} />);
-
-    await user.click(screen.getByRole('button', { name: 'submit' }));
-
-    await waitFor(() => expect(fetchMock).not.toHaveBeenCalled());
+    expect(screen.getByRole('status')).toHaveTextContent('copyFailed');
   });
 
   it('calls onClose from the close button', async () => {
