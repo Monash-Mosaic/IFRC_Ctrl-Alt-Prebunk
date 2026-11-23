@@ -9,6 +9,8 @@ import HomeContent from '@/components/home-content';
 import PointsCredibilityBar from '@/components/points-credibility-bar';
 import { defaultAlexChatState, type AlexChatState, STORAGE_KEYS, storage } from '@/lib/local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
+import { DEFAULT_AVATAR_ID, PROFILE_AVATARS } from '@/lib/profile-avatars';
+import { useProfileStore } from '@/lib/use-profile-store';
 
 jest.mock('next-intl', () => ({
   useTranslations: jest.fn(() => (key: string) => key),
@@ -128,12 +130,15 @@ jest.mock('@/components/newfeeds/prebunking-modal', () => {
 
 jest.mock('@/components/chat-content', () => () => <div data-testid="chat-content" />);
 jest.mock('@/components/game-complete', () => {
-  return function MockGameComplete({ correctAnswers, totalQuestions }: any) {
+  return function MockGameComplete({ correctAnswers, totalQuestions, restartGame }: any) {
     return (
       <div data-testid="game-complete">
         <span data-testid="game-score">
           {correctAnswers}/{totalQuestions}
         </span>
+        <button type="button" onClick={restartGame}>
+          restart
+        </button>
       </div>
     );
   };
@@ -247,5 +252,24 @@ describe('HomeContent game completion (real game store)', () => {
     expect(await screen.findByTestId('game-complete')).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'feedComplete' })).not.toBeInTheDocument();
     expect(screen.getByTestId('game-score')).toHaveTextContent('2/3');
+  });
+
+  it('resets the username and avatar along with the game on Restart simulation (FR9)', async () => {
+    act(() => {
+      useProfileStore.setState({ username: 'Sam', avatarId: PROFILE_AVATARS[3].id });
+    });
+    setAlex({ notified: true, reply: 'right' });
+    renderGame();
+    await answerFeed();
+
+    await userEvent.click(await screen.findByRole('button', { name: 'restart' }));
+
+    expect(useProfileStore.getState()).toMatchObject({ username: '', avatarId: DEFAULT_AVATAR_ID });
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEYS.PROFILE) ?? '{}').state).toEqual({
+      username: '',
+      avatarId: DEFAULT_AVATAR_ID,
+    });
+    expect(storage.getItem(STORAGE_KEYS.ALEX_CHAT)).toEqual(defaultAlexChatState);
+    expect(mockSetOnboardingCompleted).toHaveBeenCalledWith(false);
   });
 });

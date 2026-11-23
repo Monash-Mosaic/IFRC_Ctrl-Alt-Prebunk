@@ -12,6 +12,7 @@ import CONTENTS from '@/contents';
 import { type Content, ContentType, type LikeDislikeContent, type MCQContent } from '@/contents/en';
 import { createGameStore, getQuizScore } from '@/lib/use-game-store';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
+import { useProfileStore } from '@/lib/use-profile-store';
 import GameComplete from '@/components/game-complete';
 import { Link } from '@/i18n/routing';
 
@@ -39,6 +40,7 @@ export default function HomeContent() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [alexChat, setAlexChat] = useAlexChat();
+  const resetProfile = useProfileStore((state) => state.resetProfile);
   const alexNoticeSent = useRef(false);
 
   useEffect(() => {
@@ -189,6 +191,8 @@ export default function HomeContent() {
   const handleRestartSimulation = () => {
     resetGame();
     resetCredibility(contentList.length);
+    // FR9: Restart simulation also returns the player to the default username and avatar.
+    resetProfile();
     setOnboardingCompleted(false);
     alexNoticeSent.current = false;
     setAlexChat(defaultAlexChatState);

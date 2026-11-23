@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { type AlexReply, STORAGE_KEYS, storage } from './local-storage';
+import { type AlexReply, STORAGE_KEYS, storage, subscribeToStorageKeys } from './local-storage';
 import type { ContentBase, ContentId } from '@/contents/en';
 
 interface GameState {
@@ -31,7 +31,12 @@ interface GameStore extends GameState {
 const GAME_STATE_CHANGED = 'prebunk:game-state-changed';
 
 function readSavedProgress() {
-  return storage.getItem<{ state?: Partial<GameState> }>(STORAGE_KEYS.GAME_STATE)?.state;
+  try {
+    return storage.getItem<{ state?: Partial<GameState> }>(STORAGE_KEYS.GAME_STATE)?.state;
+  } catch {
+    // Corrupt JSON in storage: treat as no progress rather than crashing the page.
+    return undefined;
+  }
 }
 
 export function isPersistedGameCompleted() {
@@ -64,6 +69,39 @@ export function useFeedCompleted(posts: readonly Pick<ContentBase, 'id'>[]) {
     },
     () => false
   );
+}
+
+function isOnboardingCompleted() {
+  try {
+    return storage.getItem<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED) === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * True while a simulation is under way: from the moment Q1 is shown (onboarding
+ * finished or skipped) until the results screen is reached. Used to keep the
+ * player on their current question (Profile and Share are locked in the navigation).
+ */
+export function isQuizInProgress() {
+  return isOnboardingCompleted() && readSavedProgress()?.gameCompleted !== true;
+}
+
+function subscribeToQuizProgress(listener: () => void) {
+  const unsubscribeGame = subscribeToSavedProgress(listener);
+  const unsubscribeOnboarding = subscribeToStorageKeys(
+    [STORAGE_KEYS.ONBOARDING_COMPLETED],
+    listener
+  );
+  return () => {
+    unsubscribeGame();
+    unsubscribeOnboarding();
+  };
+}
+
+export function useQuizInProgress() {
+  return useSyncExternalStore(subscribeToQuizProgress, isQuizInProgress, () => false);
 }
 
 export function useFeedCorrectAnswers() {
