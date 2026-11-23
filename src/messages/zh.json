@@ -5,7 +5,7 @@
     "analytics": "分析",
     "share": "分享",
     "profile": "个人资料",
-    "lockedDuringQuiz": "请先完成当前模拟，再打开个人资料。"
+    "lockedDuringQuiz": "请先完成当前模拟，再打开{page}。"
   },
   "header": {
     "score": "得分",
@@ -50,6 +50,45 @@
       "red": "红色",
       "yellow": "黄色",
       "purple": "紫色"
+    }
+  },
+  "sharePage": {
+    "title": "分享",
+    "subtitle": "帮助他人在分享前三思。分享游戏、事实依据和你的成绩。",
+    "game": {
+      "title": "分享游戏",
+      "description": "邀请朋友测试他们的预防性辟谣能力。",
+      "action": "分享游戏",
+      "shareTitle": "CTRL + ALT + PREBUNK"
+    },
+    "report": {
+      "title": "分享《世界灾害报告》",
+      "description": "本模拟中事实依据所来自的红十字与红新月联会报告。",
+      "action": "分享报告",
+      "shareTitle": "世界灾害报告"
+    },
+    "academy": {
+      "title": "分享 Solferino Academy 资源",
+      "description": "来自红十字与红新月联会 Solferino Academy 的学习资源。",
+      "action": "分享 Solferino Academy",
+      "shareTitle": "IFRC Solferino Academy"
+    },
+    "progress": {
+      "title": "分享我的进度",
+      "action": "分享我的进度",
+      "result": "你的成绩：{score}",
+      "locked": "完成模拟后即可分享成绩。"
+    },
+    "feedback": {
+      "shared": "分享成功",
+      "copied": "链接已复制到剪贴板",
+      "cancelled": "已取消分享",
+      "downloaded": "图片已下载",
+      "failed": "分享失败，请重试。",
+      "linkFailed": "无法自动分享。请使用下方链接。",
+      "copyLink": "复制链接",
+      "linkLabel": "分享链接",
+      "manualCopy": "链接已选中。按 Ctrl+C（或长按）复制。"
     }
   },
   "metadata": {

@@ -5,7 +5,7 @@
     "analytics": "Analytique",
     "share": "Partager",
     "profile": "Profil",
-    "lockedDuringQuiz": "Terminez la simulation en cours pour ouvrir votre profil."
+    "lockedDuringQuiz": "Terminez la simulation en cours pour ouvrir {page}."
   },
   "header": {
     "score": "Score",
@@ -50,6 +50,45 @@
       "red": "Rouge",
       "yellow": "Jaune",
       "purple": "Violet"
+    }
+  },
+  "sharePage": {
+    "title": "Partager",
+    "subtitle": "Aidez les autres à réfléchir avant de partager. Transmettez le jeu, les preuves et votre résultat.",
+    "game": {
+      "title": "Partager le jeu",
+      "description": "Invitez vos proches à tester leurs compétences en prebunking.",
+      "action": "Partager le jeu",
+      "shareTitle": "CTRL + ALT + PREBUNK"
+    },
+    "report": {
+      "title": "Partager le Rapport sur les catastrophes dans le monde",
+      "description": "Le rapport de la FICR derrière les faits de cette simulation.",
+      "action": "Partager le rapport",
+      "shareTitle": "Rapport sur les catastrophes dans le monde"
+    },
+    "academy": {
+      "title": "Partager les ressources de la Solferino Academy",
+      "description": "Ressources d’apprentissage de la Solferino Academy de la FICR.",
+      "action": "Partager la Solferino Academy",
+      "shareTitle": "IFRC Solferino Academy"
+    },
+    "progress": {
+      "title": "Partager ma progression",
+      "action": "Partager ma progression",
+      "result": "Votre résultat : {score}",
+      "locked": "Terminez la simulation pour partager votre résultat."
+    },
+    "feedback": {
+      "shared": "Partagé avec succès",
+      "copied": "Lien copié dans le presse-papiers",
+      "cancelled": "Partage annulé",
+      "downloaded": "Image téléchargée",
+      "failed": "Échec du partage. Veuillez réessayer.",
+      "linkFailed": "Partage automatique impossible. Utilisez le lien ci-dessous.",
+      "copyLink": "Copier le lien",
+      "linkLabel": "Lien à partager",
+      "manualCopy": "Lien sélectionné. Appuyez sur Ctrl+C (ou appui long) pour le copier."
     }
   },
   "metadata": {

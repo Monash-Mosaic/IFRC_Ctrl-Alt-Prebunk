@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 type EchoAvatarProp = {
   width?: number | string;
   height?: number | string;
@@ -5,6 +7,8 @@ type EchoAvatarProp = {
 };
 
 export default function EchoAvatar({ width = 59, height = 59, fill = 'none' }: EchoAvatarProp) {
+  const maskId = useId();
+
   return (
     <svg
       width={width}
@@ -15,7 +19,7 @@ export default function EchoAvatar({ width = 59, height = 59, fill = 'none' }: E
       aria-hidden="true"
     >
       <mask
-        id="mask0_1009_6853"
+        id={maskId}
         style={{ maskType: 'alpha' } as React.CSSProperties}
         maskUnits="userSpaceOnUse"
         x="0"
@@ -25,7 +29,7 @@ export default function EchoAvatar({ width = 59, height = 59, fill = 'none' }: E
       >
         <circle cx="29.5" cy="29.5" r="29" fill="#D9D9D9" stroke="black" />
       </mask>
-      <g mask="url(#mask0_1009_6853)">
+      <g mask={`url(#${maskId})`}>
         <rect x="-3.5" y="-3.5" width="67" height="89" stroke="#011E41" />
         <path
           fillRule="evenodd"

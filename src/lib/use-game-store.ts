@@ -14,7 +14,7 @@ interface GameState {
 }
 
 interface GameStore extends GameState {
-  setAnswer: (postId: string, answer: string) => void;
+  setAnswer: (postId: string, answer: string) => boolean;
   getAnswer: (postId: string) => string | null;
   isAnswered: (postId: string) => boolean;
   isCurrentQuestionAnswered: () => boolean;
@@ -37,6 +37,12 @@ function readSavedProgress() {
     // Corrupt JSON in storage: treat as no progress rather than crashing the page.
     return undefined;
   }
+}
+
+function getCompletedFeedTotal(state?: Partial<Pick<GameState, 'answers' | 'gameCompleted'>>) {
+  if (!state?.gameCompleted || !state.answers) return null;
+  // Finished sessions retain their original score when new feed questions are added.
+  return Object.keys(state.answers).length || null;
 }
 
 export function isPersistedGameCompleted() {
@@ -64,7 +70,9 @@ export function useFeedCompleted(posts: readonly Pick<ContentBase, 'id'>[]) {
   return useSyncExternalStore(
     subscribeToSavedProgress,
     () => {
-      const answers = readSavedProgress()?.answers;
+      const progress = readSavedProgress();
+      if (progress?.gameCompleted) return true;
+      const answers = progress?.answers;
       return !!answers && posts.length > 0 && posts.every(({ id }) => id in answers);
     },
     () => false
@@ -82,7 +90,7 @@ function isOnboardingCompleted() {
 /**
  * True while a simulation is under way: from the moment Q1 is shown (onboarding
  * finished or skipped) until the results screen is reached. Used to keep the
- * player on their current question (e.g. Profile is locked in the navigation).
+ * player on their current question (Profile and Share are locked in the navigation).
  */
 export function isQuizInProgress() {
   return isOnboardingCompleted() && readSavedProgress()?.gameCompleted !== true;
@@ -109,6 +117,14 @@ export function useFeedCorrectAnswers() {
     subscribeToSavedProgress,
     () => readSavedProgress()?.correctAnswers ?? 0,
     () => 0
+  );
+}
+
+export function useCompletedFeedTotal() {
+  return useSyncExternalStore(
+    subscribeToSavedProgress,
+    () => getCompletedFeedTotal(readSavedProgress()),
+    () => null
   );
 }
 
@@ -142,16 +158,11 @@ export const createGameStore = (initialState?: Partial<GameState>) =>
           return state.questions.slice(0, postIndex).some((id) => !state.answers[id]);
         },
         setAnswer: (postId: string, answer: string) => {
-          const state = get();
-          // Only set answer if not already answered (immutability)
-          if (!state.answers[postId]) {
-            set({
-              answers: {
-                ...state.answers,
-                [postId]: answer,
-              },
-            });
-          }
+          const { answers, gameCompleted } = get();
+          if (gameCompleted || postId in answers) return false;
+
+          set({ answers: { ...answers, [postId]: answer } });
+          return true;
         },
         getAnswer: (postId: string) => {
           const state = get();
@@ -207,7 +218,7 @@ export const createGameStore = (initialState?: Partial<GameState>) =>
         },
         getNumQuestions: () => {
           const state = get();
-          return state.questions.length;
+          return getCompletedFeedTotal(state) ?? state.questions.length;
         },
         resetGame: () => {
           set(initialGameState);

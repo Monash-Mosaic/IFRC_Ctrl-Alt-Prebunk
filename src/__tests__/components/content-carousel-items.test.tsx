@@ -63,6 +63,7 @@ const mcqItem: Content = {
 const shareItem: Content = {
   id: 'share-1',
   type: ContentType.SHARE,
+  post: { id: 'share-1', user: mockUser, content: <div>Share content</div> },
   correctAnswer: 'share',
   whyCorrectAnswer: { title: <div>T</div>, content: <div>C</div> },
   whyIncorrectAnswer: { title: <div>T</div>, content: <div>C</div> },

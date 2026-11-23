@@ -1,4 +1,4 @@
-import { act, render, screen } from '@/test-utils/test-utils';
+import { act, render, screen, within } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import Navigation from '@/components/navigation-bar';
 import { STORAGE_KEYS, storage } from '@/lib/local-storage';
@@ -7,6 +7,11 @@ import { STORAGE_KEYS, storage } from '@/lib/local-storage';
 const mockUsePathname = global.mockUsePathname as unknown as jest.Mock;
 
 describe('Navigation', () => {
+  beforeAll(() => {
+    const root = document.createElement('main');
+    root.id = 'root';
+    document.body.appendChild(root);
+  });
   beforeEach(() => {
     mockUsePathname.mockReturnValue('/');
   });
@@ -104,6 +109,29 @@ describe('Navigation', () => {
         expect(svg).toBeInTheDocument();
       });
     });
+
+    it('shows Contact Us after Profile in the desktop sidebar', () => {
+      render(<Navigation />);
+      const sidebar = within(screen.getByRole('complementary'));
+      const contactButton = sidebar.getByRole('button', { name: 'contactUs' });
+      const profileLink = sidebar.getByRole('link', { name: /profile/i });
+      expect(
+        profileLink.compareDocumentPosition(contactButton) & Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy();
+    });
+
+    it('opens the contact modal without changing the route', async () => {
+      const user = userEvent.setup();
+      render(<Navigation />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await user.click(
+        within(screen.getByRole('complementary')).getByRole('button', { name: 'contactUs' })
+      );
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(global.mockUseRouter().push).not.toHaveBeenCalled();
+    });
   });
 
   describe('Mobile Bottom Navigation', () => {
@@ -129,6 +157,30 @@ describe('Navigation', () => {
       const navs = screen.getAllByRole('navigation');
       const mobileNav = navs.find((nav) => nav.classList.contains('md:hidden'));
       expect(mobileNav).toHaveClass('fixed', 'bottom-0', 'left-0', 'right-0', 'z-50');
+    });
+
+    it('opens and closes Contact Us from the last item in the mobile navigation', async () => {
+      const user = userEvent.setup();
+      render(<Navigation />);
+
+      const mobileNav = screen
+        .getAllByRole('navigation')
+        .find((nav) => nav.classList.contains('md:hidden')) as HTMLElement;
+      const menu = within(mobileNav);
+      const profileLink = menu.getByRole('link', { name: /profile/i });
+      const contactButton = menu.getByRole('button', { name: 'contactUs' });
+      expect(
+        profileLink.compareDocumentPosition(contactButton) & Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy();
+      expect(contactButton.parentElement).toHaveClass('grid-cols-6');
+
+      await user.click(contactButton);
+      expect(screen.getByRole('dialog', { name: 'title' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'solferino.academy@ifrc.org' })).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'close' }));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(contactButton).toHaveFocus();
     });
 
     it('highlights active item in mobile view', () => {
@@ -227,6 +279,21 @@ describe('Navigation', () => {
       expect(await screen.findByRole('alert')).toHaveTextContent('lockedDuringQuiz');
     });
 
+    it('keeps Share closed during the quiz too, from Q1', async () => {
+      showFeed();
+      const user = userEvent.setup();
+      render(<Navigation />);
+
+      const shareLinks = screen.getAllByRole('link', { name: /share/i });
+      expect(shareLinks).toHaveLength(2);
+      for (const link of shareLinks) {
+        expect(link).toHaveAttribute('aria-disabled', 'true');
+      }
+
+      await user.click(shareLinks[0]);
+      expect(await screen.findByRole('alert')).toHaveTextContent('lockedDuringQuiz');
+    });
+
     it('keeps Profile locked later in the quiz', () => {
       showFeed({ '1': 'like', '2': 'dislike' });
       render(<Navigation />);
@@ -240,7 +307,7 @@ describe('Navigation', () => {
       showFeed();
       render(<Navigation />);
 
-      for (const name of [/home/i, /chat/i, /share/i]) {
+      for (const name of [/home/i, /chat/i, /analytics/i]) {
         for (const link of screen.getAllByRole('link', { name })) {
           expect(link).not.toHaveAttribute('aria-disabled');
         }

@@ -1,4 +1,5 @@
 import { getRequestConfig } from 'next-intl/server';
+import englishMessages from '../messages/en.json';
 import { routing } from './routing';
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -10,8 +11,14 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale = routing.defaultLocale;
   }
 
+  const messages = (await import(`../messages/${locale}.json`)).default;
+
   return {
     locale,
-    messages: (await import(`../messages/${locale}.json`)).default,
+    messages: {
+      ...messages,
+      nav: { contactUs: englishMessages.nav.contactUs, ...messages.nav },
+      contact: { ...englishMessages.contact, ...messages.contact },
+    },
   };
 });
