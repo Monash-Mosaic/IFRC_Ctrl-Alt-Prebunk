@@ -3,10 +3,41 @@
 import { useEffect, useRef, useState } from 'react';
 import Modal from 'react-modal';
 import { useTranslations } from 'next-intl';
-import { Check, Copy, X } from 'lucide-react';
+import { Check, Copy, Mail, X } from 'lucide-react';
 
 const CONTACT_EMAIL = 'solferino.academy@ifrc.org';
-const COPIED_RESET_MS = 2000;
+
+export function ContactUsButton({ variant }: { variant: 'sidebar' | 'header' }) {
+  const t = useTranslations('nav');
+  const [isOpen, setIsOpen] = useState(false);
+  const inHeader = variant === 'header';
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        aria-haspopup="dialog"
+        aria-label={inHeader ? t('contactUs') : undefined}
+        title={inHeader ? t('contactUs') : undefined}
+        className={
+          inHeader
+            ? 'col-start-3 flex size-11 items-center justify-center justify-self-end rounded-lg text-(--color-ifrc-blue) transition-colors hover:text-(--color-ifrc-red) md:hidden'
+            : 'group flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 text-(--color-ifrc-blue) transition-colors hover:text-(--color-ifrc-red)'
+        }
+      >
+        <Mail
+          size={inHeader ? 22 : 24}
+          strokeWidth={2}
+          className={inHeader ? undefined : 'transition-transform group-hover:scale-110'}
+          aria-hidden
+        />
+        {!inHeader && <span className="text-[11px] font-medium">{t('contactUs')}</span>}
+      </button>
+      <ContactUsModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    </>
+  );
+}
 
 interface ContactUsModalProps {
   isOpen: boolean;
@@ -36,7 +67,7 @@ export default function ContactUsModal({ isOpen, onClose }: ContactUsModalProps)
     try {
       await navigator.clipboard.writeText(CONTACT_EMAIL);
       setCopyStatus('copied');
-      resetTimer.current = setTimeout(() => setCopyStatus('idle'), COPIED_RESET_MS);
+      resetTimer.current = setTimeout(() => setCopyStatus('idle'), 2000);
     } catch {
       setCopyStatus('failed');
     }
