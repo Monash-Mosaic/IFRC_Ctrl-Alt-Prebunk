@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Header from '@/components/header';
 import { getTranslations } from 'next-intl/server';
@@ -77,26 +76,6 @@ describe('Header', () => {
     expect(monashLogo).toHaveAttribute('src', '/images/logos/Monash-MOSAIC.png');
     const logoContainer = monashLogo.closest('div');
     expect(logoContainer).toHaveClass('hidden', 'items-center', 'gap-4', 'md:flex');
-  });
-
-  it('opens and closes the Contact Us modal from the mobile header', async () => {
-    const user = userEvent.setup();
-    const root = document.createElement('main');
-    root.id = 'root';
-    document.body.appendChild(root);
-    render(await Header(), { container: root });
-
-    const button = screen.getByRole('button', { name: 'contactUs' });
-    expect(button).toHaveClass('md:hidden');
-    expect(button).toHaveAttribute('aria-haspopup', 'dialog');
-
-    await user.click(button);
-    expect(screen.getByRole('dialog', { name: 'title' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'solferino.academy@ifrc.org' })).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'close' }));
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(button).toHaveFocus();
   });
 
   it('matches snapshot', async () => {

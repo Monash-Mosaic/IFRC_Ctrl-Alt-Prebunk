@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils/test-utils';
+import { render, screen, within } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import Navigation from '@/components/navigation-bar';
 import { STORAGE_KEYS, storage } from '@/lib/local-storage';
@@ -112,17 +112,9 @@ describe('Navigation', () => {
 
     it('shows Contact Us after Profile in the desktop sidebar', () => {
       render(<Navigation />);
-      const sidebar = screen
-        .getAllByRole('complementary')
-        .find((el) => el.classList.contains('md:flex')) as HTMLElement;
-      const mobileNav = screen
-        .getAllByRole('navigation')
-        .find((nav) => nav.classList.contains('md:hidden')) as HTMLElement;
-      const contactButton = screen.getByRole('button', { name: 'contactUs' });
-
-      expect(sidebar).toContainElement(contactButton);
-      expect(mobileNav).not.toContainElement(contactButton);
-      const profileLink = screen.getAllByRole('link', { name: /profile/i })[0];
+      const sidebar = within(screen.getByRole('complementary'));
+      const contactButton = sidebar.getByRole('button', { name: 'contactUs' });
+      const profileLink = sidebar.getByRole('link', { name: /profile/i });
       expect(
         profileLink.compareDocumentPosition(contactButton) & Node.DOCUMENT_POSITION_FOLLOWING
       ).toBeTruthy();
@@ -133,7 +125,9 @@ describe('Navigation', () => {
       render(<Navigation />);
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-      await user.click(screen.getByRole('button', { name: 'contactUs' }));
+      await user.click(
+        within(screen.getByRole('complementary')).getByRole('button', { name: 'contactUs' })
+      );
 
       expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(global.mockUseRouter().push).not.toHaveBeenCalled();
@@ -163,6 +157,30 @@ describe('Navigation', () => {
       const navs = screen.getAllByRole('navigation');
       const mobileNav = navs.find((nav) => nav.classList.contains('md:hidden'));
       expect(mobileNav).toHaveClass('fixed', 'bottom-0', 'left-0', 'right-0', 'z-50');
+    });
+
+    it('opens and closes Contact Us from the last item in the mobile navigation', async () => {
+      const user = userEvent.setup();
+      render(<Navigation />);
+
+      const mobileNav = screen
+        .getAllByRole('navigation')
+        .find((nav) => nav.classList.contains('md:hidden')) as HTMLElement;
+      const menu = within(mobileNav);
+      const profileLink = menu.getByRole('link', { name: /profile/i });
+      const contactButton = menu.getByRole('button', { name: 'contactUs' });
+      expect(
+        profileLink.compareDocumentPosition(contactButton) & Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy();
+      expect(contactButton.parentElement).toHaveClass('grid-cols-6');
+
+      await user.click(contactButton);
+      expect(screen.getByRole('dialog', { name: 'title' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'solferino.academy@ifrc.org' })).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'close' }));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(contactButton).toHaveFocus();
     });
 
     it('highlights active item in mobile view', () => {
