@@ -3,7 +3,7 @@
 import { type Ref, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, type routing, usePathname } from '@/i18n/routing';
-import { Home, Mail, MessageSquare, PieChart, Upload, User, X } from 'lucide-react';
+import { Home, Mail, MessageSquare, Upload, User, X } from 'lucide-react';
 import ContactUsModal from '@/components/contact-us-modal';
 import Toast from '@/components/toast';
 import { useAlexChat } from '@/lib/use-alex-chat';
@@ -190,12 +190,6 @@ export default function Navigation() {
       activeIcon: <MessageSquare size={24} stroke="currentColor" />,
     },
     {
-      href: '/analytics',
-      labelKey: 'analytics',
-      icon: <PieChart size={24} strokeWidth={2} />,
-      activeIcon: <PieChart size={24} stroke="currentColor" />,
-    },
-    {
       href: '/share',
       labelKey: 'share',
       icon: <Upload size={24} strokeWidth={2} />,
@@ -214,7 +208,7 @@ export default function Navigation() {
       {/* Desktop Sidebar */}
       <aside className="fixed top-24 z-40 hidden h-[calc(100vh-6rem)] w-20 flex-col border-[#E8E9ED] bg-white md:flex ltr:left-0 ltr:border-r rtl:right-0 rtl:border-l rtl:border-r-0">
         <nav className="flex flex-1 flex-col justify-center items-center gap-2">
-          {navItems.filter(({ href }) => href !== '/analytics').map((item) => {
+          {navItems.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
 
@@ -257,7 +251,7 @@ export default function Navigation() {
         className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E8E9ED] bg-white md:hidden"
       >
         {/* Offset the row toward its start to balance the wider Contact Us label. */}
-        <div className="grid h-16 grid-cols-6 pe-3.5 min-[360px]:ps-[5px] min-[360px]:pe-[19px]">
+        <div className="grid h-16 grid-cols-5 pe-3.5 min-[360px]:ps-[5px] min-[360px]:pe-[19px]">
           {navItems.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
