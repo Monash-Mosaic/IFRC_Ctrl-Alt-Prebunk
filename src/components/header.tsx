@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
+import { SOLFERINO_ACADEMY_URL } from '@/lib/share-links';
 import Title from './title';
 
 export default async function Header() {
@@ -12,7 +13,7 @@ export default async function Header() {
         {/* Left: IFRC Logo (hidden on mobile) */}
         <div className="hidden items-center gap-2 md:flex">
           <div className="flex items-center gap-1">
-            <Link href="/">
+            <a href={SOLFERINO_ACADEMY_URL}>
               <Image
                 src="/images/logos/IFRC-Solferino.png"
                 alt={t('ifrcLogoAlt')}
@@ -20,7 +21,7 @@ export default async function Header() {
                 width={223.67}
                 className="h-8 w-auto"
               />
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -33,8 +34,8 @@ export default async function Header() {
 
         {/* Right: Monash Logo (hidden on mobile) */}
         <div className="hidden items-center gap-4 md:flex">
-          <Link
-            href="/"
+          <a
+            href="https://www.mosaic-monash.ai/"
             className="rounded focus:outline-none focus:ring-2 focus:ring-[#E63946] focus:ring-offset-2"
           >
             <Image
@@ -44,7 +45,7 @@ export default async function Header() {
               width={655}
               className="h-8 w-auto"
             />
-          </Link>
+          </a>
         </div>
       </div>
     </header>

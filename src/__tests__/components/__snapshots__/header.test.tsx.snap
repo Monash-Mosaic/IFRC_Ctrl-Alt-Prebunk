@@ -15,7 +15,7 @@ exports[`Header matches snapshot 1`] = `
           class="flex items-center gap-1"
         >
           <a
-            href="/"
+            href="https://solferinoacademy.com/"
           >
             <img
               alt="IFRC Solferino Academy"
@@ -55,7 +55,7 @@ exports[`Header matches snapshot 1`] = `
       >
         <a
           class="rounded focus:outline-none focus:ring-2 focus:ring-[#E63946] focus:ring-offset-2"
-          href="/"
+          href="https://www.mosaic-monash.ai/"
         >
           <img
             alt="Monash University MOSAIC"

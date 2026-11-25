@@ -50,6 +50,7 @@ describe('Header', () => {
 
     const logo = screen.getByAltText('IFRC Solferino Academy');
     expect(logo).toBeInTheDocument();
+    expect(logo.closest('a')).toHaveAttribute('href', 'https://solferinoacademy.com/');
     expect(logo).toHaveAttribute('src', '/images/logos/IFRC-Solferino.png');
   });
 
@@ -73,6 +74,7 @@ describe('Header', () => {
 
     const monashLogo = screen.getByAltText('Monash University MOSAIC');
     expect(monashLogo).toBeInTheDocument();
+    expect(monashLogo.closest('a')).toHaveAttribute('href', 'https://www.mosaic-monash.ai/');
     expect(monashLogo).toHaveAttribute('src', '/images/logos/Monash-MOSAIC.png');
     const logoContainer = monashLogo.closest('div');
     expect(logoContainer).toHaveClass('hidden', 'items-center', 'gap-4', 'md:flex');
