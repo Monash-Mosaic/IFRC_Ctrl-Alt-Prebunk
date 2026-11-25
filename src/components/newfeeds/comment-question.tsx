@@ -111,7 +111,7 @@ export function CommentQuestionDialog({
           <div className="ms-7 space-y-3 border-s border-slate-200 ps-3 lg:ms-0 lg:border-0 lg:ps-0">
             <article className="flex gap-2 lg:ms-6 lg:flex-row-reverse lg:items-end">
               <Image
-                src="/images/example/player-comment-avatar.svg"
+                src="/images/example/player-comment-avatar.webp"
                 alt=""
                 width={28}
                 height={28}
