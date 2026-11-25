@@ -88,8 +88,12 @@ it('resumes the five-question feed and counts both new scored posts before showi
   await user.click(commentsButton);
   let thread = within(screen.getByRole('dialog', { name: 'comments' }));
   expect(thread.getByText(/Victoria just broke a cold-weather record/)).toBeInTheDocument();
-  expect(thread.getByRole('heading', { name: 'Echo' }).closest('article')?.querySelector('mask'))
-    .toBeInTheDocument();
+  expect(
+    thread
+      .getByRole('heading', { name: 'Echo' })
+      .closest('article')
+      ?.querySelector('image[href="/images/example/echo-avatar.webp"]')
+  ).toBeInTheDocument();
   await user.click(thread.getByRole('button', { name: 'close' }));
   await user.click(screen.getByRole('button', { name: 'comments' }));
   thread = within(screen.getByRole('dialog', { name: 'comments' }));
@@ -99,7 +103,7 @@ it('resumes the five-question feed and counts both new scored posts before showi
   expect(thread.getByText('yourReply')).toBeInTheDocument();
   expect(thread.getByRole('presentation')).toHaveAttribute(
     'src',
-    '/images/example/player-comment-avatar.svg'
+    '/images/example/player-comment-avatar.webp'
   );
   const feedbackReply = thread.getByRole('heading', { name: 'feedback' }).closest('article');
   expect(feedbackReply).toHaveFocus();
