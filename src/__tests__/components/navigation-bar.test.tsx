@@ -29,13 +29,13 @@ describe('Navigation', () => {
       expect(desktopSidebar).toHaveClass('hidden', 'md:flex');
     });
 
-    it('renders all navigation items', () => {
+    it('renders the desktop navigation without Analytics', () => {
       render(<Navigation />);
-      expect(screen.getAllByText(/home/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/chat/i).length).toBeGreaterThan(0);
-      expect(screen.queryAllByText(/analytics/i).length).toBeGreaterThan(0);
-      expect(screen.queryAllByText(/share/i).length).toBeGreaterThan(0);
-      expect(screen.queryAllByText(/profile/i).length).toBeGreaterThan(0);
+      const sidebar = within(screen.getByRole('complementary'));
+      for (const name of [/home/i, /chat/i, /share/i, /profile/i]) {
+        expect(sidebar.getByRole('link', { name })).toBeInTheDocument();
+      }
+      expect(sidebar.queryByRole('link', { name: /analytics/i })).not.toBeInTheDocument();
     });
 
     it('highlights active navigation item', () => {
@@ -90,8 +90,9 @@ describe('Navigation', () => {
       const chatLinks = screen.getAllByRole('link', { name: /chat/i });
       expect(chatLinks[0]).toHaveAttribute('href', '/chat');
 
-      const analyticsLinks = screen.getAllByRole('link', { name: /analytics/i });
-      expect(analyticsLinks[0]).toHaveAttribute('href', '/analytics');
+      const analyticsLink = screen.getByRole('link', { name: /analytics/i });
+      expect(analyticsLink).toHaveAttribute('href', '/analytics');
+      expect(analyticsLink.closest('nav')).toHaveClass('md:hidden');
 
       const shareLinks = screen.getAllByRole('link', { name: /share/i });
       expect(shareLinks[0]).toHaveAttribute('href', '/share');
