@@ -483,7 +483,7 @@ content['share-un-source'] = {
     content: (
       <p>
         🚨 ALERT! 🚨 The UN has just revealed that global carbon emissions have reached 59.3
-        gigatonnes in 2025 — the highest ever recorded. Immediate action is needed! Share this with
+        gigatonnes in 2025 – the highest ever recorded. Immediate action is needed! Share this with
         all your friends to help stop climate disaster 🌍💚
       </p>
     ),
