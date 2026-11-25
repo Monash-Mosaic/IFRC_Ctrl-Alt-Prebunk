@@ -214,7 +214,7 @@ export default function Navigation() {
       {/* Desktop Sidebar */}
       <aside className="fixed top-24 z-40 hidden h-[calc(100vh-6rem)] w-20 flex-col border-[#E8E9ED] bg-white md:flex ltr:left-0 ltr:border-r rtl:right-0 rtl:border-l rtl:border-r-0">
         <nav className="flex flex-1 flex-col justify-center items-center gap-2">
-          {navItems.map((item) => {
+          {navItems.filter(({ href }) => href !== '/analytics').map((item) => {
             const isActive =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
 
