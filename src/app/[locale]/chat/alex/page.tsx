@@ -21,9 +21,9 @@ const AlexFlow = loadDynamicComponent(() => import('./_components/alex-flow'), {
 
 export default function AlexPage() {
   return (
-    <div className="mx-auto flex flex-col md:px-4 md:pt-6">
+    <div className="mx-auto flex flex-col max-md:h-[calc(100dvh-10rem)] md:px-4 md:pt-6">
       <ChatHeadline name={CHAT_USERS.alex.name} avatar={<AlexAvatar width={32} height={32} />} />
-      <div className="mx-auto flex h-[calc(100vh-10rem)] w-full max-w-md flex-col items-center justify-center">
+      <div className="mx-auto flex max-md:min-h-0 max-md:flex-1 md:h-[calc(100vh-10rem)] w-full max-w-md flex-col items-center justify-center">
         <AlexFlow />
       </div>
     </div>

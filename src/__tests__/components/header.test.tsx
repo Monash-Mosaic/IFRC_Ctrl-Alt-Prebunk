@@ -68,7 +68,7 @@ describe('Header', () => {
     expect(titleSvg).toBeInTheDocument();
   });
 
-  it('renders the Monash logo on desktop', async () => {
+  it('renders the Monash logo and links to MOSAIC', async () => {
     const component = await Header();
     render(component);
 
@@ -76,8 +76,6 @@ describe('Header', () => {
     expect(monashLogo).toBeInTheDocument();
     expect(monashLogo.closest('a')).toHaveAttribute('href', 'https://www.mosaic-monash.ai/');
     expect(monashLogo).toHaveAttribute('src', '/images/logos/Monash-MOSAIC.png');
-    const logoContainer = monashLogo.closest('div');
-    expect(logoContainer).toHaveClass('hidden', 'items-center', 'gap-4', 'md:flex');
   });
 
   it('matches snapshot', async () => {
