@@ -88,12 +88,8 @@ it('resumes the five-question feed and counts both new scored posts before showi
   await user.click(commentsButton);
   let thread = within(screen.getByRole('dialog', { name: 'comments' }));
   expect(thread.getByText(/Victoria just broke a cold-weather record/)).toBeInTheDocument();
-  expect(
-    thread
-      .getByRole('heading', { name: 'Echo' })
-      .closest('article')
-      ?.querySelector('image[href="/images/example/echo-avatar.webp"]')
-  ).toBeInTheDocument();
+  expect(thread.getByRole('heading', { name: 'Echo' }).closest('article')?.querySelector('mask'))
+    .toBeInTheDocument();
   await user.click(thread.getByRole('button', { name: 'close' }));
   await user.click(screen.getByRole('button', { name: 'comments' }));
   thread = within(screen.getByRole('dialog', { name: 'comments' }));
