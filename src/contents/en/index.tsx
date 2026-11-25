@@ -213,7 +213,7 @@ export const practiceContent: Record<ContentId, Content> = {
       content: <ExampleQuestion />,
     },
     options: [
-      { id: 'a', label: 'Share it—the timing makes the claim convincing.' },
+      { id: 'a', label: 'Share it – the timing makes the claim convincing.' },
       { id: 'b', label: 'Check reliable sources before believing or sharing it.' },
     ],
     correctOptionId: 'b',
