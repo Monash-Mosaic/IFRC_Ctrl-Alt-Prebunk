@@ -517,7 +517,7 @@ content['comment-victoria-cold-snap'] = {
     {
       id: 'b',
       label:
-        'That record tells us about one place on one day. We’d need long-term temperature records from many places to check whether the planet is warming.',
+        'Victoria can set a cold-weather record even while the planet is warming. One local record doesn’t prove global warming has stopped.',
     },
   ],
   correctOptionId: 'b',

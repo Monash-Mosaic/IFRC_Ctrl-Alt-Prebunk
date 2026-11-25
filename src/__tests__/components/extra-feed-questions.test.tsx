@@ -93,7 +93,7 @@ it('resumes the five-question feed and counts both new scored posts before showi
   await user.click(thread.getByRole('button', { name: 'close' }));
   await user.click(screen.getByRole('button', { name: 'comments' }));
   thread = within(screen.getByRole('dialog', { name: 'comments' }));
-  const correctResponse = /That record tells us about one place on one day/;
+  const correctResponse = /Victoria can set a cold-weather record even while the planet is warming/;
   await user.click(thread.getByRole('button', { name: correctResponse }));
 
   expect(thread.getByText('yourReply')).toBeInTheDocument();
