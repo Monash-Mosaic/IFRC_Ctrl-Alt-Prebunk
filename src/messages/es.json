@@ -107,9 +107,9 @@
       "busy": "Ocupado"
     },
     "alex": {
-      "opening": "Hey, did you see this article my uncle sent? It says those disaster relief funds are actually just being funnelled to politicians' offshore accounts. Sounds super sketchy, right? Should I blast this out to everyone?",
+      "opening": "Hey, did you see this article my uncle sent? It says those disaster relief funds are actually just being funneled to politicians' offshore accounts. Sounds super sketchy, right? Should I blast this out to everyone?",
       "sendAgain": "Can you send it again?",
-      "link": "Here it is: https://q7m4x9.invalid",
+      "link": "Here it is: https://example.com/relief-ledger/offshore-accounts",
       "askOpinion": "So, what do you think?",
       "replyWrong": "That's huge if it's true! Let's share it so people know.",
       "replyRight": "Wait, Alex. The article claims there's a secret plot, but it doesn't show any evidence. Let's check reliable sources before sharing it.",

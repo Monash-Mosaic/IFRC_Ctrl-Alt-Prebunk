@@ -88,7 +88,7 @@ describe('AlexFlow', () => {
   it('shows Excellent catch and adds points for the right reply', () => {
     showReplyButtons();
 
-    expect(screen.getByText('Here it is: https://q7m4x9.invalid')).toBeInTheDocument();
+    expect(screen.getByText('Here it is: https://example.com/relief-ledger/offshore-accounts')).toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(0);
 
     fireEvent.click(screen.getByRole('button', { name: /Wait, Alex. The article claims/ }));
