@@ -43,7 +43,7 @@ export default async function Header() {
               alt={t('monashLogoAlt')}
               height={655}
               width={2747}
-              className="h-6 w-auto max-w-24 object-contain md:h-8 md:max-w-none"
+              className="h-7 w-auto max-w-28 object-contain md:h-9 md:max-w-none"
             />
           </a>
         </div>

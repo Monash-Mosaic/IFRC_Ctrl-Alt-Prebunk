@@ -59,7 +59,7 @@ exports[`Header matches snapshot 1`] = `
         >
           <img
             alt="Monash University MOSAIC"
-            class="h-6 w-auto max-w-24 object-contain md:h-8 md:max-w-none"
+            class="h-7 w-auto max-w-28 object-contain md:h-9 md:max-w-none"
             height="655"
             src="/images/logos/Monash-MOSAIC.png"
             width="2747"
