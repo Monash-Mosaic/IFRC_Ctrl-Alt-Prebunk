@@ -431,7 +431,7 @@ export const content: Record<ContentId, Content> = {
     },
     options: [
       { id: 'a', label: 'Share it because NASA is a trusted source' },
-      { id: 'b', label: 'Check whether NASA actually published this figure and in what context' },
+      { id: 'b', label: 'Check whether NASA actually published this figure, and in what context' },
       { id: 'c', label: 'Reject it because sea level rise is exaggerated' },
       { id: 'd', label: 'Assume it applies equally to all coastal regions' },
     ],
