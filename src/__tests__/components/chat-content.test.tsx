@@ -39,7 +39,7 @@ describe('ChatContent', () => {
       <ChatContent startOnboardingText="Start" skipText="Skip" />,
     );
 
-    expect(container.querySelector('svg')).toBeInTheDocument();
+    expect(container.querySelector('img')).toHaveAttribute('src', '/images/prebunk-welcome.svg');
   });
 
   it('calls onSkipClick when skip link is clicked', async () => {

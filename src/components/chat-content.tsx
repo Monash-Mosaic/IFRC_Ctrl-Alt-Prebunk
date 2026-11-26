@@ -1,6 +1,6 @@
 'use client';
 
-import Illustration from './icons/onboarding-illustration';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface ChatContentProps {
@@ -18,9 +18,14 @@ export default function ChatContent({
     <div className="flex min-h-[calc(100dvh-10rem)] flex-col items-center justify-center px-4 py-8 md:min-h-[calc(100vh-6rem)] md:py-12">
       <div className="flex w-full max-w-md flex-col items-center gap-8">
         {/* Illustration */}
-        <div className="space-y-4 overflow-y-auto">
-          <Illustration width={'100%'} />
-        </div>
+        <Image
+          src="/images/prebunk-welcome.svg"
+          alt=""
+          width={420}
+          height={450}
+          className="h-auto w-full max-w-[420px]"
+          unoptimized
+        />
 
         {/* Action Buttons */}
         <div className="flex w-full flex-col gap-4">
