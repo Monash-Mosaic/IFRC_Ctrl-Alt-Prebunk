@@ -116,7 +116,7 @@ describe('onboardingMachine', () => {
     act(() =>
       result.current[1]({
         type: 'option2-step3',
-        optionText: 'Show me an example first?',
+        optionText: 'Let me try a practice question.',
       } as OnboardingOptionEvent)
     );
 

@@ -472,7 +472,7 @@ exports[`onboardingMachine matches snapshot going through practice and completin
       {
         "id": Any<String>,
         "sender": "user",
-        "text": "Show me an example first?",
+        "text": "Let me try a practice question.",
         "timestamp": Any<Number>,
         "type": "text",
       },
@@ -559,7 +559,7 @@ exports[`onboardingMachine matches snapshot going through practice and completin
       {
         "id": Any<String>,
         "sender": "user",
-        "text": "Show me an example first?",
+        "text": "Let me try a practice question.",
         "timestamp": Any<Number>,
         "type": "text",
       },
@@ -579,7 +579,7 @@ exports[`onboardingMachine matches snapshot going through practice and completin
     "typing": false,
   },
   "event": {
-    "optionText": "Show me an example first?",
+    "optionText": "Let me try a practice question.",
     "type": "option2-step3",
   },
   "nextEvents": [
@@ -647,7 +647,7 @@ exports[`onboardingMachine matches snapshot going through practice and completin
       {
         "id": Any<String>,
         "sender": "user",
-        "text": "Show me an example first?",
+        "text": "Let me try a practice question.",
         "timestamp": Any<Number>,
         "type": "text",
       },
@@ -667,7 +667,7 @@ exports[`onboardingMachine matches snapshot going through practice and completin
     "typing": true,
   },
   "event": {
-    "optionText": "Show me an example first?",
+    "optionText": "Let me try a practice question.",
     "type": "option2-step3",
   },
   "nextEvents": [

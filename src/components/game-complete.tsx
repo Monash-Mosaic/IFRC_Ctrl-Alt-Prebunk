@@ -82,6 +82,19 @@ export default function GameComplete({
         </div>
       </div>
 
+      <p className="mt-3 max-w-sm px-4 text-xs leading-relaxed text-slate-600">
+        Illustrations adapted from{' '}
+        <a
+          href="https://www.openpeeps.com/"
+          target="_blank"
+          rel="noreferrer"
+          className="underline underline-offset-2 hover:text-[#011E41]"
+        >
+          Open Peeps
+        </a>{' '}
+        by Pablo Stanley
+      </p>
+
       <ShareProgressModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}

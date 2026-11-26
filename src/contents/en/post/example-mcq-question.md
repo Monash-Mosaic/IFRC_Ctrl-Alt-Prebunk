@@ -1,1 +1,1 @@
-Funny how the media suddenly stopped talking about bush fires once the election ended. Almost like it was all staged 👀 #ClimateHoax #GovernmentConspiracy #media
+Funny how the media suddenly stopped talking about bushfires once the election ended. Almost like it was all staged 👀 #ClimateHoax #GovernmentConspiracy #media

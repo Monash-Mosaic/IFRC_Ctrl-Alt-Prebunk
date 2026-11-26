@@ -4,6 +4,7 @@ import loadDynamicComponent from 'next/dynamic';
 import Loading from '@/components/loading';
 import { useTranslations } from 'next-intl';
 import ChatHeadline from './_components/chat-headline';
+import PaulaAvatar from './_icons/paula-avatar';
 import { CHAT_USERS } from '../_constants/users';
 
 export const dynamic = 'force-dynamic';
@@ -20,10 +21,13 @@ const OnboardingFlow = loadDynamicComponent(() => import('./_components/onboardi
 
 export default function OnboardingPage() {
   return (
-    <div className="mx-auto flex flex-col md:px-4 md:pt-6">
+    <div className="mx-auto flex flex-col max-md:h-[calc(100dvh-10rem)] md:px-4 md:pt-6">
       {/* Headline */}
-      <ChatHeadline name={CHAT_USERS.paula.name} />
-      <div className="mx-auto flex items-center justify-center h-[calc(100vh-10rem)] max-w-md flex-col w-full">
+      <ChatHeadline
+        name={CHAT_USERS.paula.name}
+        avatar={<PaulaAvatar width={32} height={32} />}
+      />
+      <div className="mx-auto flex items-center justify-center max-md:min-h-0 max-md:flex-1 md:h-[calc(100vh-10rem)] max-w-md flex-col w-full">
         <OnboardingFlow />
       </div>
     </div>

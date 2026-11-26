@@ -107,16 +107,16 @@
       "busy": "Occupé"
     },
     "alex": {
-      "opening": "Hey, did you see this article my uncle sent? It says those disaster relief funds are actually just being funnelled to politicians' offshore accounts. Sounds super sketchy, right? Should I blast this out to everyone?",
+      "opening": "Hey, did you see this article my uncle sent? It says those disaster relief funds are actually just being funneled to politicians' offshore accounts. Sounds super sketchy, right? Should I blast this out to everyone?",
       "sendAgain": "Can you send it again?",
-      "link": "Here! https://link.com",
+      "link": "Here it is: https://relief-ledger.com",
       "askOpinion": "So, what do you think?",
-      "replyWrong": "That's huge if true! Yes, let's share it, so people know!",
-      "replyRight": "Wait Alex, that sounds like a Conspiratorial Language without evidence. Check other source before sharing. Let's not amplify it.",
+      "replyWrong": "That's huge if it's true! Let's share it so people know.",
+      "replyRight": "Wait, Alex. The article claims there's a secret plot, but it doesn't show any evidence. Let's check reliable sources before sharing it.",
       "correctTitle": "Excellent catch!",
-      "correctBody": "That sounded like a Conspiratorial Language without evidence. Check other sources before sharing. Let's not amplify it.",
+      "correctBody": "The article uses conspiratorial language: it claims politicians are secretly diverting disaster relief funds without showing evidence. Before sharing, look for independent reporting or official records that support the claim. If you can't verify it, don't pass it on.",
       "wrongTitle": "Not quite",
-      "wrongBody": "You agreed to share a rumour with no evidence. It uses conspiratorial language: a secret plot with nothing to back it up. Sharing it spreads the claim. Check other sources first, and don't amplify it.",
+      "wrongBody": "Sharing the article would spread an unverified claim. Alex’s message describes a secret plot without offering evidence. Check independent reporting or official records before sharing. If you can’t verify the claim, don’t pass it on.",
       "notification": "Alex sent you a message",
       "back": "Back to the feed"
     },
@@ -141,7 +141,7 @@
         "option2": "Montre-moi un exemple d'abord ?"
       },
       "practice": {
-        "explanation": "Il y a deux types de publications que tu verras : les publications j'aime/je n'aime pas — aime si ça semble vrai, n'aime pas si ça semble faux — et les publications à choix multiples où tu choisis la meilleure réponse. Essayons-en une maintenant !",
+        "explanation": "Il y a deux types de publications que tu verras : les publications j'aime/je n'aime pas – aime si ça semble vrai, n'aime pas si ça semble faux – et les publications à choix multiples où tu choisis la meilleure réponse. Essayons-en une maintenant !",
         "mcq": "Cette publication te demande de choisir une option. Choisis la bonne.",
         "likeDislike": "Celle-ci te demande d'aimer ou de ne pas aimer. Aime si ça a l'air vrai, n'aime pas si ça a l'air faux.",
         "share": "Cette publication te demande de partager ou de défiler. Si ça a l'air louche, défile."

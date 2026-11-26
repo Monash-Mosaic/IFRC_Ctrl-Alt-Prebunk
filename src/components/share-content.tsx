@@ -101,7 +101,7 @@ export default function ShareContent() {
                 onClick={() => handleShareLink(key, url)}
                 className={cn(
                   actionButtonClass,
-                  'border border-dashed border-[#011E41] bg-white/60 text-[#011E41] hover:bg-white'
+                  'cursor-pointer border border-dashed border-[#011E41] bg-white/60 text-[#011E41] hover:bg-white'
                 )}
               >
                 <Share2 size={16} strokeWidth={2} aria-hidden="true" />
@@ -137,7 +137,7 @@ export default function ShareContent() {
               aria-describedby="share-progress-description"
               className={cn(
                 actionButtonClass,
-                'bg-[#011E41] text-white hover:bg-[#002552] disabled:cursor-not-allowed disabled:bg-[#6B7280] disabled:opacity-60'
+                'enabled:cursor-pointer bg-[#011E41] text-white hover:bg-[#002552] disabled:cursor-not-allowed disabled:bg-[#6B7280] disabled:opacity-60'
               )}
             >
               <Share2 size={16} strokeWidth={2} aria-hidden="true" />

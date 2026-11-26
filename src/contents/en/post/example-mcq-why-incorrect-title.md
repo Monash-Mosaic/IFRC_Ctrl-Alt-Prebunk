@@ -1,1 +1,1 @@
-Take another look!
+Let’s look at why.

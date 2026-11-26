@@ -1,1 +1,1 @@
-The timing may sound suspicious, but it does not prove that events were staged. The post suggests a hidden plot without providing evidence. Check reliable sources before believing or sharing the claim.
+The timing might seem suspicious, but it doesn’t prove the bushfires were staged. The post hints at a hidden plot without giving any evidence. Check reliable sources before believing or sharing the claim.

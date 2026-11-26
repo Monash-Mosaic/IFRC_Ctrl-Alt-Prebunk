@@ -29,13 +29,13 @@ describe('Navigation', () => {
       expect(desktopSidebar).toHaveClass('hidden', 'md:flex');
     });
 
-    it('renders all navigation items', () => {
+    it('renders the desktop navigation without Analytics', () => {
       render(<Navigation />);
-      expect(screen.getAllByText(/home/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/chat/i).length).toBeGreaterThan(0);
-      expect(screen.queryAllByText(/analytics/i).length).toBeGreaterThan(0);
-      expect(screen.queryAllByText(/share/i).length).toBeGreaterThan(0);
-      expect(screen.queryAllByText(/profile/i).length).toBeGreaterThan(0);
+      const sidebar = within(screen.getByRole('complementary'));
+      for (const name of [/home/i, /chat/i, /share/i, /profile/i]) {
+        expect(sidebar.getByRole('link', { name })).toBeInTheDocument();
+      }
+      expect(sidebar.queryByRole('link', { name: /analytics/i })).not.toBeInTheDocument();
     });
 
     it('highlights active navigation item', () => {
@@ -90,9 +90,6 @@ describe('Navigation', () => {
       const chatLinks = screen.getAllByRole('link', { name: /chat/i });
       expect(chatLinks[0]).toHaveAttribute('href', '/chat');
 
-      const analyticsLinks = screen.getAllByRole('link', { name: /analytics/i });
-      expect(analyticsLinks[0]).toHaveAttribute('href', '/analytics');
-
       const shareLinks = screen.getAllByRole('link', { name: /share/i });
       expect(shareLinks[0]).toHaveAttribute('href', '/share');
 
@@ -143,13 +140,16 @@ describe('Navigation', () => {
       expect(mobileNav).toHaveClass('md:hidden');
     });
 
-    it('renders all navigation items in mobile view', () => {
+    it('renders the five mobile navigation items without Analytics', () => {
       render(<Navigation />);
-      expect(screen.getAllByText(/home/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/chat/i).length).toBeGreaterThan(0);
-      expect(screen.queryAllByText(/analytics/i).length).toBeGreaterThan(0);
-      expect(screen.queryAllByText(/share/i).length).toBeGreaterThan(0);
-      expect(screen.queryAllByText(/profile/i).length).toBeGreaterThan(0);
+      const mobileNav = screen.getAllByRole('navigation').find((nav) => nav.classList.contains('md:hidden')) as HTMLElement;
+      const menu = within(mobileNav);
+      expect(menu.getAllByRole('link')).toHaveLength(4);
+      for (const name of [/home/i, /chat/i, /share/i, /profile/i]) {
+        expect(menu.getByRole('link', { name })).toBeInTheDocument();
+      }
+      expect(menu.getByRole('button', { name: 'contactUs' })).toBeInTheDocument();
+      expect(menu.queryByRole('link', { name: /analytics/i })).not.toBeInTheDocument();
     });
 
     it('has correct mobile navigation positioning', () => {
@@ -172,7 +172,7 @@ describe('Navigation', () => {
       expect(
         profileLink.compareDocumentPosition(contactButton) & Node.DOCUMENT_POSITION_FOLLOWING
       ).toBeTruthy();
-      expect(contactButton.parentElement).toHaveClass('grid-cols-6');
+      expect(contactButton.parentElement).toHaveClass('grid-cols-5');
 
       await user.click(contactButton);
       expect(screen.getByRole('dialog', { name: 'title' })).toBeInTheDocument();
@@ -307,7 +307,7 @@ describe('Navigation', () => {
       showFeed();
       render(<Navigation />);
 
-      for (const name of [/home/i, /chat/i, /analytics/i]) {
+      for (const name of [/home/i, /chat/i]) {
         for (const link of screen.getAllByRole('link', { name })) {
           expect(link).not.toHaveAttribute('aria-disabled');
         }

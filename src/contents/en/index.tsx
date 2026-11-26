@@ -213,7 +213,7 @@ export const practiceContent: Record<ContentId, Content> = {
       content: <ExampleQuestion />,
     },
     options: [
-      { id: 'a', label: 'Share it—the timing makes the claim convincing.' },
+      { id: 'a', label: 'Share it – the timing makes the claim convincing.' },
       { id: 'b', label: 'Check reliable sources before believing or sharing it.' },
     ],
     correctOptionId: 'b',
@@ -431,7 +431,7 @@ export const content: Record<ContentId, Content> = {
     },
     options: [
       { id: 'a', label: 'Share it because NASA is a trusted source' },
-      { id: 'b', label: 'Check whether NASA actually published this figure and in what context' },
+      { id: 'b', label: 'Check whether NASA actually published this figure, and in what context' },
       { id: 'c', label: 'Reject it because sea level rise is exaggerated' },
       { id: 'd', label: 'Assume it applies equally to all coastal regions' },
     ],
@@ -467,13 +467,6 @@ export const content: Record<ContentId, Content> = {
   },
 };
 
-const checkSource = (
-  <p>
-    Echo’s post claims the UN made this announcement. Before sharing a claim like this on social
-    media, check who posted it and look for the original announcement on the UN’s official website.
-  </p>
-);
-
 content['share-un-source'] = {
   id: 'share-un-source',
   type: ContentType.SHARE,
@@ -483,7 +476,7 @@ content['share-un-source'] = {
     content: (
       <p>
         🚨 ALERT! 🚨 The UN has just revealed that global carbon emissions have reached 59.3
-        gigatonnes in 2025 — the highest ever recorded. Immediate action is needed! Share this with
+        gigatonnes in 2025 – the highest ever recorded. Immediate action is needed! Share this with
         all your friends to help stop climate disaster 🌍💚
       </p>
     ),
@@ -492,8 +485,24 @@ content['share-un-source'] = {
     mediaAlt: 'Red emergency warning light',
   },
   correctAnswer: 'skip',
-  whyCorrectAnswer: { title: 'Exactly!', content: checkSource },
-  whyIncorrectAnswer: { title: 'Not quite!', content: checkSource },
+  whyCorrectAnswer: {
+    title: 'Exactly!',
+    content: (
+      <p>
+        Good call. The post names the UN but doesn’t link to its announcement. Check the UN’s
+        website before sharing the claim.
+      </p>
+    ),
+  },
+  whyIncorrectAnswer: {
+    title: 'Not quite!',
+    content: (
+      <p>
+        By sharing this post, you passed on an unverified claim. The post names the UN but doesn’t link
+        to its announcement. Check the UN’s website for the original source.
+      </p>
+    ),
+  },
 };
 
 // Keep the existing ID so saved answers still resolve after this content update.
@@ -517,7 +526,7 @@ content['comment-victoria-cold-snap'] = {
     {
       id: 'b',
       label:
-        'That record tells us about one place on one day. We’d need long-term temperature records from many places to check whether the planet is warming.',
+        'Victoria can set a cold-weather record even while the planet is warming. One local record doesn’t prove global warming has stopped.',
     },
   ],
   correctOptionId: 'b',
@@ -529,7 +538,7 @@ content['comment-victoria-cold-snap'] = {
   whyIncorrectAnswer: {
     title: 'Watch out for cherry-picking.',
     content:
-      'The commenter used one local record to make a claim about the whole planet. Look at temperature records from many places over many years.',
+      'Echo uses Victoria’s cold-weather record to claim global warming has stopped. A local cold record can occur while global temperatures are rising, so the record alone doesn’t support that claim.',
   },
 };
 

@@ -88,16 +88,16 @@ describe('AlexFlow', () => {
   it('shows Excellent catch and adds points for the right reply', () => {
     showReplyButtons();
 
-    expect(screen.getByText('Here! https://link.com')).toBeInTheDocument();
+    expect(screen.getByText('Here it is: https://relief-ledger.com')).toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(0);
 
-    fireEvent.click(screen.getByRole('button', { name: /Wait Alex, that sounds like/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Wait, Alex. The article claims/ }));
     act(() => {
       jest.advanceTimersByTime(1000);
     });
 
     expect(screen.getByText('Excellent catch!')).toBeInTheDocument();
-    expect(screen.getByText(/Check other sources before sharing/)).toBeInTheDocument();
+    expect(screen.getByText(/look for independent reporting or official records/)).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(5);
     expect(useCredibilityStore.getState().credibility).toBe(6);
@@ -109,11 +109,11 @@ describe('AlexFlow', () => {
   it('shows the Not quite popup for the wrong reply and does not add points', () => {
     showReplyButtons();
 
-    fireEvent.click(screen.getByRole('button', { name: /That's huge if true/ }));
+    fireEvent.click(screen.getByRole('button', { name: /That's huge if it's true/ }));
 
     const popup = screen.getByRole('dialog');
     expect(popup).toHaveTextContent('Not quite');
-    expect(popup).toHaveTextContent('You agreed to share a rumour with no evidence.');
+    expect(popup).toHaveTextContent('Sharing the article would spread an unverified claim.');
     expect(screen.queryByText('Excellent catch!')).not.toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(0);
     expect(useCredibilityStore.getState().credibility).toBe(4);
@@ -139,8 +139,8 @@ describe('AlexFlow', () => {
   });
 
   it.each([
-    [/Wait Alex, that sounds like/, 'right'],
-    [/That's huge if true/, 'wrong'],
+    [/Wait, Alex. The article claims/, 'right'],
+    [/That's huge if it's true/, 'wrong'],
   ] as const)('offers results after feedback on the %s reply when the feed is complete', (answer, reply) => {
     completeFeed();
     showReplyButtons();
@@ -167,8 +167,8 @@ describe('AlexFlow', () => {
 
     expect(screen.getByText('Alex’s question is unavailable.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Back to the feed' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Wait Alex, that sounds like/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /That's huge if true/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Wait, Alex. The article claims/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /That's huge if it's true/ })).not.toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(0);
   });
 });
