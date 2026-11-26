@@ -1,1 +1,1 @@
-The post suggests a hidden plot without providing evidence. Timing alone does not prove that events were staged. Check reliable sources before believing or sharing the claim.
+Even if news coverage dropped after the election, that doesn’t show the bushfires were staged. Checking reliable sources is a good way to see whether there’s any evidence for the claim.
