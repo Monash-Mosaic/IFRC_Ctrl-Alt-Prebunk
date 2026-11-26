@@ -9,7 +9,7 @@ export default async function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white">
-      <div className="flex h-full items-center justify-between gap-2 px-2 md:px-6">
+      <div className="flex h-full items-center justify-between gap-3 px-3 md:gap-2 md:px-6">
         {/* Left: IFRC Logo */}
         <div className="flex shrink-0 items-center gap-2">
           <div className="flex items-center gap-1">
@@ -26,7 +26,7 @@ export default async function Header() {
         </div>
 
         {/* Center: Title */}
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2 max-md:w-full max-md:max-w-[210px]">
           <Link href="/" className="w-full">
             <Title width={'100%'} height={'100%'} />
           </Link>
@@ -43,7 +43,7 @@ export default async function Header() {
               alt={t('monashLogoAlt')}
               height={655}
               width={2747}
-              className="h-4 w-auto max-w-16 object-contain md:h-8 md:max-w-none"
+              className="h-6 w-auto max-w-24 object-contain md:h-8 md:max-w-none"
             />
           </a>
         </div>
