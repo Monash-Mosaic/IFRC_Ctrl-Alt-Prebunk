@@ -498,7 +498,7 @@ content['share-un-source'] = {
     title: 'Not quite!',
     content: (
       <p>
-        Sharing this post would pass on an unverified claim. The post names the UN but doesn’t link
+        By sharing this post, you passed on an unverified claim. The post names the UN but doesn’t link
         to its announcement. Check the UN’s website for the original source.
       </p>
     ),
