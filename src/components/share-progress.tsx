@@ -96,8 +96,8 @@ export default function ShareProgress({
         <div className="mx-auto flex max-w-[320px] flex-col items-center justify-center">
           <Title width={'100%'} height={'100%'} />
           <p className="mt-2 text-sm leading-6 text-slate-700 sm:mt-3 sm:text-[15px] sm:leading-7">
-            You are ready to help stop disinformation in the real world. Dive deeper into the data
-            that matters.
+            I completed the IFRC prebunking challenge. Try it and see how well you spot misleading
+            posts.
           </p>
 
           <div className="mt-4 sm:mt-6">

@@ -133,26 +133,26 @@
     "onboarding": {
       "step1": {
         "greeting": "Hey! Welcome to the feed. I'm Paula, and I'll help you navigate this wild world of online information. 👋",
-        "option1": "Let's do this! I'm ready.🚀",
-        "option2": "This sounds complicated...🤔",
-        "option3": "Just show me how it works!🎮"
+        "option1": "I’m ready! 🚀",
+        "option2": "This sounds complicated… 🤔",
+        "option3": "Show me how it works! 🎮"
       },
       "step2": {
-        "explanation": "Don't worry - you've got this! See that post below? Someone's sharing something about climate change. Your job: decide if it's trustworthy or total nonsense.",
+        "explanation": "You’ve got this! Read the climate post below and decide whether the claim is supported by evidence.",
         "option1": "I can spot fake news already!",
         "option2": "Got it! Like the good stuff, call out the fake stuff.",
         "option3": "Wait, how do I know what's real?"
       },
       "step3": {
-        "tips": "Here's the secret: Look for exaggerated language, missing sources, and stuff that seems TOO crazy to be true. Try the first post - I'll tell you how you did!",
-        "tipsAgree": "Exactly! Here's the secret: Look for exaggerated language, missing sources, and stuff that seems TOO crazy to be true. Try the first post - I'll tell you how you did!",
-        "tipsShowMe": "Here's how it works. Look for exaggerated language, missing sources, and stuff that seems TOO crazy to be true. Try the first post - I'll tell you how you did!",
+        "tips": "Look for exaggerated language, missing sources and claims that seem too good or too shocking to be true. If you’re unsure, check a reliable source before sharing.",
+        "tipsAgree": "Exactly! Look for exaggerated language, missing sources and claims that seem too good or too shocking to be true. If you’re unsure, check a reliable source before sharing.",
+        "tipsShowMe": "Here’s how it works. Look for exaggerated language, missing sources and claims that seem too good or too shocking to be true. If you’re unsure, check a reliable source before sharing.",
         "option1": "Okay, entering the feed now!",
         "option2": "Show me an example first?"
       },
       "practice": {
         "explanation": "There are two kinds of posts you'll see: like/dislike posts - like it if it looks true, dislike if it looks false - and multiple-choice posts where you pick the best response. Let's try one now!",
-        "mcq": "This post is asking you to pick an option. Choose the correct one.",
+        "mcq": "Read the post, then choose how you’d respond to the claim.",
         "likeDislike": "This one is asking you to like or dislike. Like it if it looks true, dislike if it looks false.",
         "share": "This post is asking you to share or scroll. If the post looks dodgy, you should scroll."
       },

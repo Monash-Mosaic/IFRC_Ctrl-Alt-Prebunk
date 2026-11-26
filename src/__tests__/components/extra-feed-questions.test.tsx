@@ -69,7 +69,7 @@ it('resumes the five-question feed and counts both new scored posts before showi
   await user.click(screen.getByRole('button', { name: 'skip' }));
   const skipFeedback = within(screen.getByRole('dialog', { name: 'modalLabel' }));
   expect(skipFeedback.getByText('Exactly!')).toBeInTheDocument();
-  expect(skipFeedback.getByText(/look for the original announcement on the UN’s official website/))
+  expect(skipFeedback.getByText(/Check the UN’s website before sharing the claim/))
     .toBeInTheDocument();
   expect(skipFeedback.queryByRole('region', { name: 'sharedPost' })).not.toBeInTheDocument();
   expect(skipFeedback.queryByRole('heading', { name: 'friendReplied' })).not.toBeInTheDocument();
@@ -132,7 +132,7 @@ it('gives explanatory feedback for wrong choices and includes Alex only when ans
   expect(shareFeedback.getByText('Not quite!')).toBeInTheDocument();
   const friendReply = shareFeedback.getByRole('heading', { name: 'friendReplied' });
   expect(friendReply.querySelector('svg')).toBeInTheDocument();
-  expect(shareFeedback.getByText(/look for the original announcement on the UN’s official website/))
+  expect(shareFeedback.getByText(/Sharing this post would pass on an unverified claim/))
     .toBeInTheDocument();
   expect(shareFeedback.getByRole('img', { name: 'verifiedBadge' })).toBeInTheDocument();
   const credibilityAfterSharing = useCredibilityStore.getState().credibility;

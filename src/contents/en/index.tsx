@@ -467,13 +467,6 @@ export const content: Record<ContentId, Content> = {
   },
 };
 
-const checkSource = (
-  <p>
-    Echo’s post claims the UN made this announcement. Before sharing a claim like this on social
-    media, check who posted it and look for the original announcement on the UN’s official website.
-  </p>
-);
-
 content['share-un-source'] = {
   id: 'share-un-source',
   type: ContentType.SHARE,
@@ -492,8 +485,24 @@ content['share-un-source'] = {
     mediaAlt: 'Red emergency warning light',
   },
   correctAnswer: 'skip',
-  whyCorrectAnswer: { title: 'Exactly!', content: checkSource },
-  whyIncorrectAnswer: { title: 'Not quite!', content: checkSource },
+  whyCorrectAnswer: {
+    title: 'Exactly!',
+    content: (
+      <p>
+        Good call. The post names the UN but doesn’t link to its announcement. Check the UN’s
+        website before sharing the claim.
+      </p>
+    ),
+  },
+  whyIncorrectAnswer: {
+    title: 'Not quite!',
+    content: (
+      <p>
+        Sharing this post would pass on an unverified claim. The post names the UN but doesn’t link
+        to its announcement. Check the UN’s website for the original source.
+      </p>
+    ),
+  },
 };
 
 // Keep the existing ID so saved answers still resolve after this content update.
@@ -529,7 +538,7 @@ content['comment-victoria-cold-snap'] = {
   whyIncorrectAnswer: {
     title: 'Watch out for cherry-picking.',
     content:
-      'The commenter used one local record to make a claim about the whole planet. Look at temperature records from many places over many years.',
+      'Echo uses Victoria’s cold-weather record to claim global warming has stopped. A local cold record can occur while global temperatures are rising, so the record alone doesn’t support that claim.',
   },
 };
 
