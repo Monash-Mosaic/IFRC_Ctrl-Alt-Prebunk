@@ -240,4 +240,8 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+
+  :is(button:enabled, a[href], [role='button']):not([aria-disabled='true']) {
+    cursor: pointer;
+  }
 }
