@@ -152,7 +152,7 @@
       },
       "practice": {
         "explanation": "There are two kinds of posts you'll see: like/dislike posts - like it if it looks true, dislike if it looks false - and multiple-choice posts where you pick the best response. Let's try one now!",
-        "mcq": "Take a look at this post. What would you do? Pick one of the options below.",
+        "mcq": "Good question! Let’s practise with another post. What would you do? Pick one of the options below.",
         "likeDislike": "This one is asking you to like or dislike. Like it if it looks true, dislike if it looks false.",
         "share": "This post is asking you to share or scroll. If the post looks dodgy, you should scroll."
       },
