@@ -115,7 +115,7 @@ export function CommentQuestionDialog({
                 alt=""
                 width={28}
                 height={28}
-                className="mt-0.5 size-7 shrink-0 rounded-full lg:mb-0.5"
+                className="mt-0.5 size-7 shrink-0 rounded-full mix-blend-multiply lg:mb-0.5"
               />
               <div className="lg:rounded-2xl lg:rounded-br-sm lg:border lg:border-dashed lg:border-emerald-600 lg:bg-emerald-50 lg:px-3 lg:py-2">
                 <h3 className="font-semibold">{t('yourReply')}</h3>
