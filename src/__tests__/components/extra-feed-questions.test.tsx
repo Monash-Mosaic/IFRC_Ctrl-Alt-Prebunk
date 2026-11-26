@@ -132,7 +132,7 @@ it('gives explanatory feedback for wrong choices and includes Alex only when ans
   expect(shareFeedback.getByText('Not quite!')).toBeInTheDocument();
   const friendReply = shareFeedback.getByRole('heading', { name: 'friendReplied' });
   expect(friendReply.querySelector('svg')).toBeInTheDocument();
-  expect(shareFeedback.getByText(/Sharing this post would pass on an unverified claim/))
+  expect(shareFeedback.getByText(/By sharing this post, you passed on an unverified claim/))
     .toBeInTheDocument();
   expect(shareFeedback.getByRole('img', { name: 'verifiedBadge' })).toBeInTheDocument();
   const credibilityAfterSharing = useCredibilityStore.getState().credibility;
