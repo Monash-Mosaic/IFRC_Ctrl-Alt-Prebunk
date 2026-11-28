@@ -6,7 +6,7 @@ import AlexAvatar from './onboarding/_icons/alex-avatar';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/routing';
 import { useAlexChat } from '@/lib/use-alex-chat';
-import { useGameCompleted, useQuizInProgress } from '@/lib/use-game-store';
+import { useGameCompleted, useOnboardingCompleted } from '@/lib/use-game-store';
 
 interface ChatListItemProps {
   name: string;
@@ -72,7 +72,7 @@ export default function ChatPage() {
   const t = useTranslations('chat.list');
   const [alexChat] = useAlexChat();
   const gameCompleted = useGameCompleted();
-  const quizInProgress = useQuizInProgress();
+  const onboardingCompleted = useOnboardingCompleted();
   const alexOpen = alexChat.notified || alexChat.reply !== null;
 
   return (
@@ -85,9 +85,9 @@ export default function ChatPage() {
           <ChatListItem
             name={t('paula')}
             avatar={<PaulaAvatar />}
-            subText={quizInProgress ? t('onboardingComplete') : t('newMessage')}
+            subText={onboardingCompleted ? t('onboardingComplete') : t('newMessage')}
             hasSubText
-            isComplete={quizInProgress}
+            isComplete={onboardingCompleted}
             href="/chat/onboarding"
           />
           {(!gameCompleted || alexChat.reply) && (

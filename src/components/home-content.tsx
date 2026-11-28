@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import ChatContent from '@/components/chat-content';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
-import { defaultAlexChatState, STORAGE_KEYS } from '@/lib/local-storage';
+import { defaultAlexChatState, STORAGE_KEYS, storage } from '@/lib/local-storage';
 import { useLocalStorage } from '@/lib/use-local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
@@ -195,6 +195,7 @@ export default function HomeContent() {
     resetCredibility(contentList.length);
     // FR9: Restart simulation also returns the player to the default username and avatar.
     resetProfile();
+    storage.removeItem(STORAGE_KEYS.CHAT_ONBOARDING_STATE);
     setOnboardingCompleted(false);
     alexNoticeSent.current = false;
     setAlexChat(defaultAlexChatState);

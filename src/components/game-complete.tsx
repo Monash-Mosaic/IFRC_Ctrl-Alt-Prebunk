@@ -51,10 +51,7 @@ export default function GameComplete({
         </div>
 
         <div className="mx-auto mt-6 max-w-xs text-sm font-semibold text-[#011E41]">
-          <div className="flex justify-between gap-2">
-            <span>Final credibility</span>
-            <span>{credibility}/{maxCredibility}</span>
-          </div>
+          <p className="text-start">Final credibility</p>
           <meter
             aria-label="Final credibility"
             min={0}

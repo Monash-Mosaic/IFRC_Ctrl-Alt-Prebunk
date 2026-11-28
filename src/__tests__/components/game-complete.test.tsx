@@ -55,8 +55,10 @@ describe('GameComplete', () => {
     try {
       render(<GameComplete correctAnswers={2} totalQuestions={7} restartGame={jest.fn()} />);
 
-      expect(screen.getByRole('meter', { name: 'Final credibility' })).toHaveAttribute('value', '0');
-      expect(screen.getByText('0/3')).toBeInTheDocument();
+      const meter = screen.getByRole('meter', { name: 'Final credibility' });
+      expect(meter).toHaveAttribute('value', '0');
+      expect(meter).toHaveAttribute('max', '3');
+      expect(screen.queryByText('0/3')).not.toBeInTheDocument();
     } finally {
       useCredibilityStore.setState(originalCredibility);
     }

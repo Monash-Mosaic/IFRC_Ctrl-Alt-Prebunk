@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Loading from '@/components/loading';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
-import { isQuizInProgress } from '@/lib/use-game-store';
+import { isOnboardingCompleted } from '@/lib/use-game-store';
 import ChatHeadline from './_components/chat-headline';
 import PaulaAvatar from './_icons/paula-avatar';
 import { CHAT_USERS } from '../_constants/users';
@@ -27,7 +27,7 @@ export default function OnboardingPage() {
   const [canOpenOnboarding, setCanOpenOnboarding] = useState(false);
 
   useEffect(() => {
-    if (isQuizInProgress()) {
+    if (isOnboardingCompleted()) {
       router.replace('/chat');
       return;
     }
