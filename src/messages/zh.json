@@ -99,9 +99,10 @@
     "illustrationAlt": "人员和社交媒体连接网络",
     "startOnboarding": "开始与Paula的入门聊天",
     "skip": "跳过",
+    "backToFeed": "返回动态",
+    "viewMyResults": "查看我的结果",
     "list": {
       "title": "消息",
-      "backToMessages": "返回消息列表",
       "paula": "Paula",
       "alex": "Alex",
       "newMessage": "新消息",
@@ -119,8 +120,7 @@
       "correctBody": "The article uses conspiratorial language: it claims politicians are secretly diverting disaster relief funds without showing evidence. Before sharing, look for independent reporting or official records that support the claim. If you can't verify it, don't pass it on.",
       "wrongTitle": "Not quite",
       "wrongBody": "Sharing the article would spread an unverified claim. Alex’s message describes a secret plot without offering evidence. Check independent reporting or official records before sharing. If you can’t verify the claim, don’t pass it on.",
-      "notification": "Alex sent you a message",
-      "back": "Back to the feed"
+      "notification": "Alex sent you a message"
     },
     "onboarding": {
       "step1": {

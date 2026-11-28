@@ -9,7 +9,7 @@ import { isOnboardingCompleted } from '@/lib/use-game-store';
 import PostMessage from '@/components/post-message';
 import { getOnboardingHistory, type OnboardingHistory } from './_lib/onboarding-history';
 import OnboardingConversation, { practiceItem } from './_components/onboarding-conversation';
-import OptionButton from './_components/option-button';
+import ChatExitButton from '../_components/chat-exit-button';
 import ChatHeadline from './_components/chat-headline';
 import PaulaAvatar from './_icons/paula-avatar';
 import { CHAT_USERS } from '../_constants/users';
@@ -28,7 +28,6 @@ const OnboardingFlow = loadDynamicComponent(() => import('./_components/onboardi
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const t = useTranslations('chat.list');
   const [view, setView] = useState<'live' | OnboardingHistory | null>(null);
 
   useEffect(() => {
@@ -57,11 +56,7 @@ export default function OnboardingPage() {
               </OnboardingConversation>
             </div>
             <div className="border-t border-[#E8E9ED] bg-white px-4 py-4">
-              <OptionButton
-                id="paula-messages"
-                displayText={t('backToMessages')}
-                onClick={() => router.replace('/chat')}
-              />
+              <ChatExitButton id="paula-back" />
             </div>
           </div>
         ) : (

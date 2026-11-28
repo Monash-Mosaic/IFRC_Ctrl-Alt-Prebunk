@@ -145,7 +145,7 @@ describe('AlexFlow', () => {
     completeFeed();
     showReplyButtons();
     fireEvent.click(screen.getByRole('button', { name: answer }));
-    expect(screen.queryByRole('button', { name: 'View results' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'View my results' })).not.toBeInTheDocument();
 
     if (reply === 'right') {
       act(() => jest.advanceTimersByTime(1000));
@@ -154,7 +154,7 @@ describe('AlexFlow', () => {
     }
 
     expect(screen.queryByRole('button', { name: 'Back to the feed' })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'View results' }));
+    fireEvent.click(screen.getByRole('button', { name: 'View my results' }));
     expect(router.replace).toHaveBeenCalledWith('/');
   });
 
@@ -166,13 +166,18 @@ describe('AlexFlow', () => {
     showReplyButtons();
 
     expect(screen.getByText('Alex’s question is unavailable.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Back to the feed' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'View my results' }));
+    expect(router.replace).toHaveBeenCalledWith('/');
     expect(screen.queryByRole('button', { name: /Wait, Alex. The article claims/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /That's huge if it's true/ })).not.toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(0);
   });
 
-  it('shows the saved wrong reply and feedback in read-only history', () => {
+  it.each([
+    [false, 'Back to the feed'],
+    [true, 'View my results'],
+  ])('keeps Alex history read-only when the feed is complete=%s', (feedFinished, exitLabel) => {
+    if (feedFinished) completeFeed();
     setAlex({ notified: true, reply: 'wrong' });
     render(<AlexFlow />);
 
@@ -180,8 +185,8 @@ describe('AlexFlow', () => {
     expect(screen.getByText(/Sharing the article would spread an unverified claim/)).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getAllByRole('button')).toHaveLength(1);
-    fireEvent.click(screen.getByRole('button', { name: 'Back to messages' }));
-    expect(router.replace).toHaveBeenCalledWith('/chat');
+    fireEvent.click(screen.getByRole('button', { name: exitLabel }));
+    expect(router.replace).toHaveBeenCalledWith('/');
     expect(useCredibilityStore.getState().credibility).toBe(5);
   });
 });
