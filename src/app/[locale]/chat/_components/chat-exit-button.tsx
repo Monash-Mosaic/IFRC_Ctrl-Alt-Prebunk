@@ -9,6 +9,7 @@ import OptionButton from '../onboarding/_components/option-button';
 
 export default function ChatExitButton({ id }: { id: string }) {
   const t = useTranslations('chat');
+  const feedT = useTranslations('feed');
   const locale = useLocale() as keyof typeof CONTENTS;
   const router = useRouter();
   const [{ reply }] = useAlexChat();
@@ -19,7 +20,7 @@ export default function ChatExitButton({ id }: { id: string }) {
   return (
     <OptionButton
       id={id}
-      displayText={t(resultsReady ? 'viewMyResults' : 'backToFeed')}
+      displayText={resultsReady ? feedT('viewResults') : t('backToFeed')}
       onClick={() => router.replace('/')}
     />
   );

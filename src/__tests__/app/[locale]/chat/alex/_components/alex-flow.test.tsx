@@ -145,7 +145,7 @@ describe('AlexFlow', () => {
     completeFeed();
     showReplyButtons();
     fireEvent.click(screen.getByRole('button', { name: answer }));
-    expect(screen.queryByRole('button', { name: 'View my results' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'View results' })).not.toBeInTheDocument();
 
     if (reply === 'right') {
       act(() => jest.advanceTimersByTime(1000));
@@ -154,7 +154,7 @@ describe('AlexFlow', () => {
     }
 
     expect(screen.queryByRole('button', { name: 'Back to the feed' })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'View my results' }));
+    fireEvent.click(screen.getByRole('button', { name: 'View results' }));
     expect(router.replace).toHaveBeenCalledWith('/');
   });
 
@@ -166,7 +166,7 @@ describe('AlexFlow', () => {
     showReplyButtons();
 
     expect(screen.getByText('Alex’s question is unavailable.')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'View my results' }));
+    fireEvent.click(screen.getByRole('button', { name: 'View results' }));
     expect(router.replace).toHaveBeenCalledWith('/');
     expect(screen.queryByRole('button', { name: /Wait, Alex. The article claims/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /That's huge if it's true/ })).not.toBeInTheDocument();
@@ -175,7 +175,7 @@ describe('AlexFlow', () => {
 
   it.each([
     [false, 'Back to the feed'],
-    [true, 'View my results'],
+    [true, 'View results'],
   ])('keeps Alex history read-only when the feed is complete=%s', (feedFinished, exitLabel) => {
     if (feedFinished) completeFeed();
     setAlex({ notified: true, reply: 'wrong' });
