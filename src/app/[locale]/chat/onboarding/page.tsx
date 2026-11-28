@@ -59,7 +59,7 @@ export default function OnboardingPage() {
             <div className="border-t border-[#E8E9ED] bg-white px-4 py-4">
               <OptionButton
                 id="paula-messages"
-                displayText={t('title')}
+                displayText={t('backToMessages')}
                 onClick={() => router.replace('/chat')}
               />
             </div>

@@ -180,7 +180,7 @@ describe('AlexFlow', () => {
     expect(screen.getByText(/Sharing the article would spread an unverified claim/)).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getAllByRole('button')).toHaveLength(1);
-    fireEvent.click(screen.getByRole('button', { name: 'Messages' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Back to messages' }));
     expect(router.replace).toHaveBeenCalledWith('/chat');
     expect(useCredibilityStore.getState().credibility).toBe(5);
   });

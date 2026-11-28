@@ -111,6 +111,7 @@
     "skip": "Skip",
     "list": {
       "title": "Messages",
+      "backToMessages": "Back to messages",
       "paula": "Paula",
       "alex": "Alex",
       "newMessage": "New message",

@@ -202,7 +202,7 @@ export default function AlexFlow() {
               id="alex-back"
               displayText={
                 seenBefore
-                  ? listT('title')
+                  ? listT('backToMessages')
                   : reply && feedCompleted
                     ? feedT('viewResults')
                     : t('back')

@@ -101,6 +101,7 @@
     "skip": "تخطي",
     "list": {
       "title": "الرسائل",
+      "backToMessages": "العودة إلى الرسائل",
       "paula": "باولا",
       "alex": "أليكس",
       "newMessage": "رسالة جديدة",

@@ -101,6 +101,7 @@
     "skip": "Ignorer",
     "list": {
       "title": "Messages",
+      "backToMessages": "Retour aux messages",
       "paula": "Paula",
       "alex": "Alex",
       "newMessage": "Nouveau message",

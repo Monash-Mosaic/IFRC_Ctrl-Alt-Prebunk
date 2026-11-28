@@ -101,6 +101,7 @@
     "skip": "跳过",
     "list": {
       "title": "消息",
+      "backToMessages": "返回消息列表",
       "paula": "Paula",
       "alex": "Alex",
       "newMessage": "新消息",
