@@ -79,12 +79,20 @@ export function useFeedCompleted(posts: readonly Pick<ContentBase, 'id'>[]) {
   );
 }
 
-function isOnboardingCompleted() {
+export function isOnboardingCompleted() {
   try {
     return storage.getItem<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED) === true;
   } catch {
     return false;
   }
+}
+
+function subscribeToOnboardingCompletion(listener: () => void) {
+  return subscribeToStorageKeys([STORAGE_KEYS.ONBOARDING_COMPLETED], listener);
+}
+
+export function useOnboardingCompleted() {
+  return useSyncExternalStore(subscribeToOnboardingCompletion, isOnboardingCompleted, () => false);
 }
 
 /**
@@ -98,10 +106,7 @@ export function isQuizInProgress() {
 
 function subscribeToQuizProgress(listener: () => void) {
   const unsubscribeGame = subscribeToSavedProgress(listener);
-  const unsubscribeOnboarding = subscribeToStorageKeys(
-    [STORAGE_KEYS.ONBOARDING_COMPLETED],
-    listener
-  );
+  const unsubscribeOnboarding = subscribeToOnboardingCompletion(listener);
   return () => {
     unsubscribeGame();
     unsubscribeOnboarding();

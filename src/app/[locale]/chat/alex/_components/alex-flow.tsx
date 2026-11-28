@@ -1,19 +1,18 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import BotTextMessage from '../../onboarding/_components/bot-text-message';
 import UserTextMessage from '../../onboarding/_components/user-text-message';
 import TypingMessage from '../../onboarding/_components/typing-message';
 import OptionButton from '../../onboarding/_components/option-button';
+import ChatExitButton from '../../_components/chat-exit-button';
 import { CHAT_USERS } from '../../_constants/users';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
 import PrebunkingModal from '@/components/newfeeds/prebunking-modal';
 import type { AlexReply } from '@/lib/local-storage';
 import { useAlexChat } from '@/lib/use-alex-chat';
-import { useRouter } from '@/i18n/routing';
-import { isPersistedGameCompleted, useFeedCompleted, useGameCompleted } from '@/lib/use-game-store';
-import CONTENTS from '@/contents';
+import { isPersistedGameCompleted, useGameCompleted } from '@/lib/use-game-store';
 
 const TYPING_MS = 1000;
 
@@ -27,8 +26,6 @@ function formatSentAt(date: Date) {
 export default function AlexFlow() {
   const t = useTranslations('chat.alex');
   const feedT = useTranslations('feed');
-  const locale = useLocale() as keyof typeof CONTENTS;
-  const router = useRouter();
   const [alexChat, setAlexChat, ready] = useAlexChat();
   const reply = alexChat.reply;
   const scored = useRef(false);
@@ -40,7 +37,6 @@ export default function AlexFlow() {
   const endRef = useRef<HTMLDivElement>(null);
   const { addPoints, increaseCredibility, decreaseCredibility } = useCredibilityStore();
   const gameOver = useGameCompleted();
-  const feedCompleted = useFeedCompleted(CONTENTS[locale].contentList);
   const canReply = alexChat.notified && !gameOver && !reply;
   const alex = CHAT_USERS.alex;
 
@@ -92,7 +88,7 @@ export default function AlexFlow() {
     showRightOutcome ||
     (reply === 'wrong' && !wrongPopupOpen && (seenBefore || justReplied));
 
-  if (showSendAgain && sentAt === null) {
+  if (showSendAgain && !seenBefore && sentAt === null) {
     setSentAt(formatSentAt(new Date()));
   }
 
@@ -100,7 +96,7 @@ export default function AlexFlow() {
     return (
       <div className="w-full space-y-4 p-4 text-center">
         <p>{feedT('alexUnavailable')}</p>
-        <OptionButton id="alex-back" displayText={t('back')} onClick={() => router.replace('/')} />
+        <ChatExitButton id="alex-back" />
       </div>
     );
   }
@@ -121,7 +117,7 @@ export default function AlexFlow() {
         {showSendAgain && (
           <UserTextMessage
             displayText={t('sendAgain')}
-            sentAt={showLink ? (sentAt ?? undefined) : undefined}
+            sentAt={showLink && !seenBefore ? (sentAt ?? undefined) : undefined}
           />
         )}
         {showLinkTyping && <TypingMessage senderName={alex.name} senderAvatar={alex.avatar} />}
@@ -142,7 +138,10 @@ export default function AlexFlow() {
           />
         )}
         {reply && (
-          <UserTextMessage displayText={t(reply === 'right' ? 'replyRight' : 'replyWrong')} />
+          <UserTextMessage
+            displayText={t(reply === 'right' ? 'replyRight' : 'replyWrong')}
+            isIncorrect={reply === 'wrong'}
+          />
         )}
         {reply === 'right' && justReplied && !outcomeReady && (
           <TypingMessage senderName={alex.name} senderAvatar={alex.avatar} />
@@ -158,6 +157,20 @@ export default function AlexFlow() {
               senderName={alex.name}
               senderAvatar={alex.avatar}
               displayText={t('correctBody')}
+            />
+          </>
+        )}
+        {seenBefore && reply === 'wrong' && (
+          <>
+            <BotTextMessage
+              senderName={alex.name}
+              senderAvatar={alex.avatar}
+              displayText={t('wrongTitle')}
+            />
+            <BotTextMessage
+              senderName={alex.name}
+              senderAvatar={alex.avatar}
+              displayText={t('wrongBody')}
             />
           </>
         )}
@@ -180,11 +193,7 @@ export default function AlexFlow() {
                 />
               </>
             )}
-            <OptionButton
-              id="alex-back"
-              displayText={reply && feedCompleted ? feedT('viewResults') : t('back')}
-              onClick={() => router.replace('/')}
-            />
+            <ChatExitButton id="alex-back" />
           </div>
         </div>
       )}

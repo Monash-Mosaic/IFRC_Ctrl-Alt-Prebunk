@@ -109,11 +109,13 @@
     "illustrationAlt": "Network of people and social media connections",
     "startOnboarding": "Start onboarding chat with Paula",
     "skip": "Skip",
+    "backToFeed": "Back to the feed",
     "list": {
       "title": "Messages",
       "paula": "Paula",
       "alex": "Alex",
       "newMessage": "New message",
+      "onboardingComplete": "Onboarding complete",
       "busy": "Busy"
     },
     "alex": {
@@ -127,8 +129,7 @@
       "correctBody": "The article uses conspiratorial language: it claims politicians are secretly diverting disaster relief funds without showing evidence. Before sharing, look for independent reporting or official records that support the claim. If you can't verify it, don't pass it on.",
       "wrongTitle": "Not quite",
       "wrongBody": "Sharing the article would spread an unverified claim. Alex’s message describes a secret plot without offering evidence. Check independent reporting or official records before sharing. If you can’t verify the claim, don’t pass it on.",
-      "notification": "Alex sent you a message",
-      "back": "Back to the feed"
+      "notification": "Alex sent you a message"
     },
     "onboarding": {
       "step1": {

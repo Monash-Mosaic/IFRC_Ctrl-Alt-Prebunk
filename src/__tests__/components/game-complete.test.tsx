@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import GameComplete, {OUTCOME_LABELS, OUTCOME_MESSAGES} from '@/components/game-complete';
+import { useCredibilityStore } from '@/lib/use-credibility-store';
 
 const mockToPng = jest.fn();
 const mockToBlob = jest.fn();
@@ -45,6 +46,40 @@ describe('GameComplete', () => {
     expect(
       screen.getByRole('link', { name: 'Learn about Solferino Academy' }),
     ).toHaveAttribute('href', 'https://solferinoacademy.com/');
+  });
+
+  it('shows the final credibility from the game store', () => {
+    const originalCredibility = useCredibilityStore.getState();
+    useCredibilityStore.setState({ credibility: 0, initialCredibility: 3 });
+
+    try {
+      render(<GameComplete correctAnswers={2} totalQuestions={7} restartGame={jest.fn()} />);
+
+      const meter = screen.getByRole('meter', { name: 'Final credibility' });
+      expect(meter).toHaveAttribute('value', '0');
+      expect(meter).toHaveAttribute('max', '3');
+      expect(screen.queryByText('0/3')).not.toBeInTheDocument();
+    } finally {
+      useCredibilityStore.setState(originalCredibility);
+    }
+  });
+
+  it('opens and closes photo credits with the seven source links', async () => {
+    const user = userEvent.setup();
+    render(<GameComplete correctAnswers={2} totalQuestions={7} restartGame={jest.fn()} />);
+
+    await user.click(screen.getByRole('button', { name: 'Photo credits' }));
+
+    expect(screen.getByRole('heading', { name: 'Photo credits' })).toBeInTheDocument();
+    expect(screen.getAllByRole('listitem')).toHaveLength(7);
+    expect(screen.getByRole('link', { name: 'IFRC' })).toHaveAttribute(
+      'href',
+      'https://www.ifrc.org/article/el-nino-what-it-and-what-does-it-mean-disasters'
+    );
+    expect(screen.getByRole('link', { name: 'Open Peeps' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('heading', { name: 'Photo credits' })).not.toBeInTheDocument();
   });
 
   it('displays the correct outcome label and message for different scores', () => {

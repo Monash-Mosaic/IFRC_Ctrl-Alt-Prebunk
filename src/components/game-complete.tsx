@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
+import PhotoCreditsModal from '@/components/photo-credits-modal';
 import ShareProgressModal from '@/components/share-progress-modal';
 import { getSimulationOutcome } from '@/lib/simulation-outcome';
+import { useCredibilityStore } from '@/lib/use-credibility-store';
 
 export { OUTCOME_LABELS, OUTCOME_MESSAGES } from '@/lib/simulation-outcome';
 
@@ -19,11 +21,14 @@ export default function GameComplete({
   restartGame,
 }: GameCompleteProps) {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isPhotoCreditsOpen, setIsPhotoCreditsOpen] = useState(false);
+  const credibility = useCredibilityStore((state) => state.credibility);
+  const maxCredibility = useCredibilityStore((state) => Math.max(state.initialCredibility, 1));
   const outcome = getSimulationOutcome(correctAnswers, totalQuestions);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof Modal.setAppElement === 'function') {
-      Modal.setAppElement(document.body);
+      Modal.setAppElement(document.getElementById('root') ?? document.body);
     }
   }, []);
 
@@ -45,7 +50,19 @@ export default function GameComplete({
           </p>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4">
+        <div className="mx-auto mt-6 max-w-xs text-sm font-semibold text-[#011E41]">
+          <p className="text-start">Final credibility</p>
+          <meter
+            aria-label="Final credibility"
+            min={0}
+            max={maxCredibility}
+            value={credibility}
+            optimum={maxCredibility}
+            className="mt-2 block h-2.5 w-full overflow-hidden rounded-full bg-white [&::-moz-meter-bar]:rounded-full [&::-moz-meter-bar]:bg-[#23D99A] [&::-webkit-meter-bar]:rounded-full [&::-webkit-meter-bar]:border-0 [&::-webkit-meter-bar]:bg-white [&::-webkit-meter-optimum-value]:rounded-full [&::-webkit-meter-optimum-value]:bg-[#23D99A]"
+          />
+        </div>
+
+        <div className="mt-8 flex flex-col gap-4">
           <a
             href="https://wdr26.org/en"
             target="_blank"
@@ -95,6 +112,17 @@ export default function GameComplete({
         by Pablo Stanley
       </p>
 
+      <div className="max-w-sm">
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          onClick={() => setIsPhotoCreditsOpen(true)}
+          className="min-h-11 cursor-pointer px-3 text-xs text-slate-600 underline underline-offset-2 hover:text-[#011E41] focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          Photo credits
+        </button>
+      </div>
+      <PhotoCreditsModal isOpen={isPhotoCreditsOpen} onClose={() => setIsPhotoCreditsOpen(false)} />
       <ShareProgressModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}

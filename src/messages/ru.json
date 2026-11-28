@@ -99,11 +99,13 @@
     "illustrationAlt": "Сеть людей и социальных связей",
     "startOnboarding": "Начать чат-введение с Полой",
     "skip": "Пропустить",
+    "backToFeed": "Вернуться к ленте",
     "list": {
       "title": "Сообщения",
       "paula": "Паула",
       "alex": "Алекс",
       "newMessage": "Новое сообщение",
+      "onboardingComplete": "Обучение завершено",
       "busy": "Занят"
     },
     "alex": {
@@ -117,8 +119,7 @@
       "correctBody": "The article uses conspiratorial language: it claims politicians are secretly diverting disaster relief funds without showing evidence. Before sharing, look for independent reporting or official records that support the claim. If you can't verify it, don't pass it on.",
       "wrongTitle": "Not quite",
       "wrongBody": "Sharing the article would spread an unverified claim. Alex’s message describes a secret plot without offering evidence. Check independent reporting or official records before sharing. If you can’t verify the claim, don’t pass it on.",
-      "notification": "Alex sent you a message",
-      "back": "Back to the feed"
+      "notification": "Alex sent you a message"
     },
     "onboarding": {
       "step1": {

@@ -99,7 +99,7 @@ it('resumes the five-question feed and counts both new scored posts before showi
   expect(thread.getByText('yourReply')).toBeInTheDocument();
   expect(thread.getByRole('presentation')).toHaveAttribute(
     'src',
-    '/images/example/player-comment-avatar.webp'
+    '/images/example/player-comment-avatar.svg'
   );
   const feedbackReply = thread.getByRole('heading', { name: 'feedback' }).closest('article');
   expect(feedbackReply).toHaveFocus();

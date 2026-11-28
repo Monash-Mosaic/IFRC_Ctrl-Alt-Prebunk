@@ -166,9 +166,27 @@ describe('AlexFlow', () => {
     showReplyButtons();
 
     expect(screen.getByText('Alex’s question is unavailable.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Back to the feed' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'View results' }));
+    expect(router.replace).toHaveBeenCalledWith('/');
     expect(screen.queryByRole('button', { name: /Wait, Alex. The article claims/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /That's huge if it's true/ })).not.toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(0);
+  });
+
+  it.each([
+    [false, 'Back to the feed'],
+    [true, 'View results'],
+  ])('keeps Alex history read-only when the feed is complete=%s', (feedFinished, exitLabel) => {
+    if (feedFinished) completeFeed();
+    setAlex({ notified: true, reply: 'wrong' });
+    render(<AlexFlow />);
+
+    expect(screen.getByText(/That's huge if it's true/)).toBeInTheDocument();
+    expect(screen.getByText(/Sharing the article would spread an unverified claim/)).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: exitLabel }));
+    expect(router.replace).toHaveBeenCalledWith('/');
+    expect(useCredibilityStore.getState().credibility).toBe(5);
   });
 });
