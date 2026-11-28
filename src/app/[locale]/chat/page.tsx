@@ -6,7 +6,7 @@ import AlexAvatar from './onboarding/_icons/alex-avatar';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/routing';
 import { useAlexChat } from '@/lib/use-alex-chat';
-import { useGameCompleted } from '@/lib/use-game-store';
+import { useGameCompleted, useQuizInProgress } from '@/lib/use-game-store';
 
 interface ChatListItemProps {
   name: string;
@@ -14,6 +14,7 @@ interface ChatListItemProps {
   subText: string;
   hasSubText?: boolean;
   isDisabled?: boolean;
+  isComplete?: boolean;
   href: '/chat/onboarding' | '/chat/alex';
 }
 
@@ -23,29 +24,44 @@ function ChatListItem({
   subText,
   hasSubText = false,
   isDisabled = false,
+  isComplete = false,
   href,
 }: ChatListItemProps) {
-  return (
-    <Link
-      className={cn(
-        'flex items-center justify-between w-full rounded-3xl border border-dashed border-[#011E41] bg-[#E4EAF3] px-6 py-4 min-h-[60px]',
-        isDisabled && 'opacity-50 cursor-not-allowed'
-      )}
-      href={href}
-      onClick={(e) => {
-        if (isDisabled) e.preventDefault();
-      }}
-    >
-      <div className="flex items-center gap-3">
+  const className = cn(
+    'flex items-center justify-between w-full gap-3 rounded-3xl border border-dashed border-[#011E41] bg-[#E4EAF3] px-6 py-4 min-h-[60px]',
+    (isDisabled || isComplete) && 'cursor-not-allowed',
+    isDisabled && 'opacity-50'
+  );
+  const content = (
+    <>
+      <span className="flex items-center gap-3">
         <span className="h-10 w-10 flex items-center justify-center">{avatar}</span>
         <span className="text-lg font-bold text-[#011E41]">{name}</span>
-      </div>
+      </span>
       {hasSubText && (
-        <div className="right-6 flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-red-500"></span>
-          <span className="text-sm font-medium text-red-600">{subText}</span>
-        </div>
+        <span className="flex items-center gap-2 text-end">
+          {!isComplete && <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" />}
+          <span className={cn('text-sm font-medium', isComplete ? 'text-slate-600' : 'text-red-600')}>
+            {subText}
+          </span>
+        </span>
       )}
+    </>
+  );
+
+  return isComplete ? (
+    <button type="button" className={className} disabled>
+      {content}
+    </button>
+  ) : (
+    <Link
+      className={className}
+      href={href}
+      onClick={(event) => {
+        if (isDisabled) event.preventDefault();
+      }}
+    >
+      {content}
     </Link>
   );
 }
@@ -54,6 +70,7 @@ export default function ChatPage() {
   const t = useTranslations('chat.list');
   const [alexChat] = useAlexChat();
   const gameCompleted = useGameCompleted();
+  const quizInProgress = useQuizInProgress();
   const alexOpen = alexChat.notified || alexChat.reply !== null;
 
   return (
@@ -66,8 +83,9 @@ export default function ChatPage() {
           <ChatListItem
             name={t('paula')}
             avatar={<PaulaAvatar />}
-            subText={t('newMessage')}
-            hasSubText={true}
+            subText={quizInProgress ? t('onboardingComplete') : t('newMessage')}
+            hasSubText
+            isComplete={quizInProgress}
             href="/chat/onboarding"
           />
           {(!gameCompleted || alexChat.reply) && (
