@@ -171,4 +171,17 @@ describe('AlexFlow', () => {
     expect(screen.queryByRole('button', { name: /That's huge if it's true/ })).not.toBeInTheDocument();
     expect(useCredibilityStore.getState().points).toBe(0);
   });
+
+  it('shows the saved wrong reply and feedback in read-only history', () => {
+    setAlex({ notified: true, reply: 'wrong' });
+    render(<AlexFlow />);
+
+    expect(screen.getByText(/That's huge if it's true/)).toBeInTheDocument();
+    expect(screen.getByText(/Sharing the article would spread an unverified claim/)).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Messages' }));
+    expect(router.replace).toHaveBeenCalledWith('/chat');
+    expect(useCredibilityStore.getState().credibility).toBe(5);
+  });
 });

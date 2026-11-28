@@ -196,6 +196,7 @@ export default function HomeContent() {
     // FR9: Restart simulation also returns the player to the default username and avatar.
     resetProfile();
     storage.removeItem(STORAGE_KEYS.CHAT_ONBOARDING_STATE);
+    storage.removeItem(STORAGE_KEYS.PAULA_CHAT_HISTORY);
     setOnboardingCompleted(false);
     alexNoticeSent.current = false;
     setAlexChat(defaultAlexChatState);

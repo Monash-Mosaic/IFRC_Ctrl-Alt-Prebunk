@@ -2,7 +2,7 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@/test-utils/test-utils';
 import OnboardingFlow from '@/app/[locale]/chat/onboarding/_components/onboarding-flow';
 import { useCredibilityStore } from '@/lib/use-credibility-store';
-import { STORAGE_KEYS } from '@/lib/local-storage';
+import { STORAGE_KEYS, storage } from '@/lib/local-storage';
 import CONTENTS from '@/contents';
 import { ContentType } from '@/contents/en';
 
@@ -223,6 +223,15 @@ describe('OnboardingFlow practice question', () => {
     expect(mockMoveToNextQuestion).not.toHaveBeenCalled();
     expect(mockReplace).toHaveBeenCalledWith('/');
     expect(window.localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED)).toBe('true');
+    expect(storage.getItem(STORAGE_KEYS.PAULA_CHAT_HISTORY)).toMatchObject({
+      messages: [
+        { sender: 'paula', text: 'step1.greeting' },
+        { sender: 'user', text: 'step1.option3' },
+        { sender: 'paula', text: 'practice.explanation' },
+      ],
+      practiceAnswer: 'opt-a',
+      finalReply: 'step3.option1',
+    });
   });
 
   it('returns to locale home without starting the quiz', () => {
@@ -243,5 +252,6 @@ describe('OnboardingFlow practice question', () => {
     expect(mockReplace).toHaveBeenCalledWith('/');
     expect(window.localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED)).not.toBe('true');
     expect(window.localStorage.getItem(STORAGE_KEYS.CHAT_ONBOARDING_STATE)).toBeNull();
+    expect(window.localStorage.getItem(STORAGE_KEYS.PAULA_CHAT_HISTORY)).toBeNull();
   });
 });

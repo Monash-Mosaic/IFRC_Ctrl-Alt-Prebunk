@@ -3,6 +3,7 @@
  */
 export const STORAGE_KEYS = {
   CHAT_ONBOARDING_STATE: 'chat_onboarding_state',
+  PAULA_CHAT_HISTORY: 'paula_chat_history',
   ONBOARDING_COMPLETED: 'onboarding_completed',
   GAME_STATE: 'game_state',
   ALEX_CHAT: 'alex_chat',

@@ -26,6 +26,7 @@ function formatSentAt(date: Date) {
 
 export default function AlexFlow() {
   const t = useTranslations('chat.alex');
+  const listT = useTranslations('chat.list');
   const feedT = useTranslations('feed');
   const locale = useLocale() as keyof typeof CONTENTS;
   const router = useRouter();
@@ -92,7 +93,7 @@ export default function AlexFlow() {
     showRightOutcome ||
     (reply === 'wrong' && !wrongPopupOpen && (seenBefore || justReplied));
 
-  if (showSendAgain && sentAt === null) {
+  if (showSendAgain && !seenBefore && sentAt === null) {
     setSentAt(formatSentAt(new Date()));
   }
 
@@ -121,7 +122,7 @@ export default function AlexFlow() {
         {showSendAgain && (
           <UserTextMessage
             displayText={t('sendAgain')}
-            sentAt={showLink ? (sentAt ?? undefined) : undefined}
+            sentAt={showLink && !seenBefore ? (sentAt ?? undefined) : undefined}
           />
         )}
         {showLinkTyping && <TypingMessage senderName={alex.name} senderAvatar={alex.avatar} />}
@@ -142,7 +143,10 @@ export default function AlexFlow() {
           />
         )}
         {reply && (
-          <UserTextMessage displayText={t(reply === 'right' ? 'replyRight' : 'replyWrong')} />
+          <UserTextMessage
+            displayText={t(reply === 'right' ? 'replyRight' : 'replyWrong')}
+            isIncorrect={reply === 'wrong'}
+          />
         )}
         {reply === 'right' && justReplied && !outcomeReady && (
           <TypingMessage senderName={alex.name} senderAvatar={alex.avatar} />
@@ -158,6 +162,20 @@ export default function AlexFlow() {
               senderName={alex.name}
               senderAvatar={alex.avatar}
               displayText={t('correctBody')}
+            />
+          </>
+        )}
+        {seenBefore && reply === 'wrong' && (
+          <>
+            <BotTextMessage
+              senderName={alex.name}
+              senderAvatar={alex.avatar}
+              displayText={t('wrongTitle')}
+            />
+            <BotTextMessage
+              senderName={alex.name}
+              senderAvatar={alex.avatar}
+              displayText={t('wrongBody')}
             />
           </>
         )}
@@ -182,8 +200,14 @@ export default function AlexFlow() {
             )}
             <OptionButton
               id="alex-back"
-              displayText={reply && feedCompleted ? feedT('viewResults') : t('back')}
-              onClick={() => router.replace('/')}
+              displayText={
+                seenBefore
+                  ? listT('title')
+                  : reply && feedCompleted
+                    ? feedT('viewResults')
+                    : t('back')
+              }
+              onClick={() => router.replace(seenBefore ? '/chat' : '/')}
             />
           </div>
         </div>

@@ -1,32 +1,23 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { initialContextValue, useOnboardingMachine } from '../_machines/onboarding-machine';
-import UserTextMessage from './user-text-message';
-import BotTextMessage from './bot-text-message';
 import OptionButton from './option-button';
-import type {
-  Message,
-  OnboardingOptionEvent,
-  OnboardingContext,
-} from '../_machines/onboarding-machine';
-import PostMessage from '@/components/post-message';
-import POSTS from '../_posts';
+import type { OnboardingOptionEvent, OnboardingContext } from '../_machines/onboarding-machine';
+import OnboardingConversation, { practiceItem } from './onboarding-conversation';
+import type { OnboardingHistory } from '../_lib/onboarding-history';
 import { STORAGE_KEYS, getStorage, storage as localStorage } from '@/lib/local-storage';
-import TypingMessage from './typing-message';
-import { CHAT_USERS } from '../../_constants/users';
 import { useRouter } from '@/i18n/routing';
-import CONTENTS from '@/contents';
-import { type MCQContent } from '@/contents/en';
 import MCQPostMessage from '@/components/newfeeds/mcq-post-message';
-import PlayerAvatar from '@/components/player-avatar';
-import { useProfileStore } from '@/lib/use-profile-store';
 
 interface StoredOnboardingState {
   context: OnboardingContext | undefined;
   state: string | undefined;
+  practiceAnswer?: string | null;
 }
+
+const storage = getStorage<StoredOnboardingState>(STORAGE_KEYS.CHAT_ONBOARDING_STATE);
 
 const VALID_ONBOARDING_STATES = [
   'initial',
@@ -38,16 +29,10 @@ const VALID_ONBOARDING_STATES = [
 ];
 
 export default function OnboardingFlow() {
-  const locale = useLocale();
   const t = useTranslations('chat.onboarding');
-  const profileT = useTranslations('profile');
-  const { username, avatarId } = useProfileStore();
-  const playerName = username || profileT('defaultUsername');
-  const storage = getStorage<StoredOnboardingState>(STORAGE_KEYS.CHAT_ONBOARDING_STATE);
-  const persisted = storage.getItem({
-    context: initialContextValue,
-    state: 'initial',
-  });
+  const [persisted] = useState(() =>
+    storage.getItem({ context: initialContextValue, state: 'initial' })
+  );
   // Guard against stale persisted state referencing a state that no longer exists in the
   // machine (e.g. the removed `example` state) — fall back to a fresh initial state instead
   // of crashing when the machine library looks up an unknown state name.
@@ -60,24 +45,32 @@ export default function OnboardingFlow() {
   );
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const post = POSTS[locale];
-
-  const practiceItem = CONTENTS.en.practiceContent['example-mcq'];
-  const practiceCoachingKey = 'practice.mcq';
-
-  const [exampleAnswer, setExampleAnswer] = useState<string | null>(null);
+  const [exampleAnswer, setExampleAnswer] = useState(persisted.practiceAnswer ?? null);
   const isPracticeState = state.value === 'practice' || state.value === 'example-handoff';
 
   useEffect(() => {
     if (isCompleted) {
+      const history: OnboardingHistory = {
+        messages: state.context.messages.filter((message) => message.type !== 'typing'),
+        practiceAnswer: exampleAnswer,
+        finalReply:
+          'optionText' in state.event && typeof state.event.optionText === 'string'
+            ? state.event.optionText
+            : undefined,
+      };
+      localStorage.setItem(STORAGE_KEYS.PAULA_CHAT_HISTORY, history);
       storage.removeItem();
-    } else {
-      storage.setItem({
-        context: state.context,
-        state: state.value,
-      });
+      localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
+      router.replace('/');
+      return;
     }
-  }, [storage, state, isCompleted]);
+
+    storage.setItem({
+      context: state.context,
+      state: state.value,
+      practiceAnswer: exampleAnswer,
+    });
+  }, [state, isCompleted, exampleAnswer, router]);
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
@@ -97,14 +90,6 @@ export default function OnboardingFlow() {
     router.replace('/');
   };
 
-  // Move navigation and localStorage set to useEffect
-  useEffect(() => {
-    if (isCompleted) {
-      localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
-      router.replace('/');
-    }
-  }, [isCompleted, router]);
-
   const handlePracticeAnswer = (_postId: string, answer: string) => {
     if (exampleAnswer) return;
     setExampleAnswer(answer);
@@ -123,97 +108,26 @@ export default function OnboardingFlow() {
     <div className="flex h-full flex-col w-full">
       {/* Messages Container */}
       <div className="flex-1 space-y-4 overflow-y-auto px-4 py-6">
-        {state.context.messages.map((message: Message) => {
-          const sender = CHAT_USERS[message.sender as keyof typeof CHAT_USERS];
-          switch (message.type) {
-            case 'text':
-              return message.sender === 'user' ? (
-                <UserTextMessage
-                  key={message.id}
-                  displayText={t(message.text)}
-                  senderAvatar={<PlayerAvatar avatarId={avatarId} name={playerName} size={40} />}
-                />
-              ) : (
-                <BotTextMessage
-                  key={message.id}
-                  senderName={sender.name}
-                  senderAvatar={sender.avatar}
-                  displayText={t(
-                    message.text === 'practice.explanation' ? practiceCoachingKey : message.text
-                  )}
-                />
-              );
-            case 'post':
-              return (
-                <PostMessage
-                  key={message.id}
-                  user={CHAT_USERS[message.sender as keyof typeof CHAT_USERS]}
-                  content={post[message.post.contentKey as keyof typeof post] as React.ReactNode}
-                  mediaUrl={message.post.mediaUrl}
-                  mediaType={message.post.mediaType}
-                />
-              );
-            case 'typing':
-              return (
-                <TypingMessage
-                  key={message.id}
-                  senderName={sender.name}
-                  senderAvatar={sender.avatar}
-                />
-              );
-            default:
-              return null;
-          }
-        })}
-
-        {/* Interactive practice question: answerable in chat */}
-        {isPracticeState && !state.context.typing && (
-          <div className="mb-4">
-            <MCQPostMessage
-              postId={practiceItem.id}
-              user={(practiceItem as MCQContent).post.user}
-              content={(practiceItem as MCQContent).post.content}
-              mediaUrl={(practiceItem as MCQContent).post.mediaUrl}
-              mediaType={(practiceItem as MCQContent).post.mediaType}
-              options={(practiceItem as MCQContent).options}
-              correctOptionId={(practiceItem as MCQContent).correctOptionId}
-              answer={exampleAnswer}
-              onAnswer={handlePracticeAnswer}
-            />
-          </div>
-        )}
-
-        {isPracticeState &&
-          exampleAnswer &&
-          (() => {
-            const isCorrect = exampleAnswer === (practiceItem as MCQContent).correctOptionId;
-            const feedback = isCorrect
-              ? practiceItem.whyCorrectAnswer
-              : practiceItem.whyIncorrectAnswer;
-            const label =
-              (practiceItem as MCQContent).options.find((o) => o.id === exampleAnswer)?.label ?? '';
-            return (
-              <>
-                <UserTextMessage displayText={label} isIncorrect={!isCorrect} />
-                <BotTextMessage
-                  senderName={CHAT_USERS.paula.name}
-                  senderAvatar={CHAT_USERS.paula.avatar}
-                  displayText={feedback.title}
-                />
-                <BotTextMessage
-                  senderName={CHAT_USERS.paula.name}
-                  senderAvatar={CHAT_USERS.paula.avatar}
-                  displayText={feedback.content}
-                />
-                <BotTextMessage
-                  senderName={CHAT_USERS.paula.name}
-                  senderAvatar={CHAT_USERS.paula.avatar}
-                  displayText={t('handoff')}
-                />
-              </>
-            );
-          })()}
-
+        <OnboardingConversation
+          messages={state.context.messages}
+          practiceAnswer={isPracticeState ? exampleAnswer : null}
+        >
+          {isPracticeState && !state.context.typing && (
+            <div className="mb-4">
+              <MCQPostMessage
+                postId={practiceItem.id}
+                user={practiceItem.post.user}
+                content={practiceItem.post.content}
+                mediaUrl={practiceItem.post.mediaUrl}
+                mediaType={practiceItem.post.mediaType}
+                options={practiceItem.options}
+                correctOptionId={practiceItem.correctOptionId}
+                answer={exampleAnswer}
+                onAnswer={handlePracticeAnswer}
+              />
+            </div>
+          )}
+        </OnboardingConversation>
         <div ref={messagesEndRef} />
       </div>
 
