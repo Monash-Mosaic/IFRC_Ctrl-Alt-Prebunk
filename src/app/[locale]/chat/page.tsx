@@ -28,15 +28,19 @@ function ChatListItem({
   href,
 }: ChatListItemProps) {
   const className = cn(
-    'flex items-center justify-between w-full gap-3 rounded-3xl border border-dashed border-[#011E41] bg-[#E4EAF3] px-6 py-4 min-h-[60px]',
-    (isDisabled || isComplete) && 'cursor-not-allowed',
-    isDisabled && 'opacity-50'
+    'flex items-center justify-between w-full gap-3 rounded-3xl border border-dashed px-6 py-4 min-h-[60px]',
+    isComplete
+      ? 'cursor-default border-slate-400 bg-slate-50'
+      : 'border-[#011E41] bg-[#E4EAF3]',
+    isDisabled && 'cursor-not-allowed opacity-50'
   );
   const content = (
     <>
       <span className="flex items-center gap-3">
         <span className="h-10 w-10 flex items-center justify-center">{avatar}</span>
-        <span className="text-lg font-bold text-[#011E41]">{name}</span>
+        <span className={cn('text-lg font-bold', isComplete ? 'text-slate-600' : 'text-[#011E41]')}>
+          {name}
+        </span>
       </span>
       {hasSubText && (
         <span className="flex items-center gap-2 text-end">

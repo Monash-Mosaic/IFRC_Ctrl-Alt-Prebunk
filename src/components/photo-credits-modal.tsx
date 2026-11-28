@@ -7,14 +7,14 @@ import Modal from 'react-modal';
 const photoCredits = [
   {
     title: 'flooding',
-    image: '/images/posts/ifrc/question-02.webp',
+    thumbnail: '/images/photo-credits/flooding.webp',
     source: 'IFRC',
     author: 'Fernando Gandarillas',
     href: 'https://www.ifrc.org/article/el-nino-what-it-and-what-does-it-mean-disasters',
   },
   {
     title: 'Debate podiums',
-    image: '/images/posts/ifrc/question-03.webp',
+    thumbnail: '/images/photo-credits/debate-podiums.webp',
     source: 'Wikimedia Commons',
     author: 'Kefr4000',
     href: 'https://commons.wikimedia.org/wiki/File:Official_podiums_at_Marienborg_2.jpg',
@@ -22,28 +22,28 @@ const photoCredits = [
   },
   {
     title: '70% sign',
-    image: '/images/posts/ifrc/question-05.webp',
+    thumbnail: '/images/photo-credits/70-percent-sign.webp',
     source: 'PxHere',
     href: 'https://pxhere.com/en/photo/1187264',
     edited: true,
   },
   {
     title: 'Glacier calving',
-    image: '/images/posts/ifrc/question-07.webp',
+    thumbnail: '/images/photo-credits/glacier-calving.webp',
     source: 'Pixabay',
     author: 'Schmid-Reportagen',
     href: 'https://pixabay.com/photos/alaska-glacier-ice-cream-calve-566722/',
   },
   {
     title: 'Drought',
-    image: '/images/posts/ifrc/question-08.webp',
+    thumbnail: '/images/photo-credits/drought.webp',
     source: 'Alabama Extension',
     author: 'Bruce Dupree',
     href: 'https://www.flickr.com/photos/alabama_extension/48832143091/',
   },
   {
     title: 'Red warning light',
-    image: '/images/posts/ifrc/question-04.webp',
+    thumbnail: '/images/photo-credits/red-warning-light.webp',
     source: 'ISO Republic',
     author: 'ISO Legacy',
     href: 'https://isorepublic.com/photo/red-light/',
@@ -51,7 +51,7 @@ const photoCredits = [
   },
   {
     title: 'Winter landscape',
-    image: '/images/example/echo-post-img.jpg',
+    thumbnail: '/images/photo-credits/winter-landscape.webp',
     source: 'Unsplash',
     author: 'Joakim Nådell',
     href: 'https://unsplash.com/photos/photo-of-green-trees-3I9QlTia9Qo',
@@ -86,9 +86,15 @@ export default function PhotoCreditsModal({
       </header>
 
       <ul className="min-h-0 divide-y divide-slate-200 overflow-y-auto overscroll-contain px-5">
-        {photoCredits.map(({ title, image, source, author, href, edited }) => (
+        {photoCredits.map(({ title, thumbnail, source, author, href, edited }) => (
           <li key={title} className="flex items-center gap-3 py-3">
-            <Image src={image} alt="" width={64} height={44} className="h-11 w-16 shrink-0 rounded-md object-cover" />
+            <Image
+              src={thumbnail}
+              alt=""
+              width={64}
+              height={44}
+              className="h-11 w-16 shrink-0 rounded-md object-cover"
+            />
             <div className="min-w-0 text-sm">
               <p className="font-semibold">{title}</p>
               <p className="text-xs leading-relaxed text-slate-700">
